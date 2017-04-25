@@ -16,6 +16,10 @@ Img.hexTargeted.src = "../client/img/hexTargeted.png";
 //Units
 Img.worker = new Image();
 Img.worker.src = "../client/img/worker.png";
+Img.soldier = new Image();
+Img.soldier.src = "../client/img/soldier.png";
+Img.mage = new Image();
+Img.mage.src = "../client/img/mage.png";
 
 //UI
 Img.uiBuildingBg = new Image();

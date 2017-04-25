@@ -273,16 +273,17 @@ checkMouseUIcollision = function(){
 //Step functions
 stepEvent = function(){
 	showUnitsUI();
+
+  //Reset training / dismissing values
+  if (!showUnitUI){
+    trainValue = [0,0,0];
+    trainDigits = [[],[],[]];
+  }
 }
 
 showUnitsUI = function(){
 	if (hexSelected !== -1){
-		if (hex[hexSelected].building !== -1){
-			showUnitUI = true;
-		}
-		else {
-			showUnitUI = false;
-		}
+		showUnitUI = true;
 	}
 	else {
 		showUnitUI = false;
@@ -325,6 +326,16 @@ input = function(){
             trainValue[trainButtonSelected] = calculateTrainValue(trainDigits, trainButtonSelected);
           }
         }
+      }
+    }
+
+    //test
+    if(event.keyCode === 8){
+      console.log("Works 1");
+      if (trainButtonSelected !== -1){
+        console.log("Works 2");
+        trainDigits[trainButtonSelected] = [];
+        trainValue[trainButtonSelected] = 0;
       }
     }
   }

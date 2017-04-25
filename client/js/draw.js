@@ -105,37 +105,44 @@ drawHexElements = function(){
 	for(var id in hex){
 		//Building
 		if (hex[id].building !== -1){
-			var xOffset = Img.hex.width/2 *0;
-			var yOffset = Img.hex.height/2 *0.5;
+			var xOffset = Img.hex.width/2 * 0;
+			var yOffset = Img.hex.height/2 * 0.6;
 			var centerX = Math.round(hex[id].x - Img.farm.width/2 - xOffset);
 			var centerY = Math.round(hex[id].y - Img.farm.height/2 + yOffset);
 			var image = selectImage(hex[id].building);
 			ctx.drawImage(image,0,0,image.width,image.height,centerX,centerY,image.width,image.height);
 		}
 
-		//Workers
+		//Units
 		if (hex[id].workers !== 0){
-			var xOffset = Img.hex.width/2 *0.5;
-			var yOffset = Img.hex.height/2 *0;
-			var centerX = Math.round(hex[id].x - Img.worker.width/2 - xOffset);
-			var centerY = Math.round(hex[id].y - Img.worker.height/2 + yOffset);;
-			ctx.drawImage(Img.worker,0,0,Img.worker.width,Img.worker.height,centerX,centerY,Img.worker.width,Img.worker.height);
-
-			/*
-			//Pouze test!
-			var xOffset = Img.hex.width/2 *0;
-			var yOffset = Img.hex.height/2 *0.5;
-			var centerX = Math.round(hex[id].x - Img.farm.width/2 - xOffset);
-			var centerY = Math.round(hex[id].y - Img.farm.height/2 + yOffset);
-			ctx.drawImage(Img.farm,0,0,Img.farm.width,Img.farm.height,centerX,centerY,Img.farm.width,Img.farm.height);
-			*/
+			drawEachUnit("worker", 0.5, 0.1, id);
 		}
-
-		//Soldiers
-
-
-		//Mages
+		if (hex[id].soldiers !== 0){
+			drawEachUnit("soldier", 0, -0.2, id);
+		}
+		if (hex[id].mages !== 0){
+			drawEachUnit("mage", -0.5, 0.1, id);
+		}
 	}
+}
+
+drawEachUnit = function(type, xOff, yOff, id){
+	//Image
+	var xOffset = Img.hex.width/2 *xOff;
+	var yOffset = Img.hex.height/2 * yOff;
+	var centerX = Math.round(hex[id].x - Img[type].width/2 - xOffset);
+	var centerY = Math.round(hex[id].y - Img[type].height/2 + yOffset);;
+	ctx.drawImage(Img[type],0,0,Img[type].width,Img[type].height,centerX,centerY,Img[type].width,Img[type].height);
+
+	//Text
+	ctx.font = "11px Arial";
+	ctx.fillStyle = "black";
+	ctx.textAlign="center";
+	ctx.textBaseline="middle";
+	var unitVarName = type + "s";
+	var x = centerX + Img[type].width/2;
+	var y = centerY + Img[type].width/2;
+	ctx.fillText(hex[id][unitVarName], x, y);
 }
 
 drawUI = function(){
@@ -149,10 +156,10 @@ drawUI = function(){
     //Titles
     ctx.font="30px Arial";
     ctx.fillStyle = "black";
-    ctx.textAlign="left";
+    ctx.textAlign="center";
     ctx.textBaseline="top";
-    ctx.fillText("Train",200,5);
-    ctx.fillText("Dismiss",380,5);
+    ctx.fillText("Train",248,5);
+    ctx.fillText("Dismiss",470,5);
 
     for(var key in uiHidden){
 			//Dismiss
@@ -168,32 +175,43 @@ drawUI = function(){
         }
 			}
 		}
+
+		//Show text if units can't be trained in this land
+		if (!checkIfCanTrain(hexSelected)){
+			ctx.font="24px Arial";
+	    ctx.fillStyle = "black";
+	    ctx.textAlign="center";
+	    ctx.textBaseline="top";
+			ctx.fillText("Cannot train here!",250,50);
+		}
 	}
 }
 
 drawTrainButtonsText = function(key){
-  if (uiHidden[key].name === "sendButton"){
-    ctx.font = "18px Arial";
-    ctx.fillStyle = "black";
-    ctx.textAlign="center";
-    ctx.textBaseline="middle";
-    var x = uiHidden[key].x + (uiHidden[key].image.width / 2);
-    var y = uiHidden[key].y + (uiHidden[key].image.height / 2);
-    ctx.fillText("OK",x,y);
-  }
-
-  if (uiHidden[key].name === "writeButton"){
-		if (uiHidden[key].id !== trainButtonSelected || trainValue[uiHidden[key].id] !== 0){
-			ctx.font = "18px Arial";
+	if ((uiHidden[key].id === 0 && checkIfCanTrain(hexSelected)) || uiHidden[key].id !== 0){
+		if (uiHidden[key].name === "sendButton"){
+	    ctx.font = "18px Arial";
 	    ctx.fillStyle = "black";
 	    ctx.textAlign="center";
 	    ctx.textBaseline="middle";
 	    var x = uiHidden[key].x + (uiHidden[key].image.width / 2);
 	    var y = uiHidden[key].y + (uiHidden[key].image.height / 2);
-	    var value = trainValue[uiHidden[key].id];
-	    ctx.fillText(value,x,y);
-		}
-  }
+	    ctx.fillText("OK",x,y);
+	  }
+
+	  if (uiHidden[key].name === "writeButton"){
+			if (uiHidden[key].id !== trainButtonSelected || trainValue[uiHidden[key].id] !== 0){
+				ctx.font = "18px Arial";
+		    ctx.fillStyle = "black";
+		    ctx.textAlign="center";
+		    ctx.textBaseline="middle";
+		    var x = uiHidden[key].x + (uiHidden[key].image.width / 2);
+		    var y = uiHidden[key].y + (uiHidden[key].image.height / 2);
+		    var value = trainValue[uiHidden[key].id];
+		    ctx.fillText(value,x,y);
+			}
+	  }
+	}
 }
 
 drawUIhover = function(){
@@ -208,7 +226,7 @@ drawUIhover = function(){
 
     //Hidden
     var keyHidden = mouseHiddenUIcolliding;
-    if (keyHidden !== -1){
+    if (keyHidden !== -1 && showUnitUI){
       if (uiHidden[keyHidden].name === "writeButton")
         ctx.drawImage(Img.writeButtonHover, 0, 0, Img.writeButtonHover.width, Img.writeButtonHover.height, uiHidden[keyHidden].x, uiHidden[keyHidden].y, Img.writeButtonHover.width, Img.writeButtonHover.height);
 				if (uiHidden[keyHidden].name === "sendButton")
