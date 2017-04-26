@@ -71,7 +71,7 @@ selectHexagon = function(){
   		}
 
   		if (mouseUIcolliding !== -1){
-  			if (ui[mouseUIcolliding].name === "trainBar"){			//Označení se nezruší, pokud klikne na train bar (pokud chce trénovat nebo propustit jednotky)
+  			if (ui["main"][mouseUIcolliding].name === "trainBar"){			//Označení se nezruší, pokud klikne na train bar (pokud chce trénovat nebo propustit jednotky)
   				unselect = false;
   			}
   		}
@@ -87,7 +87,7 @@ placeBuilding = function(){
   if (playing){
   	//Pokud klikne na budovu v UI, budovu tím vybere.
   	if (mouseUIcolliding !== -1){
-  		if (ui[mouseUIcolliding].name === "building"){
+  		if (ui["main"][mouseUIcolliding].name === "building"){
   			placingBuilding = mouseUIcolliding;
   		}
       else {
@@ -112,10 +112,10 @@ placeBuilding = function(){
 selectTrainButton = function(){
   trainButtonSelected = -1;
   if (mouseHiddenUIcolliding !== -1){
-    for(var key in uiHidden){
-      if (key == mouseHiddenUIcolliding && uiHidden[key].name === "writeButton"){
-        if ((uiHidden[key].id !== 0) || (uiHidden[key].id === 0 && checkIfCanTrain(hexSelected))){
-          trainButtonSelected = uiHidden[key].id;
+    for(var key in ui["trainingUnits"]){
+      if (key == mouseHiddenUIcolliding && ui["trainingUnits"][key].name === "writeButton"){
+        if ((ui["trainingUnits"][key].id !== 0) || (ui["trainingUnits"][key].id === 0 && checkIfCanTrain(hexSelected))){
+          trainButtonSelected = ui["trainingUnits"][key].id;
         }
       }
     }
@@ -124,15 +124,15 @@ selectTrainButton = function(){
 
 unitsSendButton = function(){
   if (showUnitUI && hexSelected !== -1){
-    for(var i in uiHidden){
+    for(var i in ui["trainingUnits"]){
       if (mouseHiddenUIcolliding === i){
-        if (uiHidden[i].name === "sendButton"){
+        if (ui["trainingUnits"][i].name === "sendButton"){
           //Train
-          if (uiHidden[i].id === 0){
-            for (var id in ui){
-              if (ui[id].name === "building")
+          if (ui["trainingUnits"][i].id === 0){
+            for (var id in ui["main"]){
+              if (ui["main"][id].name === "building")
                 break;
-                //Vrátí id jako číslo první budovy. Další výcvikové buvody jsou id+1 a id+2.
+                //Vrátí id jako číslo první budovy. Další výcvikové budovy jsou id+1 a id+2.
                 //Pozn. - nutno převést id na integer
             }
 
@@ -154,27 +154,27 @@ unitsSendButton = function(){
 
           //Dismiss
           //Red (soldiers)
-          if (uiHidden[i].id === 1){
-            if (hex[hexSelected].soldiers < trainValue[uiHidden[i].id]){
+          if (ui["trainingUnits"][i].id === 1){
+            if (hex[hexSelected].soldiers < trainValue[ui["trainingUnits"][i].id]){
               hex[hexSelected].soldiers = 0;
             }
             else {
-              hex[hexSelected].soldiers -= trainValue[uiHidden[i].id];
+              hex[hexSelected].soldiers -= trainValue[ui["trainingUnits"][i].id];
             }
           }
           //Blue (mages)
-          else if (uiHidden[i].id === 2){
-            if (hex[hexSelected].mages < trainValue[uiHidden[i].id]){
+          else if (ui["trainingUnits"][i].id === 2){
+            if (hex[hexSelected].mages < trainValue[ui["trainingUnits"][i].id]){
               hex[hexSelected].mages = 0;
             }
             else {
-              hex[hexSelected].mages -= trainValue[uiHidden[i].id];
+              hex[hexSelected].mages -= trainValue[ui["trainingUnits"][i].id];
             }
           }
 
           //Reset value
-          trainValue[uiHidden[i].id] = 0;
-          trainDigits[uiHidden[i].id] = [];
+          trainValue[ui["trainingUnits"][i].id] = 0;
+          trainDigits[ui["trainingUnits"][i].id] = [];
         }
       }
     }
@@ -183,18 +183,26 @@ unitsSendButton = function(){
 
 trainUnits = function(units,i){
   //Zde budu muset později přidat kontrolu, jestli má hráč dostatek zlata
-  hex[hexSelected][units] += trainValue[uiHidden[i].id];
+  hex[hexSelected][units] += trainValue[ui["trainingUnits"][i].id];
 }
 
 endTurn = function(socket){
   if (playing){
     if (mouseUIcolliding !== -1){
-      if (ui[mouseUIcolliding].name === "endTurn"){
+      if (ui["main"][mouseUIcolliding].name === "endTurn"){
         socket.emit("endTurn");
         playing = false;
       }
     }
   }
+}
+
+sendUnits = function(){
+  for(var id in hexMoveAvailable){
+		if (hexMoveAvailable[id] === mouseHexColliding){
+			showSendUnitsUI = true;
+		}
+	}
 }
 
 calculateTrainValue = function(trainDigits, trainButtonSelected){

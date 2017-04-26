@@ -44,44 +44,44 @@ createMap = function(columns,mainColumnSize){
 }
 
 createUI = function(){
-	//struktura: createUIelements(image, name, id, x, y, hidden)
+	//struktura: createUIelements(image, name, id, x, y, subObject)
 
 	//Levý horní roh
-	createUIelements(Img.uiInfo, "info", 0, 0, 0, false);
+	createUIelements(Img.uiInfo, "info", 0, 0, 0, "main");
 
 	//Horní lišta
-	createUIelements(Img.uiTrainBar, "trainBar", 0, 120, 0, false);
-	createUIelements(Img.uiEndTurn, "endTurn", 0, 570, 0, false);
+	createUIelements(Img.uiTrainBar, "trainBar", 0, 120, 0, "main");
+	createUIelements(Img.uiEndTurn, "endTurn", 0, 570, 0, "main");
 
 	//Levá lišta
 	//Přepínání mezi budovami a kouzly
-	createUIelements(Img.uiBuildingSpellSwitch, "buildingSpellSwitch", 0, 0, 100, false);
-	createUIelements(Img.uiBuildingSpellSwitch, "buildingSpellSwitch", 1, 60, 100, false);
+	createUIelements(Img.uiBuildingSpellSwitch, "buildingSpellSwitch", 0, 0, 100, "main");
+	createUIelements(Img.uiBuildingSpellSwitch, "buildingSpellSwitch", 1, 60, 100, "main");
 
 	//Budovy
 	var startX = 0;
 	var startY = 160;
 	for(var i = 0; i <= 8; i++){
-		createUIelements(Img.uiBuildingBg, "building", i, 0, startY + i*Img.uiBuildingBg.height, false);
+		createUIelements(Img.uiBuildingBg, "building", i, 0, startY + i*Img.uiBuildingBg.height, "main");
 	}
 
 	//Hidden
 	//Horní lišta - skryté ikony
 		//Levá část
-	createUIelements(Img.writeButton, "writeButton", 0, 180, 55, true);
-	createUIelements(Img.sendButton, "sendButton", 0, 270, 55, true);
+	createUIelements(Img.writeButton, "writeButton", 0, 180, 55, "trainingUnits");
+	createUIelements(Img.sendButton, "sendButton", 0, 270, 55, "trainingUnits");
 
 		//Pravá část
-	createUIelements(Img.writeButton, "writeButton", 1, 400, 40, true);
-	createUIelements(Img.sendButton, "sendButton", 1, 490, 40, true);
-	createUIelements(Img.writeButton, "writeButton", 2, 400, 70, true);
-	createUIelements(Img.sendButton, "sendButton", 2, 490, 70, true);
+	createUIelements(Img.writeButton, "writeButton", 1, 400, 40, "trainingUnits");
+	createUIelements(Img.sendButton, "sendButton", 1, 490, 40, "trainingUnits");
+	createUIelements(Img.writeButton, "writeButton", 2, 400, 70, "trainingUnits");
+	createUIelements(Img.sendButton, "sendButton", 2, 490, 70, "trainingUnits");
 }
 
-createUIelements = function(image, name, id, x, y, hidden){
+createUIelements = function(image, name, id, x, y, subObject){
 	/*
 	Struktura
-	ui[index] = {
+	ui[subObject][index] = {
 		image: název obrázku v objektu Img
 		name: jméno elementu,
 		id: pokud je více elementů se stejným jménem, mají odlišné id. V základu je id 0,
@@ -89,24 +89,14 @@ createUIelements = function(image, name, id, x, y, hidden){
 		y: y,
 	}
 	*/
-	if (!hidden){
-		ui[index] = {
-			image: image,
-			name: name,
-			id: id,
-			x: x,
-			y: y,
-		}
-	}
-	else {
-		uiHidden[index] = {
-			image: image,
-			name: name,
-			id: id,
-			x: x,
-			y: y,
-		}
-	}
+
+  ui[subObject][index] = {
+    image: image,
+    name: name,
+    id: id,
+    x: x,
+    y: y,
+  }
 
 	index++;		//index = global var
 }

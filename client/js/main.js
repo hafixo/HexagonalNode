@@ -34,12 +34,16 @@ var placingBuilding = -1;		//What building player has selected. If none, -1. 	//
 var hexSelected = -1;		//What hexagon player has selected. If none, -1.
 
 var showUnitUI = false;		//Jestli se má zobrazovat lišta pro trénování jednotek (zobrazuje se, pokud je označena nějaká země a je v ní budovu pro výcvik).
+var showSendUnitsUI = false;  //Jestli se má zobrazovat lišta pro přemístění jednotek (zobrazuje se při přemisťování jednotek).
 
 var hexMoveAvailable = [];		//If a hexagon is selected, it shows available moves. This array contains the id of hexagons, where the movement is possible.
 
 //UI
-var ui = {};
-var uiHidden = {};
+var ui = {
+  main:{},
+  trainingUnits:{},
+  sendUnits:{}
+};
 
 //Definované funkce
 //Non-game socket functions

@@ -69,8 +69,6 @@ drawTargetHex = function(){
 			}
 		}
 	}
-	//Moving units
-
 }
 
 drawHexSelected = function(){
@@ -146,9 +144,9 @@ drawEachUnit = function(type, xOff, yOff, id){
 }
 
 drawUI = function(){
-	for(var key in ui){
+	for(var key in ui["main"]){
     //Images
-		ctx.drawImage(ui[key].image, 0, 0, ui[key].image.width, ui[key].image.height, ui[key].x, ui[key].y, ui[key].image.width, ui[key].image.height);
+		ctx.drawImage(ui["main"][key].image, 0, 0, ui["main"][key].image.width, ui["main"][key].image.height, ui["main"][key].x, ui["main"][key].y, ui["main"][key].image.width, ui["main"][key].image.height);
 	}
 
 	//Tlačítka pro propouštění jednotek se zobrazí jenom v případě, že je označena země. Tlačítka pro trénování jednotek se objeví jenom v případě, že je v dané zemi postavena stavba pro výcvik.
@@ -161,17 +159,17 @@ drawUI = function(){
     ctx.fillText("Train",248,5);
     ctx.fillText("Dismiss",470,5);
 
-    for(var key in uiHidden){
+    for(var key in ui["trainingUnits"]){
 			//Dismiss
-			if (uiHidden[key].id !== 0){
+			if (ui["trainingUnits"][key].id !== 0){
         //Draw images
-				ctx.drawImage(uiHidden[key].image, 0, 0, uiHidden[key].image.width, uiHidden[key].image.height, uiHidden[key].x, uiHidden[key].y, uiHidden[key].image.width, uiHidden[key].image.height);
+				ctx.drawImage(ui["trainingUnits"][key].image, 0, 0, ui["trainingUnits"][key].image.width, ui["trainingUnits"][key].image.height, ui["trainingUnits"][key].x, ui["trainingUnits"][key].y, ui["trainingUnits"][key].image.width, ui["trainingUnits"][key].image.height);
       }
 			//Train
 			else {
 				if (checkIfCanTrain(hexSelected)){
           //Draw images
-					ctx.drawImage(uiHidden[key].image, 0, 0, uiHidden[key].image.width, uiHidden[key].image.height, uiHidden[key].x, uiHidden[key].y, uiHidden[key].image.width, uiHidden[key].image.height);
+					ctx.drawImage(ui["trainingUnits"][key].image, 0, 0, ui["trainingUnits"][key].image.width, ui["trainingUnits"][key].image.height, ui["trainingUnits"][key].x, ui["trainingUnits"][key].y, ui["trainingUnits"][key].image.width, ui["trainingUnits"][key].image.height);
         }
 			}
 		}
@@ -188,26 +186,26 @@ drawUI = function(){
 }
 
 drawTrainButtonsText = function(key){
-	if ((uiHidden[key].id === 0 && checkIfCanTrain(hexSelected)) || uiHidden[key].id !== 0){
-		if (uiHidden[key].name === "sendButton"){
+	if ((ui["trainingUnits"][key].id === 0 && checkIfCanTrain(hexSelected)) || ui["trainingUnits"][key].id !== 0){
+		if (ui["trainingUnits"][key].name === "sendButton"){
 	    ctx.font = "18px Arial";
 	    ctx.fillStyle = "black";
 	    ctx.textAlign="center";
 	    ctx.textBaseline="middle";
-	    var x = uiHidden[key].x + (uiHidden[key].image.width / 2);
-	    var y = uiHidden[key].y + (uiHidden[key].image.height / 2);
+	    var x = ui["trainingUnits"][key].x + (ui["trainingUnits"][key].image.width / 2);
+	    var y = ui["trainingUnits"][key].y + (ui["trainingUnits"][key].image.height / 2);
 	    ctx.fillText("OK",x,y);
 	  }
 
-	  if (uiHidden[key].name === "writeButton"){
-			if (uiHidden[key].id !== trainButtonSelected || trainValue[uiHidden[key].id] !== 0){
+	  if (ui["trainingUnits"][key].name === "writeButton"){
+			if (ui["trainingUnits"][key].id !== trainButtonSelected || trainValue[ui["trainingUnits"][key].id] !== 0){
 				ctx.font = "18px Arial";
 		    ctx.fillStyle = "black";
 		    ctx.textAlign="center";
 		    ctx.textBaseline="middle";
-		    var x = uiHidden[key].x + (uiHidden[key].image.width / 2);
-		    var y = uiHidden[key].y + (uiHidden[key].image.height / 2);
-		    var value = trainValue[uiHidden[key].id];
+		    var x = ui["trainingUnits"][key].x + (ui["trainingUnits"][key].image.width / 2);
+		    var y = ui["trainingUnits"][key].y + (ui["trainingUnits"][key].image.height / 2);
+		    var value = trainValue[ui["trainingUnits"][key].id];
 		    ctx.fillText(value,x,y);
 			}
 	  }
@@ -218,48 +216,48 @@ drawUIhover = function(){
   if (playing){
     if (mouseUIcolliding !== -1){
       var key = mouseUIcolliding;
-      if (ui[key].name === "building")
-        ctx.drawImage(Img.uiBuildingHover, 0, 0, Img.uiBuildingHover.width, Img.uiBuildingHover.height, ui[key].x, ui[key].y, Img.uiBuildingHover.width, Img.uiBuildingHover.height);
-      if (ui[key].name === "endTurn")
-        ctx.drawImage(Img.uiEndTurnHover, 0, 0, Img.uiEndTurnHover.width, Img.uiEndTurnHover.height, ui[key].x, ui[key].y, Img.uiEndTurnHover.width, Img.uiEndTurnHover.height);
+      if (ui["main"][key].name === "building")
+        ctx.drawImage(Img.uiBuildingHover, 0, 0, Img.uiBuildingHover.width, Img.uiBuildingHover.height, ui["main"][key].x, ui["main"][key].y, Img.uiBuildingHover.width, Img.uiBuildingHover.height);
+      if (ui["main"][key].name === "endTurn")
+        ctx.drawImage(Img.uiEndTurnHover, 0, 0, Img.uiEndTurnHover.width, Img.uiEndTurnHover.height, ui["main"][key].x, ui["main"][key].y, Img.uiEndTurnHover.width, Img.uiEndTurnHover.height);
     }
 
     //Hidden
     var keyHidden = mouseHiddenUIcolliding;
     if (keyHidden !== -1 && showUnitUI){
-			if ((uiHidden[keyHidden].id !== 0) || (uiHidden[keyHidden].id === 0 && checkIfCanTrain(hexSelected))){
-				if (uiHidden[keyHidden].name === "writeButton")
-	        ctx.drawImage(Img.writeButtonHover, 0, 0, Img.writeButtonHover.width, Img.writeButtonHover.height, uiHidden[keyHidden].x, uiHidden[keyHidden].y, Img.writeButtonHover.width, Img.writeButtonHover.height);
-				if (uiHidden[keyHidden].name === "sendButton")
-					ctx.drawImage(Img.sendButtonHover, 0, 0, Img.sendButtonHover.width, Img.sendButtonHover.height, uiHidden[keyHidden].x, uiHidden[keyHidden].y, Img.sendButtonHover.width, Img.sendButtonHover.height);
+			if ((ui["trainingUnits"][keyHidden].id !== 0) || (ui["trainingUnits"][keyHidden].id === 0 && checkIfCanTrain(hexSelected))){
+				if (ui["trainingUnits"][keyHidden].name === "writeButton")
+	        ctx.drawImage(Img.writeButtonHover, 0, 0, Img.writeButtonHover.width, Img.writeButtonHover.height, ui["trainingUnits"][keyHidden].x, ui["trainingUnits"][keyHidden].y, Img.writeButtonHover.width, Img.writeButtonHover.height);
+				if (ui["trainingUnits"][keyHidden].name === "sendButton")
+					ctx.drawImage(Img.sendButtonHover, 0, 0, Img.sendButtonHover.width, Img.sendButtonHover.height, ui["trainingUnits"][keyHidden].x, ui["trainingUnits"][keyHidden].y, Img.sendButtonHover.width, Img.sendButtonHover.height);
 			}
     }
   }
 }
 
 drawUItopLayer = function(){
-	for(var key in ui){
+	for(var key in ui["main"]){
     //Draw images of buildings
-		if (ui[key].name === "building"){
+		if (ui["main"][key].name === "building"){
 			var image = selectUiImage(key);
 
 			if (image !== undefined){
 				var xOffset = 10;		//O kolik bude obrázek posunut doleva od pravého okraje
-				var x = ui[key].x + ui[key].image.width - image.width - xOffset;
-				var y = ui[key].y + ui[key].image.height/2 - image.height/2;
+				var x = ui["main"][key].x + ui["main"][key].image.width - image.width - xOffset;
+				var y = ui["main"][key].y + ui["main"][key].image.height/2 - image.height/2;
 
 				ctx.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height);
 			}
 		}
 
     //End turn text
-    if (ui[key].name === "endTurn"){
+    if (ui["main"][key].name === "endTurn"){
       ctx.font = "32px Arial";
       ctx.fillStyle = "black";
       ctx.textAlign="center";
       ctx.textBaseline="middle";
-      var x = ui[key].x + (ui[key].image.width / 2);
-      var y = ui[key].y + (ui[key].image.height / 2);
+      var x = ui["main"][key].x + (ui["main"][key].image.width / 2);
+      var y = ui["main"][key].y + (ui["main"][key].image.height / 2);
       var text1;
       var text2 = "turn"
       if (playing) text1 = "End";
@@ -271,12 +269,82 @@ drawUItopLayer = function(){
 
   //Hidden
   if(showUnitUI){
-    for(var key in uiHidden){
-			if (uiHidden[key].name === "writeButton" && uiHidden[key].id === trainButtonSelected){
-				ctx.drawImage(Img.writeButtonType, 0, 0, Img.writeButtonType.width, Img.writeButtonType.height, uiHidden[key].x, uiHidden[key].y, Img.writeButtonType.width, Img.writeButtonType.height);
+    for(var key in ui["trainingUnits"]){
+			if (ui["trainingUnits"][key].name === "writeButton" && ui["trainingUnits"][key].id === trainButtonSelected){
+				ctx.drawImage(Img.writeButtonType, 0, 0, Img.writeButtonType.width, Img.writeButtonType.height, ui["trainingUnits"][key].x, ui["trainingUnits"][key].y, Img.writeButtonType.width, Img.writeButtonType.height);
 			}
 
       drawTrainButtonsText(key);
     }
   }
+}
+
+
+//Supporting functions
+selectUiImage = function(key){
+	var image;
+	switch(ui["main"][key].id){
+		case 0:
+			image = Img.uiFarm;
+			break;
+		case 1:
+			image = Img.uiBarracks;
+			break;
+		case 2:
+			image = Img.uiSchoolOfMagic;
+			break;
+		case 3:
+			image = Img.uiMill;
+			break;
+		case 4:
+			image = Img.uiWell;
+			break;
+		case 5:
+			image = Img.uiTemple;
+			break;
+		case 6:
+			image = Img.uiYellowCrystal;
+			break;
+		case 7:
+			image = Img.uiRedCrystal;
+			break;
+		case 8:
+			image = Img.uiBlueCrystal;
+			break;
+	}
+	return image;
+}
+
+selectImage = function(key){
+	var image;
+	switch(ui["main"][key].id){
+		case 0:
+			image = Img.farm;
+			break;
+		case 1:
+			image = Img.barracks;
+			break;
+		case 2:
+			image = Img.schoolOfMagic;
+			break;
+		case 3:
+			image = Img.mill;
+			break;
+		case 4:
+			image = Img.well;
+			break;
+		case 5:
+			image = Img.temple;
+			break;
+		case 6:
+			image = Img.yellowCrystal;
+			break;
+		case 7:
+			image = Img.redCrystal;
+			break;
+		case 8:
+			image = Img.blueCrystal;
+			break;
+	}
+	return image;
 }

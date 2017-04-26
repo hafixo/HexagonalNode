@@ -33,11 +33,11 @@ checkMouseHexCollision = function(){
 
 checkMouseUIcollision = function(){
 	mouseUIcolliding = -1;		//Tato hodnota se změní, pokud bude colliding
-	for(var key in ui){
-		if (mouseX >= ui[key].x &&
-			mouseX <= ui[key].x + ui[key].image.width &&
-			mouseY >= ui[key].y &&
-			mouseY <= ui[key].y + ui[key].image.height){
+	for(var key in ui["main"]){
+		if (mouseX >= ui["main"][key].x &&
+			mouseX <= ui["main"][key].x + ui["main"][key].image.width &&
+			mouseY >= ui["main"][key].y &&
+			mouseY <= ui["main"][key].y + ui["main"][key].image.height){
 				mouseUIcolliding = key;
 		}
 	}
@@ -45,11 +45,11 @@ checkMouseUIcollision = function(){
   //Hidden UI
   mouseHiddenUIcolliding = -1;		//Tato hodnota se změní, pokud bude colliding
   if (showUnitUI){
-    for(var key in uiHidden){
-  		if (mouseX >= uiHidden[key].x &&
-  			mouseX <= uiHidden[key].x + uiHidden[key].image.width &&
-  			mouseY >= uiHidden[key].y &&
-  			mouseY <= uiHidden[key].y + uiHidden[key].image.height){
+    for(var key in ui["trainingUnits"]){
+  		if (mouseX >= ui["trainingUnits"][key].x &&
+  			mouseX <= ui["trainingUnits"][key].x + ui["trainingUnits"][key].image.width &&
+  			mouseY >= ui["trainingUnits"][key].y &&
+  			mouseY <= ui["trainingUnits"][key].y + ui["trainingUnits"][key].image.height){
   				mouseHiddenUIcolliding = key;
   		}
   	}
