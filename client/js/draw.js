@@ -227,10 +227,12 @@ drawUIhover = function(){
     //Hidden
     var keyHidden = mouseHiddenUIcolliding;
     if (keyHidden !== -1 && showUnitUI){
-      if (uiHidden[keyHidden].name === "writeButton")
-        ctx.drawImage(Img.writeButtonHover, 0, 0, Img.writeButtonHover.width, Img.writeButtonHover.height, uiHidden[keyHidden].x, uiHidden[keyHidden].y, Img.writeButtonHover.width, Img.writeButtonHover.height);
+			if ((uiHidden[keyHidden].id !== 0) || (uiHidden[keyHidden].id === 0 && checkIfCanTrain(hexSelected))){
+				if (uiHidden[keyHidden].name === "writeButton")
+	        ctx.drawImage(Img.writeButtonHover, 0, 0, Img.writeButtonHover.width, Img.writeButtonHover.height, uiHidden[keyHidden].x, uiHidden[keyHidden].y, Img.writeButtonHover.width, Img.writeButtonHover.height);
 				if (uiHidden[keyHidden].name === "sendButton")
 					ctx.drawImage(Img.sendButtonHover, 0, 0, Img.sendButtonHover.width, Img.sendButtonHover.height, uiHidden[keyHidden].x, uiHidden[keyHidden].y, Img.sendButtonHover.width, Img.sendButtonHover.height);
+			}
     }
   }
 }
