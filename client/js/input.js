@@ -12,6 +12,8 @@ input = function(){
     	placeBuilding();		//Kvůli proměnné placingBuilding musí být až po selectHexagon
       selectTrainButton();
       unitsSendButton();
+      showSendUnitsUI();
+      dontShowSendUnitsUI();
       endTurn(socket);
     }
   }
@@ -53,12 +55,13 @@ input = function(){
 selectHexagon = function(){
   if (playing){
   	var notUnselect = false;		//Zajistí, aby se země neodznačila hned po to, co je označena.
-  	//Kliknutí na zemi a nestaví budovu
+  	//Klikne na zemi a nestaví budovu
   	if ((mouseHexColliding !== -1) && (placingBuilding === -1)){
   		//Pokud klikne na zemi, tak danou zemi označí.
   		if (hexSelected === -1){
   			hexSelected = mouseHexColliding;
   			notUnselect = true;
+        hexMoveAvailable = findAdjacentHexagons(hexSelected);
   		}
   	}
   	//Pokud má označenou zemi a klikne, tak se označení zruší. Jsou zde 2 výjimky.
@@ -70,8 +73,8 @@ selectHexagon = function(){
   			}
   		}
 
-  		if (mouseUIcolliding !== -1){
-  			if (ui["main"][mouseUIcolliding].name === "trainBar"){			//Označení se nezruší, pokud klikne na train bar (pokud chce trénovat nebo propustit jednotky)
+  		if (mouseUIcolliding.main !== -1){
+  			if (ui["main"][mouseUIcolliding.main].name === "trainBar"){			//Označení se nezruší, pokud klikne na train bar (pokud chce trénovat nebo propustit jednotky)
   				unselect = false;
   			}
   		}
@@ -83,12 +86,30 @@ selectHexagon = function(){
   }
 }
 
+findAdjacentHexagons = function(currentHex){
+	var adjacentHexagons = []; 	//sem budu zapisovat id hexagonů, které s daným hexagonem sousedí
+
+	for(var id in hex){
+		//Přiřadí hexagony z vedlejších sloupců
+		if (Math.abs(hex[currentHex].column - hex[id].column) === 1)
+			if (Math.abs(hex[currentHex].line - hex[id].line) === 0.5)
+				adjacentHexagons.push(id);
+
+		//Přiřadí hexagony ze stejného sloupce
+		if (hex[currentHex].column === hex[id].column)
+			if (Math.abs(hex[currentHex].line - hex[id].line) === 1)
+				adjacentHexagons.push(id);
+	}
+	//console.log(adjacentHexagons.join(" "));
+	return adjacentHexagons;
+}
+
 placeBuilding = function(){
   if (playing){
   	//Pokud klikne na budovu v UI, budovu tím vybere.
-  	if (mouseUIcolliding !== -1){
-  		if (ui["main"][mouseUIcolliding].name === "building"){
-  			placingBuilding = mouseUIcolliding;
+  	if (mouseUIcolliding.main !== -1){
+  		if (ui["main"][mouseUIcolliding.main].name === "building"){
+  			placingBuilding = mouseUIcolliding.main;
   		}
       else {
         placingBuilding = -1;     //Označení se zruší, pokud klikne jinam do UI.
@@ -111,9 +132,9 @@ placeBuilding = function(){
 
 selectTrainButton = function(){
   trainButtonSelected = -1;
-  if (mouseHiddenUIcolliding !== -1){
+  if (mouseUIcolliding.trainingUnits !== -1){
     for(var key in ui["trainingUnits"]){
-      if (key == mouseHiddenUIcolliding && ui["trainingUnits"][key].name === "writeButton"){
+      if (key == mouseUIcolliding.trainingUnits && ui["trainingUnits"][key].name === "writeButton"){
         if ((ui["trainingUnits"][key].id !== 0) || (ui["trainingUnits"][key].id === 0 && checkIfCanTrain(hexSelected))){
           trainButtonSelected = ui["trainingUnits"][key].id;
         }
@@ -125,7 +146,7 @@ selectTrainButton = function(){
 unitsSendButton = function(){
   if (showUnitUI && hexSelected !== -1){
     for(var i in ui["trainingUnits"]){
-      if (mouseHiddenUIcolliding === i){
+      if (mouseUIcolliding.trainingUnits === i){
         if (ui["trainingUnits"][i].name === "sendButton"){
           //Train
           if (ui["trainingUnits"][i].id === 0){
@@ -186,23 +207,39 @@ trainUnits = function(units,i){
   hex[hexSelected][units] += trainValue[ui["trainingUnits"][i].id];
 }
 
+showSendUnitsUI = function(){
+	//Jestli se má zobrazovat UI pro posílání jednotek
+  if (canMoveUnits && mouseHexColliding !== -1){
+    for(var id in hexMoveAvailable){
+  		if (hexMoveAvailable[id] === mouseHexColliding){
+  			showSendUnitUI = true;
+  		}
+  	}
+  }
+}
+
+//NEDOKONČENO
+dontShowSendUnitsUI = function(){
+  /*
+  if (showSendUnitUI){
+    if (mouseUIcolliding["trainingUnitsBg"] !== -1){
+      for(var key in ui["trainingUnitsBg"]){
+        //if (key == mouseHiddenUIcolliding
+      }
+    }
+  }
+  */
+}
+
 endTurn = function(socket){
   if (playing){
-    if (mouseUIcolliding !== -1){
-      if (ui["main"][mouseUIcolliding].name === "endTurn"){
+    if (mouseUIcolliding.main !== -1){
+      if (ui["main"][mouseUIcolliding.main].name === "endTurn"){
         socket.emit("endTurn");
         playing = false;
       }
     }
   }
-}
-
-sendUnits = function(){
-  for(var id in hexMoveAvailable){
-		if (hexMoveAvailable[id] === mouseHexColliding){
-			showSendUnitsUI = true;
-		}
-	}
 }
 
 calculateTrainValue = function(trainDigits, trainButtonSelected){

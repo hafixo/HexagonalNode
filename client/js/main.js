@@ -10,7 +10,7 @@ var playing = -1;   //kdo je na tahu
 var mouseX = 0;
 var mouseY = 0;
 
-var index = 0;    //slouží při hidden ui
+var index = 0;    //slouží při tvorbě ui
 
 var trainValue = [0,0,0];    //hodnota, která se udává při trénování nebo propuštění jednotek. 3 tlačítka, proto 3 hodnoty v array.
 var trainButtonSelected = -1;   //Které z tlačítek pro trénování je označeno. Pokud žádné, -1.
@@ -26,23 +26,35 @@ var hexXpos = 275;	//Pozice, kde začíná mapa (kde se nachází hexagon s inde
 var hexYpos = 280;
 
 var mouseHexColliding = -1;		//What hexagon is mouse hovering over. If none, -1.
+var mouseUIcolliding = {
+  main:-1,
+  trainingUnits:-1,
+  sendingUnitsBg:-1,
+  sendingUnits:-1
+};
+
+/*
 var mouseUIcolliding = -1;		//What UI element is mouse hovering over. If none, -1.
 var mouseHiddenUIcolliding = -1;    //What hidden UI element is mouse hovering over. If none, -1.
+var mouseSendUnitsUIcolliding = -1;
+*/
 
 var placingBuilding = -1;		//What building player has selected. If none, -1. 	//ID stavby = id stavby v UI.
 
 var hexSelected = -1;		//What hexagon player has selected. If none, -1.
 
 var showUnitUI = false;		//Jestli se má zobrazovat lišta pro trénování jednotek (zobrazuje se, pokud je označena nějaká země a je v ní budovu pro výcvik).
-var showSendUnitsUI = false;  //Jestli se má zobrazovat lišta pro přemístění jednotek (zobrazuje se při přemisťování jednotek).
+var showSendUnitUI = false;  //Jestli se má zobrazovat lišta pro přemístění jednotek (zobrazuje se při přemisťování jednotek).
 
 var hexMoveAvailable = [];		//If a hexagon is selected, it shows available moves. This array contains the id of hexagons, where the movement is possible.
+var canMoveUnits = false;     //Jestli je označen hexagon, tak tato proměnná určí, jestli se mají zvýraznit okolní hexagony kvůli pohybu jednotek. Pokud v označené zemi žádné jednotky nejsou, tak se nic nezobrazí. Mění se přes step event.
 
 //UI
 var ui = {
   main:{},
   trainingUnits:{},
-  sendUnits:{}
+  sendingUnitsBg:{},
+  sendingUnits:{}
 };
 
 //Definované funkce

@@ -1,12 +1,8 @@
 //Step functions
 stepEvent = function(){
 	showUnitsUI();
-
-  //Reset training / dismissing values
-  if (!showUnitUI){
-    trainValue = [0,0,0];
-    trainDigits = [[],[],[]];
-  }
+	checkIfCanMoveUnits(hexSelected);
+  resetValues();
 }
 
 showUnitsUI = function(){
@@ -16,4 +12,22 @@ showUnitsUI = function(){
 	else {
 		showUnitUI = false;
 	}
+}
+
+checkIfCanMoveUnits = function(hexSelected){
+	if (hexSelected !== -1){
+		if (hex[hexSelected].workers !== 0 || hex[hexSelected].soldiers !== 0 || hex[hexSelected].mages !== 0){
+			canMoveUnits = true;
+		}
+		else {
+			canMoveUnits = false;
+		}
+	}
+}
+
+resetValues = function(){
+	if (!showUnitUI){
+    trainValue = [0,0,0];
+    trainDigits = [[],[],[]];
+  }
 }

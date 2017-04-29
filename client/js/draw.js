@@ -86,15 +86,16 @@ drawHexSelected = function(){
 
 drawAdjacentHexagons = function(hexSelected){
 	//Draw available hexagons
-	hexMoveAvailable = findAdjacentHexagons(hexSelected);
-	for(var id in hexMoveAvailable){
-		var centerX = hex[hexMoveAvailable[id]].x - Img.hex.width/2;
-		var centerY = hex[hexMoveAvailable[id]].y - Img.hex.height/2;
-		ctx.drawImage(Img.hexAvailable,0,0,Img.hexAvailable.width,Img.hexAvailable.height,centerX,centerY,Img.hexAvailable.width,Img.hexAvailable.height);
+	if (canMoveUnits){		//If there's at least 1 unit in the selected hexagon
+		for(var id in hexMoveAvailable){
+			var centerX = hex[hexMoveAvailable[id]].x - Img.hex.width/2;
+			var centerY = hex[hexMoveAvailable[id]].y - Img.hex.height/2;
+			ctx.drawImage(Img.hexAvailable,0,0,Img.hexAvailable.width,Img.hexAvailable.height,centerX,centerY,Img.hexAvailable.width,Img.hexAvailable.height);
 
-		//Highlight targeted hexagon (if targeted)
-		if (hexMoveAvailable[id] === mouseHexColliding){
-			ctx.drawImage(Img.hexTargeted,0,0,Img.hexTargeted.width,Img.hexTargeted.height,centerX,centerY,Img.hexTargeted.width,Img.hexTargeted.height);
+			//Highlight targeted hexagon (if targeted)
+			if (hexMoveAvailable[id] === mouseHexColliding){
+				ctx.drawImage(Img.hexTargeted,0,0,Img.hexTargeted.width,Img.hexTargeted.height,centerX,centerY,Img.hexTargeted.width,Img.hexTargeted.height);
+			}
 		}
 	}
 }
@@ -144,11 +145,13 @@ drawEachUnit = function(type, xOff, yOff, id){
 }
 
 drawUI = function(){
+	//Main
 	for(var key in ui["main"]){
     //Images
 		ctx.drawImage(ui["main"][key].image, 0, 0, ui["main"][key].image.width, ui["main"][key].image.height, ui["main"][key].x, ui["main"][key].y, ui["main"][key].image.width, ui["main"][key].image.height);
 	}
 
+	//Training units
 	//Tlačítka pro propouštění jednotek se zobrazí jenom v případě, že je označena země. Tlačítka pro trénování jednotek se objeví jenom v případě, že je v dané zemi postavena stavba pro výcvik.
   if (showUnitUI === true ){
     //Titles
@@ -174,13 +177,20 @@ drawUI = function(){
 			}
 		}
 
-		//Show text if units can't be trained in this land
+		//Show text if units can't be trained in this hexagon
 		if (!checkIfCanTrain(hexSelected)){
 			ctx.font="24px Arial";
 	    ctx.fillStyle = "black";
 	    ctx.textAlign="center";
 	    ctx.textBaseline="top";
 			ctx.fillText("Cannot train here!",250,50);
+		}
+	}
+
+	//Sending units
+	if (showSendUnitUI){
+		for(var key in ui["sendingUnits"]){
+			ctx.drawImage(ui["sendingUnits"][key].image, 0, 0, ui["sendingUnits"][key].image.width, ui["sendingUnits"][key].image.height, ui["sendingUnits"][key].x, ui["sendingUnits"][key].y, ui["sendingUnits"][key].image.width, ui["sendingUnits"][key].image.height);
 		}
 	}
 }
@@ -214,16 +224,17 @@ drawTrainButtonsText = function(key){
 
 drawUIhover = function(){
   if (playing){
-    if (mouseUIcolliding !== -1){
-      var key = mouseUIcolliding;
+		//Main
+    if (mouseUIcolliding.main !== -1){
+      var key = mouseUIcolliding.main;
       if (ui["main"][key].name === "building")
         ctx.drawImage(Img.uiBuildingHover, 0, 0, Img.uiBuildingHover.width, Img.uiBuildingHover.height, ui["main"][key].x, ui["main"][key].y, Img.uiBuildingHover.width, Img.uiBuildingHover.height);
       if (ui["main"][key].name === "endTurn")
         ctx.drawImage(Img.uiEndTurnHover, 0, 0, Img.uiEndTurnHover.width, Img.uiEndTurnHover.height, ui["main"][key].x, ui["main"][key].y, Img.uiEndTurnHover.width, Img.uiEndTurnHover.height);
     }
 
-    //Hidden
-    var keyHidden = mouseHiddenUIcolliding;
+    //Training units
+    var keyHidden = mouseUIcolliding.trainingUnits;
     if (keyHidden !== -1 && showUnitUI){
 			if ((ui["trainingUnits"][keyHidden].id !== 0) || (ui["trainingUnits"][keyHidden].id === 0 && checkIfCanTrain(hexSelected))){
 				if (ui["trainingUnits"][keyHidden].name === "writeButton")

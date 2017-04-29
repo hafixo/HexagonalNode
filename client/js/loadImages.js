@@ -22,6 +22,7 @@ Img.mage = new Image();
 Img.mage.src = "../client/img/mage.png";
 
 //UI
+//UI main
 Img.uiBuildingBg = new Image();
 Img.uiBuildingBg.src = "../client/img/uiBuildingBg.png";
 Img.uiBuildingHover = new Image();
@@ -37,20 +38,7 @@ Img.uiEndTurn.src = "../client/img/uiEndTurn.png";
 Img.uiEndTurnHover = new Image();
 Img.uiEndTurnHover.src = "../client/img/uiEndTurnHover.png";
 
-//UI Buttons
-Img.writeButton = new Image();
-Img.writeButton.src = "../client/img/writeButton.png";
-Img.writeButtonHover = new Image();
-Img.writeButtonHover.src = "../client/img/writeButtonHover.png";
-Img.writeButtonType = new Image();
-Img.writeButtonType.src = "../client/img/writeButtonType.png";
-Img.sendButton = new Image();
-Img.sendButton.src = "../client/img/sendButton.png";
-Img.sendButtonHover = new Image();
-Img.sendButtonHover.src = "../client/img/sendButtonHover.png";
-
-
-//UI Buildings
+//UI Main - buildings
 Img.uiFarm = new Image();
 Img.uiFarm.src = "../client/img/uiFarm.png";
 Img.uiBarracks = new Image();
@@ -69,6 +57,22 @@ Img.uiRedCrystal = new Image();
 Img.uiRedCrystal.src = "../client/img/uiRedCrystal.png";
 Img.uiBlueCrystal = new Image();
 Img.uiBlueCrystal.src = "../client/img/uiBlueCrystal.png";
+
+//UI Training units
+Img.writeButton = new Image();
+Img.writeButton.src = "../client/img/writeButton.png";
+Img.writeButtonHover = new Image();
+Img.writeButtonHover.src = "../client/img/writeButtonHover.png";
+Img.writeButtonType = new Image();
+Img.writeButtonType.src = "../client/img/writeButtonType.png";
+Img.sendButton = new Image();
+Img.sendButton.src = "../client/img/sendButton.png";
+Img.sendButtonHover = new Image();
+Img.sendButtonHover.src = "../client/img/sendButtonHover.png";
+
+//UI Sending units
+Img.uiSendUnitsBg = new Image();
+Img.uiSendUnitsBg.src = "../client/img/uiSendUnitsBg.png";
 
 //Buildings
 Img.farm = new Image();

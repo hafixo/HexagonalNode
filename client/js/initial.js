@@ -46,27 +46,28 @@ createMap = function(columns,mainColumnSize){
 createUI = function(){
 	//struktura: createUIelements(image, name, id, x, y, subObject)
 
-	//Levý horní roh
+	//Main
+		//Levý horní roh
 	createUIelements(Img.uiInfo, "info", 0, 0, 0, "main");
 
-	//Horní lišta
+		//Horní lišta
 	createUIelements(Img.uiTrainBar, "trainBar", 0, 120, 0, "main");
 	createUIelements(Img.uiEndTurn, "endTurn", 0, 570, 0, "main");
 
-	//Levá lišta
-	//Přepínání mezi budovami a kouzly
+		//Levá lišta
+		//Přepínání mezi budovami a kouzly
 	createUIelements(Img.uiBuildingSpellSwitch, "buildingSpellSwitch", 0, 0, 100, "main");
 	createUIelements(Img.uiBuildingSpellSwitch, "buildingSpellSwitch", 1, 60, 100, "main");
 
-	//Budovy
+		//Budovy
 	var startX = 0;
 	var startY = 160;
 	for(var i = 0; i <= 8; i++){
 		createUIelements(Img.uiBuildingBg, "building", i, 0, startY + i*Img.uiBuildingBg.height, "main");
 	}
 
-	//Hidden
-	//Horní lišta - skryté ikony
+	//Training units
+		//Horní lišta - skryté ikony
 		//Levá část
 	createUIelements(Img.writeButton, "writeButton", 0, 180, 55, "trainingUnits");
 	createUIelements(Img.sendButton, "sendButton", 0, 270, 55, "trainingUnits");
@@ -76,6 +77,11 @@ createUI = function(){
 	createUIelements(Img.sendButton, "sendButton", 1, 490, 40, "trainingUnits");
 	createUIelements(Img.writeButton, "writeButton", 2, 400, 70, "trainingUnits");
 	createUIelements(Img.sendButton, "sendButton", 2, 490, 70, "trainingUnits");
+
+	//Sending units
+	var x = 120+(WIDTH-120) / 2 - Img.uiSendUnitsBg.width / 2;
+	var y = 100+(HEIGHT-100) / 2 - Img.uiSendUnitsBg.height / 2;
+	createUIelements(Img.uiSendUnitsBg, "sendUnitsBg", 0, x, y, "sendingUnits");
 }
 
 createUIelements = function(image, name, id, x, y, subObject){
