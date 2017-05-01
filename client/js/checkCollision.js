@@ -37,53 +37,6 @@ checkMouseUIcollision = function(){
 	checkEachUIcollision("trainingUnits", mouseX, mouseY);
 	checkEachUIcollision("sendingUnitsBg", mouseX, mouseY);
 	checkEachUIcollision("sendingUnits", mouseX, mouseY);
-	/*
-	mouseUIcolliding = -1;		//Tato hodnota se změní, pokud bude colliding
-	for(var key in ui["main"]){
-		if (mouseX >= ui["main"][key].x &&
-			mouseX <= ui["main"][key].x + ui["main"][key].image.width &&
-			mouseY >= ui["main"][key].y &&
-			mouseY <= ui["main"][key].y + ui["main"][key].image.height){
-				mouseUIcolliding = key;
-		}
-	}
-
-  //Hidden UI
-  mouseHiddenUIcolliding = -1;		//Tato hodnota se změní, pokud bude colliding
-  if (showUnitUI){
-    for(var key in ui["trainingUnits"]){
-  		if (mouseX >= ui["trainingUnits"][key].x &&
-  			mouseX <= ui["trainingUnits"][key].x + ui["trainingUnits"][key].image.width &&
-  			mouseY >= ui["trainingUnits"][key].y &&
-  			mouseY <= ui["trainingUnits"][key].y + ui["trainingUnits"][key].image.height){
-  				mouseHiddenUIcolliding = key;
-  		}
-  	}
-  }
-
-	//Sending units
-	if (showSendUnitUI){
-		for(var key in ui["sendingUnitsBg"]){
-  		if (mouseX >= ui["sendingUnitsBg"][key].x &&
-  			mouseX <= ui["sendingUnitsBg"][key].x + ui["sendingUnitsBg"][key].image.width &&
-  			mouseY >= ui["sendingUnitsBg"][key].y &&
-  			mouseY <= ui["sendingUnitsBg"][key].y + ui["sendingUnitsBg"][key].image.height){
-  				mouseHiddenUIcolliding = key;
-  		}
-  	}
-	}
-
-	if (showSendUnitUI){
-		for(var key in ui["sendingUnitsBg"]){
-  		if (mouseX >= ui["sendingUnitsBg"][key].x &&
-  			mouseX <= ui["sendingUnitsBg"][key].x + ui["sendingUnitsBg"][key].image.width &&
-  			mouseY >= ui["sendingUnitsBg"][key].y &&
-  			mouseY <= ui["sendingUnitsBg"][key].y + ui["sendingUnitsBg"][key].image.height){
-  				mouseHiddenUIcolliding = key;
-  		}
-  	}
-	}
-	*/
 }
 
 checkEachUIcollision = function(uiTypeName, mouseX, mouseY){

@@ -73,6 +73,10 @@ Img.sendButtonHover.src = "../client/img/sendButtonHover.png";
 //UI Sending units
 Img.uiSendUnitsBg = new Image();
 Img.uiSendUnitsBg.src = "../client/img/uiSendUnitsBg.png";
+Img.uiSendUnitsButton = new Image();
+Img.uiSendUnitsButton.src = "../client/img/uiSendUnitsButton.png";
+Img.uiSendUnitsButtonHover = new Image();
+Img.uiSendUnitsButtonHover.src = "../client/img/uiSendUnitsButtonHover.png";
 
 //Buildings
 Img.farm = new Image();

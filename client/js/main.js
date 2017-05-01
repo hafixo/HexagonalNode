@@ -16,6 +16,10 @@ var trainValue = [0,0,0];    //hodnota, která se udává při trénování nebo
 var trainButtonSelected = -1;   //Které z tlačítek pro trénování je označeno. Pokud žádné, -1.
 var trainDigits = [[],[],[]];   //3 arraye v arrayi. 1 podarray v sobě zahrnuje číslice, které hráč zmáčknul, když měl označené tlačítko pro zadávání počtu jednotek.
 
+var sendValue = [0,0,0];     //hodnota, která se udává při posílání jednotek. 3 tlačítka, proto 3 hodnoty v array.
+var sendButtonSelected = -1;   //Které z tlačítek pro posílání jednotek je označeno. Pokud žádné, -1.
+var sendDigits = [[],[],[]];   //3 arraye v arrayi. 1 podarray v sobě zahrnuje číslice, které hráč zmáčknul, když měl označené tlačítko pro zadávání počtu jednotek.
+
 var mapCreated = false;
 
 var columns = 5;
@@ -33,12 +37,6 @@ var mouseUIcolliding = {
   sendingUnits:-1
 };
 
-/*
-var mouseUIcolliding = -1;		//What UI element is mouse hovering over. If none, -1.
-var mouseHiddenUIcolliding = -1;    //What hidden UI element is mouse hovering over. If none, -1.
-var mouseSendUnitsUIcolliding = -1;
-*/
-
 var placingBuilding = -1;		//What building player has selected. If none, -1. 	//ID stavby = id stavby v UI.
 
 var hexSelected = -1;		//What hexagon player has selected. If none, -1.
@@ -48,6 +46,10 @@ var showSendUnitUI = false;  //Jestli se má zobrazovat lišta pro přemístěn�
 
 var hexMoveAvailable = [];		//If a hexagon is selected, it shows available moves. This array contains the id of hexagons, where the movement is possible.
 var canMoveUnits = false;     //Jestli je označen hexagon, tak tato proměnná určí, jestli se mají zvýraznit okolní hexagony kvůli pohybu jednotek. Pokud v označené zemi žádné jednotky nejsou, tak se nic nezobrazí. Mění se přes step event.
+var moveUnitsToHex = -1;      //Do jaké země se jednotky přesouvají.
+
+var justOpened = false;   //Využití u funkce showSendUnitsUI(). Slouží k tomu, aby se UI nezavřela hned potom, co se otevře.
+
 
 //UI
 var ui = {

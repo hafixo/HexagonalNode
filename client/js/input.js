@@ -11,16 +11,21 @@ input = function(){
       selectHexagon();
     	placeBuilding();		//Kvůli proměnné placingBuilding musí být až po selectHexagon
       selectTrainButton();
+      selectSendButton();
       unitsSendButton();
       showSendUnitsUI();
-      dontShowSendUnitsUI();
       endTurn(socket);
+      dontShowSendUnitsUI();    //Musí být na konci
     }
   }
 
   document.oncontextmenu = function(mouse){		//oncontextmenu = right click
-  	placingBuilding = -1;
-  	hexSelected = -1;
+    if (!showSendUnitUI){
+      placingBuilding = -1;
+    	hexSelected = -1;
+    }
+
+    dontShowSendUnitsUI();
 
   	return false;		//Musí být, aby se neukázalo otravné HTML okno
   }
@@ -53,7 +58,7 @@ input = function(){
 }
 
 selectHexagon = function(){
-  if (playing){
+  if (playing && !showSendUnitUI){
   	var notUnselect = false;		//Zajistí, aby se země neodznačila hned po to, co je označena.
   	//Klikne na zemi a nestaví budovu
   	if ((mouseHexColliding !== -1) && (placingBuilding === -1)){
@@ -105,7 +110,7 @@ findAdjacentHexagons = function(currentHex){
 }
 
 placeBuilding = function(){
-  if (playing){
+  if (playing && !showSendUnitUI){
   	//Pokud klikne na budovu v UI, budovu tím vybere.
   	if (mouseUIcolliding.main !== -1){
   		if (ui["main"][mouseUIcolliding.main].name === "building"){
@@ -132,7 +137,7 @@ placeBuilding = function(){
 
 selectTrainButton = function(){
   trainButtonSelected = -1;
-  if (mouseUIcolliding.trainingUnits !== -1){
+  if (mouseUIcolliding.trainingUnits !== -1 && !showSendUnitUI){
     for(var key in ui["trainingUnits"]){
       if (key == mouseUIcolliding.trainingUnits && ui["trainingUnits"][key].name === "writeButton"){
         if ((ui["trainingUnits"][key].id !== 0) || (ui["trainingUnits"][key].id === 0 && checkIfCanTrain(hexSelected))){
@@ -143,8 +148,19 @@ selectTrainButton = function(){
   }
 }
 
+selectSendButton = function(){
+  sendButtonSelected = -1;
+  if (mouseUIcolliding.sendingUnits !== -1 && showSendUnitUI){
+    for(var key in ui["sendingUnits"]){
+      if (key == mouseUIcolliding.sendingUnits && ui["sendingUnits"][key].name === "writeButton"){
+        sendButtonSelected = ui["sendingUnits"][key].id;
+      }
+    }
+  }
+}
+
 unitsSendButton = function(){
-  if (showUnitUI && hexSelected !== -1){
+  if (showUnitUI && hexSelected !== -1 && !showSendUnitUI){
     for(var i in ui["trainingUnits"]){
       if (mouseUIcolliding.trainingUnits === i){
         if (ui["trainingUnits"][i].name === "sendButton"){
@@ -209,30 +225,41 @@ trainUnits = function(units,i){
 
 showSendUnitsUI = function(){
 	//Jestli se má zobrazovat UI pro posílání jednotek
-  if (canMoveUnits && mouseHexColliding !== -1){
+  if (canMoveUnits && !showSendUnitUI && mouseHexColliding !== -1){
     for(var id in hexMoveAvailable){
   		if (hexMoveAvailable[id] === mouseHexColliding){
   			showSendUnitUI = true;
+        moveUnitsToHex = mouseHexColliding;
+        justOpened = true;
   		}
   	}
   }
 }
 
-//NEDOKONČENO
 dontShowSendUnitsUI = function(){
-  /*
-  if (showSendUnitUI){
-    if (mouseUIcolliding["trainingUnitsBg"] !== -1){
-      for(var key in ui["trainingUnitsBg"]){
-        //if (key == mouseHiddenUIcolliding
+  if (showSendUnitUI && !justOpened){
+    //Pokud hráč kliknul mimo lištu
+    if (mouseUIcolliding.sendingUnitsBg === -1){
+      showSendUnitUI = false;
+    }
+
+    //Pokud hráč kiknul na tlačítko pro zrušení
+    if (mouseUIcolliding.sendingUnits !== -1){
+      for (var key in ui["sendingUnits"]){
+        if (key == mouseUIcolliding.sendingUnits && ui["sendingUnits"][key].name === "cancelButton"){
+          showSendUnitUI = false;
+        }
       }
     }
   }
-  */
+
+
+  //Reset
+  justOpened = false;
 }
 
 endTurn = function(socket){
-  if (playing){
+  if (playing && !showSendUnitUI){
     if (mouseUIcolliding.main !== -1){
       if (ui["main"][mouseUIcolliding.main].name === "endTurn"){
         socket.emit("endTurn");

@@ -78,10 +78,31 @@ createUI = function(){
 	createUIelements(Img.writeButton, "writeButton", 2, 400, 70, "trainingUnits");
 	createUIelements(Img.sendButton, "sendButton", 2, 490, 70, "trainingUnits");
 
+	//Sending units BG
+		//Background
+	var x = Math.round(120+(WIDTH-120) / 2 - Img.uiSendUnitsBg.width / 2);
+	var y = Math.round(100+(HEIGHT-100) / 2 - Img.uiSendUnitsBg.height / 2);
+	createUIelements(Img.uiSendUnitsBg, "sendUnitsBg", 0, x, y, "sendingUnitsBg");
+
 	//Sending units
-	var x = 120+(WIDTH-120) / 2 - Img.uiSendUnitsBg.width / 2;
-	var y = 100+(HEIGHT-100) / 2 - Img.uiSendUnitsBg.height / 2;
-	createUIelements(Img.uiSendUnitsBg, "sendUnitsBg", 0, x, y, "sendingUnits");
+		//Buttons - cancel, send
+	var newX = Math.round(x + Img.uiSendUnitsBg.width * 0.7);
+	var newY = Math.round(y + Img.uiSendUnitsBg.height * 0.45);
+	createUIelements(Img.uiSendUnitsButton, "cancelButton", 0, newX, newY, "sendingUnits");
+	var newX = Math.round(x + Img.uiSendUnitsBg.width * 0.7);
+	var newY = Math.round(y + Img.uiSendUnitsBg.height * 0.7);
+	createUIelements(Img.uiSendUnitsButton, "sendButton", 0, newX, newY, "sendingUnits");
+
+		//Buttons - choosing the amount
+	var newX = Math.round(x + Img.uiSendUnitsBg.width * 0.25);
+	var newY = Math.round(y + Img.uiSendUnitsBg.height * 0.425);
+	createUIelements(Img.writeButton, "writeButton", 0, newX, newY, "sendingUnits");
+	var newX = Math.round(x + Img.uiSendUnitsBg.width * 0.25);
+	var newY = Math.round(y + Img.uiSendUnitsBg.height * 0.6);
+	createUIelements(Img.writeButton, "writeButton", 1, newX, newY, "sendingUnits");
+	var newX = Math.round(x + Img.uiSendUnitsBg.width * 0.25);
+	var newY = Math.round(y + Img.uiSendUnitsBg.height * 0.775);
+	createUIelements(Img.writeButton, "writeButton", 2, newX, newY, "sendingUnits");
 }
 
 createUIelements = function(image, name, id, x, y, subObject){

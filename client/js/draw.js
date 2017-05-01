@@ -92,10 +92,17 @@ drawAdjacentHexagons = function(hexSelected){
 			var centerY = hex[hexMoveAvailable[id]].y - Img.hex.height/2;
 			ctx.drawImage(Img.hexAvailable,0,0,Img.hexAvailable.width,Img.hexAvailable.height,centerX,centerY,Img.hexAvailable.width,Img.hexAvailable.height);
 
-			//Highlight targeted hexagon (if targeted)
-			if (hexMoveAvailable[id] === mouseHexColliding){
+			//Highlight targeted hexagon (if hovered by mouse)
+			if (hexMoveAvailable[id] === mouseHexColliding && !showSendUnitUI){
 				ctx.drawImage(Img.hexTargeted,0,0,Img.hexTargeted.width,Img.hexTargeted.height,centerX,centerY,Img.hexTargeted.width,Img.hexTargeted.height);
 			}
+		}
+
+		//Highlight hexagon (if sending units)
+		if (showSendUnitUI){
+			var centerX = hex[moveUnitsToHex].x - Img.hex.width/2;
+			var centerY = hex[moveUnitsToHex].y - Img.hex.height/2;
+			ctx.drawImage(Img.hexTargeted,0,0,Img.hexTargeted.width,Img.hexTargeted.height,centerX,centerY,Img.hexTargeted.width,Img.hexTargeted.height);
 		}
 	}
 }
@@ -189,9 +196,24 @@ drawUI = function(){
 
 	//Sending units
 	if (showSendUnitUI){
+		//Images
+		//Background
+		for(var key in ui["sendingUnitsBg"]){
+			ctx.drawImage(ui["sendingUnitsBg"][key].image, 0, 0, ui["sendingUnitsBg"][key].image.width, ui["sendingUnitsBg"][key].image.height, ui["sendingUnitsBg"][key].x, ui["sendingUnitsBg"][key].y, ui["sendingUnitsBg"][key].image.width, ui["sendingUnitsBg"][key].image.height);
+		}
+		//Foreground
 		for(var key in ui["sendingUnits"]){
 			ctx.drawImage(ui["sendingUnits"][key].image, 0, 0, ui["sendingUnits"][key].image.width, ui["sendingUnits"][key].image.height, ui["sendingUnits"][key].x, ui["sendingUnits"][key].y, ui["sendingUnits"][key].image.width, ui["sendingUnits"][key].image.height);
 		}
+
+		//Text
+		ctx.font="34px Arial";
+		ctx.fillStyle = "black";
+		ctx.textAlign="center";
+		ctx.textBaseline="top";
+		var x = 120+(WIDTH-120) / 2;
+		var y = 100+(HEIGHT-100) / 2 - Img.uiSendUnitsBg.height / 2 + 15;		//poslední číslo = odsazení od horního okraje
+		ctx.fillText("How many units to send?", x, y);
 	}
 }
 
@@ -227,15 +249,17 @@ drawUIhover = function(){
 		//Main
     if (mouseUIcolliding.main !== -1){
       var key = mouseUIcolliding.main;
-      if (ui["main"][key].name === "building")
-        ctx.drawImage(Img.uiBuildingHover, 0, 0, Img.uiBuildingHover.width, Img.uiBuildingHover.height, ui["main"][key].x, ui["main"][key].y, Img.uiBuildingHover.width, Img.uiBuildingHover.height);
-      if (ui["main"][key].name === "endTurn")
-        ctx.drawImage(Img.uiEndTurnHover, 0, 0, Img.uiEndTurnHover.width, Img.uiEndTurnHover.height, ui["main"][key].x, ui["main"][key].y, Img.uiEndTurnHover.width, Img.uiEndTurnHover.height);
-    }
+			if (!showSendUnitUI){
+				if (ui["main"][key].name === "building")
+	        ctx.drawImage(Img.uiBuildingHover, 0, 0, Img.uiBuildingHover.width, Img.uiBuildingHover.height, ui["main"][key].x, ui["main"][key].y, Img.uiBuildingHover.width, Img.uiBuildingHover.height);
+	      if (ui["main"][key].name === "endTurn")
+	        ctx.drawImage(Img.uiEndTurnHover, 0, 0, Img.uiEndTurnHover.width, Img.uiEndTurnHover.height, ui["main"][key].x, ui["main"][key].y, Img.uiEndTurnHover.width, Img.uiEndTurnHover.height);
+				}
+      }
 
     //Training units
     var keyHidden = mouseUIcolliding.trainingUnits;
-    if (keyHidden !== -1 && showUnitUI){
+    if (keyHidden !== -1 && showUnitUI && !showSendUnitUI){
 			if ((ui["trainingUnits"][keyHidden].id !== 0) || (ui["trainingUnits"][keyHidden].id === 0 && checkIfCanTrain(hexSelected))){
 				if (ui["trainingUnits"][keyHidden].name === "writeButton")
 	        ctx.drawImage(Img.writeButtonHover, 0, 0, Img.writeButtonHover.width, Img.writeButtonHover.height, ui["trainingUnits"][keyHidden].x, ui["trainingUnits"][keyHidden].y, Img.writeButtonHover.width, Img.writeButtonHover.height);
@@ -243,10 +267,20 @@ drawUIhover = function(){
 					ctx.drawImage(Img.sendButtonHover, 0, 0, Img.sendButtonHover.width, Img.sendButtonHover.height, ui["trainingUnits"][keyHidden].x, ui["trainingUnits"][keyHidden].y, Img.sendButtonHover.width, Img.sendButtonHover.height);
 			}
     }
+
+		//Sending units
+		var key = mouseUIcolliding.sendingUnits;
+		if (key !== -1 && showSendUnitUI){
+			if (ui["sendingUnits"][key].name === "writeButton")
+				ctx.drawImage(Img.writeButtonHover, 0, 0, Img.writeButtonHover.width, Img.writeButtonHover.height, ui["sendingUnits"][key].x, ui["sendingUnits"][key].y, Img.writeButtonHover.width, Img.writeButtonHover.height);
+			if (ui["sendingUnits"][key].name === "sendButton" || ui["sendingUnits"][key].name === "cancelButton")
+				ctx.drawImage(Img.uiSendUnitsButtonHover, 0, 0, Img.uiSendUnitsButtonHover.width, Img.uiSendUnitsButtonHover.height, ui["sendingUnits"][key].x, ui["sendingUnits"][key].y, Img.uiSendUnitsButtonHover.width, Img.uiSendUnitsButtonHover.height);
+		}
   }
 }
 
 drawUItopLayer = function(){
+	//Main
 	for(var key in ui["main"]){
     //Draw images of buildings
 		if (ui["main"][key].name === "building"){
@@ -278,8 +312,8 @@ drawUItopLayer = function(){
     }
 	}
 
-  //Hidden
-  if(showUnitUI){
+  //Training units
+  if (showUnitUI){
     for(var key in ui["trainingUnits"]){
 			if (ui["trainingUnits"][key].name === "writeButton" && ui["trainingUnits"][key].id === trainButtonSelected){
 				ctx.drawImage(Img.writeButtonType, 0, 0, Img.writeButtonType.width, Img.writeButtonType.height, ui["trainingUnits"][key].x, ui["trainingUnits"][key].y, Img.writeButtonType.width, Img.writeButtonType.height);
@@ -288,6 +322,33 @@ drawUItopLayer = function(){
       drawTrainButtonsText(key);
     }
   }
+
+	//Sending units
+	if (showSendUnitUI){
+		for(var key in ui["sendingUnits"]){
+			if (ui["sendingUnits"][key].name === "writeButton" && ui["sendingUnits"][key].id === sendButtonSelected){
+				ctx.drawImage(Img.writeButtonType, 0, 0, Img.writeButtonType.width, Img.writeButtonType.height, ui["sendingUnits"][key].x, ui["sendingUnits"][key].y, Img.writeButtonType.width, Img.writeButtonType.height);
+			}
+
+			//Draw text - cancel button and send button
+			ctx.font = "20px Arial";
+			ctx.fillStyle = "black";
+			ctx.textAlign="center";
+			ctx.textBaseline="middle";
+			if (ui["sendingUnits"][key].name === "cancelButton"){
+	      var x = ui["sendingUnits"][key].x + (ui["sendingUnits"][key].image.width / 2);
+	      var y = ui["sendingUnits"][key].y + (ui["sendingUnits"][key].image.height / 2);
+	      ctx.fillText("Cancel",x,y);
+			}
+
+			if (ui["sendingUnits"][key].name === "sendButton"){
+	      var x = ui["sendingUnits"][key].x + (ui["sendingUnits"][key].image.width / 2);
+	      var y = ui["sendingUnits"][key].y + (ui["sendingUnits"][key].image.height / 2);
+	      ctx.fillText("Send",x,y);
+			}
+
+		}
+	}
 }
 
 
