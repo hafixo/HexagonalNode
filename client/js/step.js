@@ -26,8 +26,15 @@ checkIfCanMoveUnits = function(hexSelected){
 }
 
 resetValues = function(){
+	//Train
 	if (!showUnitUI){
     trainValue = [0,0,0];
     trainDigits = [[],[],[]];
+  }
+
+	//Send
+	if (!showSendUnitUI){
+    sendValue = [0,0,0];
+    sendDigits = [[],[],[]];
   }
 }

@@ -14,6 +14,7 @@ input = function(){
       selectSendButton();
       unitsSendButton();
       showSendUnitsUI();
+      sendUnits();
       endTurn(socket);
       dontShowSendUnitsUI();    //Musí být na konci
     }
@@ -23,6 +24,7 @@ input = function(){
     if (!showSendUnitUI){
       placingBuilding = -1;
     	hexSelected = -1;
+      canMoveUnits = false;
     }
 
     dontShowSendUnitsUI();
@@ -35,10 +37,20 @@ input = function(){
     for(var i = 0; i <= 9; i++){
       if(event.keyCode === 48 + i || event.keyCode === 96 + i){    //48 = 0; 57 = 9;   NUM: 96 = 0; 105 = 9;
         var numberPressed = i;
+
+        //Training / dismissing units
         if (trainButtonSelected !== -1){
           if (trainDigits[trainButtonSelected].length < 4 && (!(trainDigits[trainButtonSelected].length === 0 && numberPressed === 0))){    //Číslo se nepřidá, pokud a) je délka 4; b) je délka 0 a zmáčknutá klávesa je 0
             trainDigits[trainButtonSelected].push(numberPressed);
             trainValue[trainButtonSelected] = calculateTrainValue(trainDigits, trainButtonSelected);
+          }
+        }
+
+        //Sending units
+        if (sendButtonSelected !== -1){
+          if (sendDigits[sendButtonSelected].length < 4 && (!(sendDigits[sendButtonSelected].length === 0 && numberPressed === 0))){    //Číslo se nepřidá, pokud a) je délka 4; b) je délka 0 a zmáčknutá klávesa je 0
+            sendDigits[sendButtonSelected].push(numberPressed);
+            sendValue[sendButtonSelected] = calculateSendValue(sendDigits, sendButtonSelected);
           }
         }
       }
@@ -46,11 +58,16 @@ input = function(){
 
     //test
     if(event.keyCode === 8){
-      console.log("Works 1");
+      //Reset training values
       if (trainButtonSelected !== -1){
-        console.log("Works 2");
         trainDigits[trainButtonSelected] = [];
         trainValue[trainButtonSelected] = 0;
+      }
+
+      //Reset sending values
+      if (sendButtonSelected !== -1){
+        sendDigits[sendButtonSelected] = [];
+        sendValue[sendButtonSelected] = 0;
       }
     }
   }
@@ -86,6 +103,7 @@ selectHexagon = function(){
 
   		if (unselect === true){
   			hexSelected = -1;
+        canMoveUnits = false;
   		}
   	}
   }
@@ -236,6 +254,48 @@ showSendUnitsUI = function(){
   }
 }
 
+sendUnits = function(){
+  if (mouseUIcolliding.sendingUnits !== -1 && showSendUnitUI){
+    for(var key in ui["sendingUnits"]){
+      if (key == mouseUIcolliding.sendingUnits && ui["sendingUnits"][key].name === "sendButton"){
+        //Poslat
+        //hexSelected, moveUnitsToHex, sendValue
+        for(var i in sendValue){
+          //Choose a unit for this loop
+          var unitType;
+          switch(parseInt(i)){
+            case 0:
+              unitType = "workers";
+              break;
+            case 1:
+              unitType = "soldiers";
+              break;
+            case 2:
+              unitType = "mages";
+              break;
+          }
+
+          //If the value is higher than the actual amount of units, then the value will be lowered to the amount of units
+          var actualValue = sendValue[i];
+            //console.log("unitType = " + unitType + "; sendValue[i] = " + sendValue[i] + "; hex[hexSelected][unitType] = " + hex[hexSelected][unitType]);
+          if (sendValue[i] > hex[hexSelected][unitType]){
+            actualValue = hex[hexSelected][unitType];
+          }
+
+          //Substract the units from the selected hexagon
+          hex[hexSelected][unitType] -= actualValue;
+
+          //Add the units to the recieving hexagon
+          hex[moveUnitsToHex][unitType] += actualValue;
+
+          //Close the sendUnitsUI
+          showSendUnitUI = false;
+        }
+      }
+    }
+  }
+}
+
 dontShowSendUnitsUI = function(){
   if (showSendUnitUI && !justOpened){
     //Pokud hráč kliknul mimo lištu
@@ -272,6 +332,19 @@ endTurn = function(socket){
 calculateTrainValue = function(trainDigits, trainButtonSelected){
   var value = 0;
   var array = trainDigits[trainButtonSelected];
+  var length = array.length;
+  for(var i in array){
+    var multiple = Math.pow(10, length-1);
+    value += array[i] * multiple;
+    length--;
+  }
+
+  return value;
+}
+
+calculateSendValue = function(sendDigits, sendButtonSelected){
+  var value = 0;
+  var array = sendDigits[sendButtonSelected];
   var length = array.length;
   for(var i in array){
     var multiple = Math.pow(10, length-1);

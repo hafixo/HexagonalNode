@@ -244,6 +244,40 @@ drawTrainButtonsText = function(key){
 	}
 }
 
+drawSendButtonsText = function(key){
+	//Draw text - cancel button and send button
+	ctx.font = "20px Arial";
+	ctx.fillStyle = "black";
+	ctx.textAlign="center";
+	ctx.textBaseline="middle";
+	if (ui["sendingUnits"][key].name === "cancelButton"){
+		var x = ui["sendingUnits"][key].x + (ui["sendingUnits"][key].image.width / 2);
+		var y = ui["sendingUnits"][key].y + (ui["sendingUnits"][key].image.height / 2);
+		ctx.fillText("Cancel",x,y);
+	}
+
+	if (ui["sendingUnits"][key].name === "sendButton"){
+		var x = ui["sendingUnits"][key].x + (ui["sendingUnits"][key].image.width / 2);
+		var y = ui["sendingUnits"][key].y + (ui["sendingUnits"][key].image.height / 2);
+		ctx.fillText("Send",x,y);
+	}
+
+	//Draw values
+	 if (ui["sendingUnits"][key].name === "writeButton"){
+		if (ui["sendingUnits"][key].id !== sendButtonSelected || sendValue[ui["sendingUnits"][key].id] !== 0){
+			ctx.font = "18px Arial";
+		  ctx.fillStyle = "black";
+		  ctx.textAlign="center";
+		  ctx.textBaseline="middle";
+		  var x = ui["sendingUnits"][key].x + (ui["sendingUnits"][key].image.width / 2);
+		  var y = ui["sendingUnits"][key].y + (ui["sendingUnits"][key].image.height / 2);
+		  var value = sendValue[ui["sendingUnits"][key].id];
+		 	ctx.fillText(value,x,y);
+	  }
+	}
+}
+
+
 drawUIhover = function(){
   if (playing){
 		//Main
@@ -330,23 +364,7 @@ drawUItopLayer = function(){
 				ctx.drawImage(Img.writeButtonType, 0, 0, Img.writeButtonType.width, Img.writeButtonType.height, ui["sendingUnits"][key].x, ui["sendingUnits"][key].y, Img.writeButtonType.width, Img.writeButtonType.height);
 			}
 
-			//Draw text - cancel button and send button
-			ctx.font = "20px Arial";
-			ctx.fillStyle = "black";
-			ctx.textAlign="center";
-			ctx.textBaseline="middle";
-			if (ui["sendingUnits"][key].name === "cancelButton"){
-	      var x = ui["sendingUnits"][key].x + (ui["sendingUnits"][key].image.width / 2);
-	      var y = ui["sendingUnits"][key].y + (ui["sendingUnits"][key].image.height / 2);
-	      ctx.fillText("Cancel",x,y);
-			}
-
-			if (ui["sendingUnits"][key].name === "sendButton"){
-	      var x = ui["sendingUnits"][key].x + (ui["sendingUnits"][key].image.width / 2);
-	      var y = ui["sendingUnits"][key].y + (ui["sendingUnits"][key].image.height / 2);
-	      ctx.fillText("Send",x,y);
-			}
-
+			drawSendButtonsText(key);
 		}
 	}
 }

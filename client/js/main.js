@@ -20,6 +20,10 @@ var sendValue = [0,0,0];     //hodnota, která se udává při posílání jedno
 var sendButtonSelected = -1;   //Které z tlačítek pro posílání jednotek je označeno. Pokud žádné, -1.
 var sendDigits = [[],[],[]];   //3 arraye v arrayi. 1 podarray v sobě zahrnuje číslice, které hráč zmáčknul, když měl označené tlačítko pro zadávání počtu jednotek.
 
+var hexMoveAvailable = [];		//If a hexagon is selected, it shows available moves. This array contains the id of hexagons, where the movement is possible.
+var canMoveUnits = false;     //Jestli je označen hexagon, tak tato proměnná určí, jestli se mají zvýraznit okolní hexagony kvůli pohybu jednotek. Pokud v označené zemi žádné jednotky nejsou, tak se nic nezobrazí. Mění se přes step event.
+var moveUnitsToHex = -1;      //Do jaké země se jednotky přesouvají.
+
 var mapCreated = false;
 
 var columns = 5;
@@ -43,10 +47,6 @@ var hexSelected = -1;		//What hexagon player has selected. If none, -1.
 
 var showUnitUI = false;		//Jestli se má zobrazovat lišta pro trénování jednotek (zobrazuje se, pokud je označena nějaká země a je v ní budovu pro výcvik).
 var showSendUnitUI = false;  //Jestli se má zobrazovat lišta pro přemístění jednotek (zobrazuje se při přemisťování jednotek).
-
-var hexMoveAvailable = [];		//If a hexagon is selected, it shows available moves. This array contains the id of hexagons, where the movement is possible.
-var canMoveUnits = false;     //Jestli je označen hexagon, tak tato proměnná určí, jestli se mají zvýraznit okolní hexagony kvůli pohybu jednotek. Pokud v označené zemi žádné jednotky nejsou, tak se nic nezobrazí. Mění se přes step event.
-var moveUnitsToHex = -1;      //Do jaké země se jednotky přesouvají.
 
 var justOpened = false;   //Využití u funkce showSendUnitsUI(). Slouží k tomu, aby se UI nezavřela hned potom, co se otevře.
 
