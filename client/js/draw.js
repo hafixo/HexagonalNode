@@ -172,16 +172,19 @@ drawUI = function(){
     for(var key in ui["trainingUnits"]){
 			//Dismiss
 			if (ui["trainingUnits"][key].id !== 0){
-        //Draw images
+        //Draw buttons
 				ctx.drawImage(ui["trainingUnits"][key].image, 0, 0, ui["trainingUnits"][key].image.width, ui["trainingUnits"][key].image.height, ui["trainingUnits"][key].x, ui["trainingUnits"][key].y, ui["trainingUnits"][key].image.width, ui["trainingUnits"][key].image.height);
-      }
+				}
 			//Train
 			else {
 				if (checkIfCanTrain(hexSelected)){
-          //Draw images
+          //Draw buttons
 					ctx.drawImage(ui["trainingUnits"][key].image, 0, 0, ui["trainingUnits"][key].image.width, ui["trainingUnits"][key].image.height, ui["trainingUnits"][key].x, ui["trainingUnits"][key].y, ui["trainingUnits"][key].image.width, ui["trainingUnits"][key].image.height);
         }
 			}
+
+			//Draw unit images
+			drawUiTrainUnitImage(key);
 		}
 
 		//Show text if units can't be trained in this hexagon
@@ -204,6 +207,8 @@ drawUI = function(){
 		//Foreground
 		for(var key in ui["sendingUnits"]){
 			ctx.drawImage(ui["sendingUnits"][key].image, 0, 0, ui["sendingUnits"][key].image.width, ui["sendingUnits"][key].image.height, ui["sendingUnits"][key].x, ui["sendingUnits"][key].y, ui["sendingUnits"][key].image.width, ui["sendingUnits"][key].image.height);
+
+			drawUiSendUnitImage(key);
 		}
 
 		//Text
@@ -215,6 +220,83 @@ drawUI = function(){
 		var y = 100+(HEIGHT-100) / 2 - Img.uiSendUnitsBg.height / 2 + 15;		//poslední číslo = odsazení od horního okraje
 		ctx.fillText("How many units to send?", x, y);
 	}
+}
+
+drawUiTrainUnitImage = function(key){
+	if (ui["trainingUnits"][key].name === "writeButton"){
+		var xOffset = 30;
+		var yOffset = 0;
+		var x = Math.round(ui["trainingUnits"][key].x - xOffset);
+		var y = Math.round((ui["trainingUnits"][key].y + ui["trainingUnits"][key].image.height/2 - Img.worker.height/2) - yOffset);
+
+		var image;
+		switch (ui["trainingUnits"][key].id) {
+			case 0:
+				image = getTrainingUnitImage(hexSelected);
+				//console.log(image);
+				break;
+			case 1:
+				image = Img.soldier;
+				break;
+			case 2:
+				image = Img.mage;
+				break;
+		}
+
+		if (image !== undefined)			//Zabrání vykreslování neexistujícího obrázku, pokud nelze v dané zemi trénovat jednotky
+			ctx.drawImage(image, 0, 0, ui["trainingUnits"][key].image.width, ui["trainingUnits"][key].image.height, x, y, ui["trainingUnits"][key].image.width, ui["trainingUnits"][key].image.height);
+		}
+}
+
+drawUiSendUnitImage = function(key){
+	if (ui["sendingUnits"][key].name === "writeButton"){
+		var xOffset = 30;
+		var yOffset = 0;
+		var x = Math.round(ui["sendingUnits"][key].x - xOffset);
+		var y = Math.round((ui["sendingUnits"][key].y + ui["sendingUnits"][key].image.height/2 - Img.worker.height/2) - yOffset);
+
+		var image;
+		switch (ui["sendingUnits"][key].id) {
+			case 0:
+				image = Img.worker;
+				break;
+			case 1:
+				image = Img.soldier;
+				break;
+			case 2:
+				image = Img.mage;
+				break;
+		}
+
+		ctx.drawImage(image, 0, 0, ui["sendingUnits"][key].image.width, ui["sendingUnits"][key].image.height, x, y, ui["sendingUnits"][key].image.width, ui["sendingUnits"][key].image.height);
+		}
+}
+
+getTrainingUnitImage = function(hexSelected){
+	for (var i in ui["main"]){
+		if (ui["main"][i].name === "building")
+			break;
+			//Vrátí i jako číslo první budovy. Další výcvikové buvody jsou i+1 a i+2.
+			//Pozn. - nutno převést i na integer
+	}
+	var i = parseInt(i);
+	var building = parseInt(hex[hexSelected].building);
+
+	var image;
+	//console.log("hex[hexSelected].building = " + hex[hexSelected].building + "; i = " + i);
+	switch(building){
+		case i:
+			image = Img.worker;
+			break;
+		case i+1:
+			image = Img.soldier;
+			break;
+		case i+2:
+			image = Img.mage;
+			break;
+	}
+
+	return image;
 }
 
 drawTrainButtonsText = function(key){

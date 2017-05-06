@@ -282,7 +282,7 @@ sendUnits = function(){
             actualValue = hex[hexSelected][unitType];
           }
 
-          //Substract the units from the selected hexagon
+          //Subtract the units from the selected hexagon
           hex[hexSelected][unitType] -= actualValue;
 
           //Add the units to the recieving hexagon
