@@ -184,7 +184,7 @@ drawUI = function(){
 			}
 
 			//Draw unit images
-			drawUiTrainUnitImage(key);
+			drawUiUnitImage(key, "trainingUnits");
 		}
 
 		//Show text if units can't be trained in this hexagon
@@ -208,7 +208,7 @@ drawUI = function(){
 		for(var key in ui["sendingUnits"]){
 			ctx.drawImage(ui["sendingUnits"][key].image, 0, 0, ui["sendingUnits"][key].image.width, ui["sendingUnits"][key].image.height, ui["sendingUnits"][key].x, ui["sendingUnits"][key].y, ui["sendingUnits"][key].image.width, ui["sendingUnits"][key].image.height);
 
-			drawUiSendUnitImage(key);
+			drawUiUnitImage(key, "sendingUnits");
 		}
 
 		//Text
@@ -222,18 +222,20 @@ drawUI = function(){
 	}
 }
 
-drawUiTrainUnitImage = function(key){
-	if (ui["trainingUnits"][key].name === "writeButton"){
+drawUiUnitImage = function(key, uiType){
+	if (ui[uiType][key].name === "writeButton"){
 		var xOffset = 30;
 		var yOffset = 0;
-		var x = Math.round(ui["trainingUnits"][key].x - xOffset);
-		var y = Math.round((ui["trainingUnits"][key].y + ui["trainingUnits"][key].image.height/2 - Img.worker.height/2) - yOffset);
+		var x = Math.round(ui[uiType][key].x - xOffset);
+		var y = Math.round((ui[uiType][key].y + ui[uiType][key].image.height/2 - Img.worker.height/2) - yOffset);
 
 		var image;
-		switch (ui["trainingUnits"][key].id) {
+		switch (ui[uiType][key].id) {
 			case 0:
-				image = getTrainingUnitImage(hexSelected);
-				//console.log(image);
+				if (uiType === "trainingUnits")
+					image = getTrainingUnitImage(hexSelected);
+				else if (uiType === "sendingUnits")
+					image = Img.worker;
 				break;
 			case 1:
 				image = Img.soldier;
@@ -244,31 +246,7 @@ drawUiTrainUnitImage = function(key){
 		}
 
 		if (image !== undefined)			//Zabrání vykreslování neexistujícího obrázku, pokud nelze v dané zemi trénovat jednotky
-			ctx.drawImage(image, 0, 0, ui["trainingUnits"][key].image.width, ui["trainingUnits"][key].image.height, x, y, ui["trainingUnits"][key].image.width, ui["trainingUnits"][key].image.height);
-		}
-}
-
-drawUiSendUnitImage = function(key){
-	if (ui["sendingUnits"][key].name === "writeButton"){
-		var xOffset = 30;
-		var yOffset = 0;
-		var x = Math.round(ui["sendingUnits"][key].x - xOffset);
-		var y = Math.round((ui["sendingUnits"][key].y + ui["sendingUnits"][key].image.height/2 - Img.worker.height/2) - yOffset);
-
-		var image;
-		switch (ui["sendingUnits"][key].id) {
-			case 0:
-				image = Img.worker;
-				break;
-			case 1:
-				image = Img.soldier;
-				break;
-			case 2:
-				image = Img.mage;
-				break;
-		}
-
-		ctx.drawImage(image, 0, 0, ui["sendingUnits"][key].image.width, ui["sendingUnits"][key].image.height, x, y, ui["sendingUnits"][key].image.width, ui["sendingUnits"][key].image.height);
+			ctx.drawImage(image, 0, 0, ui[uiType][key].image.width, ui[uiType][key].image.height, x, y, ui[uiType][key].image.width, ui[uiType][key].image.height);
 		}
 }
 
