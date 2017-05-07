@@ -209,9 +209,12 @@ drawUI = function(){
 			ctx.drawImage(ui["sendingUnits"][key].image, 0, 0, ui["sendingUnits"][key].image.width, ui["sendingUnits"][key].image.height, ui["sendingUnits"][key].x, ui["sendingUnits"][key].y, ui["sendingUnits"][key].image.width, ui["sendingUnits"][key].image.height);
 
 			drawUiUnitImage(key, "sendingUnits");
+
+			//Text (maximum amount of units that can be sent)
+			drawSendMaxAmount(key, hexSelected);
 		}
 
-		//Text
+		//General text
 		ctx.font="34px Arial";
 		ctx.fillStyle = "black";
 		ctx.textAlign="center";
@@ -224,13 +227,13 @@ drawUI = function(){
 
 drawUiUnitImage = function(key, uiType){
 	if (ui[uiType][key].name === "writeButton"){
-		var xOffset = 30;
+		var xOffset = -30;
 		var yOffset = 0;
-		var x = Math.round(ui[uiType][key].x - xOffset);
-		var y = Math.round((ui[uiType][key].y + ui[uiType][key].image.height/2 - Img.worker.height/2) - yOffset);
+		var x = Math.round(ui[uiType][key].x + xOffset);
+		var y = Math.round((ui[uiType][key].y + ui[uiType][key].image.height/2 - Img.worker.height/2) + yOffset);
 
 		var image;
-		switch (ui[uiType][key].id) {
+		switch (ui[uiType][key].id){
 			case 0:
 				if (uiType === "trainingUnits")
 					image = getTrainingUnitImage(hexSelected);
@@ -248,6 +251,35 @@ drawUiUnitImage = function(key, uiType){
 		if (image !== undefined)			//Zabrání vykreslování neexistujícího obrázku, pokud nelze v dané zemi trénovat jednotky
 			ctx.drawImage(image, 0, 0, ui[uiType][key].image.width, ui[uiType][key].image.height, x, y, ui[uiType][key].image.width, ui[uiType][key].image.height);
 		}
+}
+
+drawSendMaxAmount = function(key, hexSelected){
+	if (ui["sendingUnits"][key].name === "writeButton"){
+		ctx.font="19px Arial";
+		ctx.fillStyle = "black";
+		ctx.textAlign="left";
+		ctx.textBaseline="middle";
+
+		var xOffset = 58;
+		var yOffset = 0;
+		var x = Math.round(ui["sendingUnits"][key].x + xOffset);
+		var y = Math.round((ui["sendingUnits"][key].y + ui["sendingUnits"][key].image.height/2) + yOffset);
+
+		var unitType;
+		switch (ui["sendingUnits"][key].id){
+			case 0:
+				unitType = "workers";
+				break;
+			case 1:
+				unitType = "soldiers";
+				break;
+			case 2:
+				unitType = "mages";
+				break;
+		}
+
+		ctx.fillText("/ " + hex[hexSelected][unitType], x, y);
+	}
 }
 
 getTrainingUnitImage = function(hexSelected){
@@ -336,7 +368,6 @@ drawSendButtonsText = function(key){
 	  }
 	}
 }
-
 
 drawUIhover = function(){
   if (playing){
@@ -428,7 +459,6 @@ drawUItopLayer = function(){
 		}
 	}
 }
-
 
 //Supporting functions
 selectUiImage = function(key){
