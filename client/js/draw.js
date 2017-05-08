@@ -5,6 +5,8 @@ drawGame = function(){
 
 	drawHexagons();
 
+	drawHexagonBackground();
+	/*
 	drawHexHover();
 
 	drawHexAvailable();
@@ -12,6 +14,7 @@ drawGame = function(){
 	drawTargetHex();
 
 	drawHexSelected();
+	*/
 
 	drawHexElements();
 
@@ -33,10 +36,158 @@ drawHexagons = function(){
 	}
 }
 
+drawHexagonBackground = function(){
+	for(var key in hex){
+		//Set counter. If there's a correct background, counter will be changed and no other background will be drawn.
+		hexBackgroundSelected = false;		//global var
+
+		//Go through each layer
+		drawHexSelected(key);
+		drawHexAdjacentToSelectedHexHover(key);
+		drawHexAdjacentToSelectedHexIfSendingUnits(key);
+		drawHexAdjacentToSelectedHex(key);
+		drawHexPlacingBuildingHover(key);
+		drawHexPlacingBuildingAvailable(key);
+		drawHexHover(key);
+		drawOwnerBackground(key);
+	}
+}
+
+drawHexSelected = function(key){
+	//Draw background if this hexagon is selected
+	if (playing && hexBackgroundSelected === false){
+		if (key === hexSelected){
+			var centerX = hex[key].x - Img.hex.width/2;
+			var centerY = hex[key].y - Img.hex.height/2;
+			ctx.drawImage(Img.hexSelected,0,0,Img.hexSelected.width,Img.hexSelected.height,centerX,centerY,Img.hexSelected.width,Img.hexSelected.height);
+
+			hexBackgroundSelected = true;
+		}
+	}
+}
+
+drawHexAdjacentToSelectedHexIfSendingUnits = function(key){
+	//Highlight targeted hexagon (if sending units)
+ 	if (canMoveUnits && showSendUnitUI && hexBackgroundSelected === false){
+		if (key === moveUnitsToHex){
+	 		var centerX = hex[moveUnitsToHex].x - Img.hex.width/2;
+	 		var centerY = hex[moveUnitsToHex].y - Img.hex.height/2;
+	 		ctx.drawImage(Img.hexTargeted,0,0,Img.hexTargeted.width,Img.hexTargeted.height,centerX,centerY,Img.hexTargeted.width,Img.hexTargeted.height);
+
+			hexBackgroundSelected = true;
+		}
+ 	}
+}
+
+drawHexAdjacentToSelectedHexHover = function(key){
+	//Highlight targeted hexagon (if hovered by mouse)
+	if (canMoveUnits && hexBackgroundSelected === false){		//If there's at least 1 unit in the selected hexagon
+		for(var id in hexMoveAvailable){
+			if (key === hexMoveAvailable[id] && key === mouseHexColliding && !showSendUnitUI){
+				var centerX = hex[key].x - Img.hex.width/2;
+				var centerY = hex[key].y - Img.hex.height/2;
+				ctx.drawImage(Img.hexTargeted,0,0,Img.hexTargeted.width,Img.hexTargeted.height,centerX,centerY,Img.hexTargeted.width,Img.hexTargeted.height);
+
+				hexBackgroundSelected = true;
+			}
+		}
+	}
+}
+
+drawHexAdjacentToSelectedHex = function(key){
+	//Draw hexagons which are available for unit to move into.
+	if (canMoveUnits && hexBackgroundSelected === false){		//If there's at least 1 unit in the selected hexagon
+		for(var id in hexMoveAvailable){
+			if (key == hexMoveAvailable[id]){
+				var centerX = hex[hexMoveAvailable[id]].x - Img.hex.width/2;
+				var centerY = hex[hexMoveAvailable[id]].y - Img.hex.height/2;
+				ctx.drawImage(Img.hexAvailable,0,0,Img.hexAvailable.width,Img.hexAvailable.height,centerX,centerY,Img.hexAvailable.width,Img.hexAvailable.height);
+
+				hexBackgroundSelected = true;
+			}
+
+			/*
+			//Highlight targeted hexagon (if hovered by mouse)
+			if (hexMoveAvailable[id] === mouseHexColliding && !showSendUnitUI){
+				ctx.drawImage(Img.hexTargeted,0,0,Img.hexTargeted.width,Img.hexTargeted.height,centerX,centerY,Img.hexTargeted.width,Img.hexTargeted.height);
+			}
+			*/
+		}
+
+		/*
+		//Highlight hexagon (if sending units)
+		if (showSendUnitUI){
+			var centerX = hex[moveUnitsToHex].x - Img.hex.width/2;
+			var centerY = hex[moveUnitsToHex].y - Img.hex.height/2;
+			ctx.drawImage(Img.hexTargeted,0,0,Img.hexTargeted.width,Img.hexTargeted.height,centerX,centerY,Img.hexTargeted.width,Img.hexTargeted.height);
+		}
+		*/
+	}
+}
+
+drawHexPlacingBuildingHover = function(key){
+	//Draw background if mouse is hovering over a hexagon where a building can be built
+	if (playing && placingBuilding !== -1 && hexBackgroundSelected === false){
+		if (key === mouseHexColliding){		//check for collision
+			if (hex[mouseHexColliding].building === -1){	 //check if it's possible to build here
+				var centerX = hex[mouseHexColliding].x - Img.hexTargeted.width/2;
+				var centerY = hex[mouseHexColliding].y - Img.hexTargeted.height/2;
+				ctx.drawImage(Img.hexTargeted,0,0,Img.hexTargeted.width,Img.hexTargeted.height,centerX,centerY,Img.hexTargeted.width,Img.hexTargeted.height);
+
+				hexBackgroundSelected = true;
+			}
+		}
+	}
+}
+
+drawHexPlacingBuildingAvailable = function(key){
+	//Draw background if a building can be placed here (when the player wants to build)
+	if (playing && placingBuilding !== -1 && hexBackgroundSelected === false){
+		if (hex[key].building === -1){
+			var centerX = hex[key].x - Img.hex.width/2;
+			var centerY = hex[key].y - Img.hex.height/2;
+			ctx.drawImage(Img.hexAvailable,0,0,Img.hexAvailable.width,Img.hexAvailable.height,centerX,centerY,Img.hexAvailable.width,Img.hexAvailable.height);
+
+			hexBackgroundSelected = true;
+		}
+	}
+}
+
+drawHexHover = function(key){
+	//Draw mouse hovering over a normal hexagon with no other background (except owner's bachground)
+	if (playing && hexBackgroundSelected === false){
+  	if (mouseHexColliding === key && hexSelected === -1 && placingBuilding === -1){
+  		var centerX = hex[mouseHexColliding].x - Img.hexHover.width/2;
+  		var centerY = hex[mouseHexColliding].y - Img.hexHover.height/2;
+  		ctx.drawImage(Img.hexHover,0,0,Img.hexHover.width,Img.hexHover.height,centerX,centerY,Img.hexHover.width,Img.hexHover.height);
+
+			hexBackgroundSelected = true;
+  	}
+  }
+}
+
+drawOwnerBackground = function(key){
+	//Draw standard owner's background
+	if (hexBackgroundSelected === false){
+		var image = undefined;
+		if (hex[key].owner === 1)
+			image = Img.hexOwner1;
+		if (hex[key].owner === 2)
+			image = Img.hexOwner2;
+
+		if (image !== undefined){
+			var centerX = hex[key].x - Img.hex.width/2;
+			var centerY = hex[key].y - Img.hex.height/2;
+			ctx.drawImage(image,0,0,image.width,image.height,centerX,centerY,image.width,image.height);
+		}
+		hexBackgroundSelected = true;
+	}
+}
+/*
 drawHexHover = function(hexId){
   if (playing){
     var hexId = mouseHexColliding;
-  	if (hexId !== -1 && hexSelected === -1 && placingBuilding === -1){
+  	if (mouseHexColliding !== -1 && hexSelected === -1 && placingBuilding === -1){
   		var centerX = hex[hexId].x - Img.hexHover.width/2;
   		var centerY = hex[hexId].y - Img.hexHover.height/2;
   		ctx.drawImage(Img.hexHover,0,0,Img.hexHover.width,Img.hexHover.height,centerX,centerY,Img.hexHover.width,Img.hexHover.height);
@@ -106,6 +257,7 @@ drawAdjacentHexagons = function(hexSelected){
 		}
 	}
 }
+*/
 
 drawHexElements = function(){
 	for(var id in hex){
@@ -120,13 +272,13 @@ drawHexElements = function(){
 		}
 
 		//Units
-		if (hex[id].workers !== 0 || hex[id].workersWaiting){
+		if (hex[id].workers !== 0 || hex[id].workersWaiting !== 0){
 			drawEachUnit("worker", 0.5, 0.1, id);
 		}
-		if (hex[id].soldiers !== 0 || hex[id].soldiersWaiting){
+		if (hex[id].soldiers !== 0 || hex[id].soldiersWaiting !== 0){
 			drawEachUnit("soldier", 0, -0.2, id);
 		}
-		if (hex[id].mages !== 0 || hex[id].magesWaiting){
+		if (hex[id].mages !== 0 || hex[id].magesWaiting !== 0){
 			drawEachUnit("mage", -0.5, 0.1, id);
 		}
 	}

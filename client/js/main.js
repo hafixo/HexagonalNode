@@ -11,6 +11,7 @@ var mouseX = 0;
 var mouseY = 0;
 
 var index = 0;    //slouží při tvorbě ui
+var hexBackgroundSelected = false;    //slouží při vykreslování pozadí hexagonů
 
 var trainValue = [0,0,0];    //hodnota, která se udává při trénování nebo propuštění jednotek. 3 tlačítka, proto 3 hodnoty v array.
 var trainButtonSelected = -1;   //Které z tlačítek pro trénování je označeno. Pokud žádné, -1.
@@ -94,6 +95,12 @@ onStartGame = function(socket){
   socket.on("startGame", function(data){
     loopGame = true;
     playing = data;
+    if (playing === true){
+      player = 1;
+    }
+    else {
+      player = 2;
+    }
     console.log("Start game! Is this player first? " + playing);
 
     //Draw some basic text (temporary)

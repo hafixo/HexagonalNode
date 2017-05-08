@@ -32,6 +32,7 @@ createMap = function(columns,mainColumnSize){
 		hex[id].workersWaiting = 0;
 		hex[id].soldiersWaiting = 0;
 		hex[id].magesWaiting = 0;
+		hex[id].owner = setHexOwner(hex[id].column, hex[id].line);			//0 = neutrální; 1 = hráč, který začínal; 2 = hráč, který nezačínal;
 
 		currentColPos++;
 		if (currentColPos > currentColSize){
@@ -44,6 +45,25 @@ createMap = function(columns,mainColumnSize){
 	}
 
 	mapCreated = true;
+}
+
+setHexOwner = function(column, line){
+	var owner = 0;
+	if (column === (columns+1) / 2){		//Pokud se jedná o prostřední sloupec
+		switch(line){
+			case 1:
+				owner = 2;
+				break;
+			case mainColumnSize:
+				owner = 1;
+				break;
+			default:
+				owner = 0;
+				break;
+		}
+	}
+
+	return owner;
 }
 
 createUI = function(){
