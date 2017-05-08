@@ -12,7 +12,7 @@ input = function(){
     	placeBuilding();		//Kvůli proměnné placingBuilding musí být až po selectHexagon
       selectTrainButton();
       selectSendButton();
-      unitsSendButton();
+      trainUnitsButton();
       showSendUnitsUI();
       sendUnits();
       endTurn(socket);
@@ -177,7 +177,7 @@ selectSendButton = function(){
   }
 }
 
-unitsSendButton = function(){
+trainUnitsButton = function(){
   if (showUnitUI && hexSelected !== -1 && !showSendUnitUI){
     for(var i in ui["trainingUnits"]){
       if (mouseUIcolliding.trainingUnits === i){
@@ -238,7 +238,8 @@ unitsSendButton = function(){
 
 trainUnits = function(units,i){
   //Zde budu muset později přidat kontrolu, jestli má hráč dostatek zlata
-  hex[hexSelected][units] += trainValue[ui["trainingUnits"][i].id];
+  var unitWaitingVarName = units + "Waiting"
+  hex[hexSelected][unitWaitingVarName] += trainValue[ui["trainingUnits"][i].id];
 }
 
 showSendUnitsUI = function(){
@@ -286,7 +287,8 @@ sendUnits = function(){
           hex[hexSelected][unitType] -= actualValue;
 
           //Add the units to the recieving hexagon
-          hex[moveUnitsToHex][unitType] += actualValue;
+          var unitWaitingType = unitType + "Waiting";
+          hex[moveUnitsToHex][unitWaitingType] += actualValue;
 
           //Close the sendUnitsUI
           showSendUnitUI = false;
@@ -323,7 +325,36 @@ endTurn = function(socket){
     if (mouseUIcolliding.main !== -1){
       if (ui["main"][mouseUIcolliding.main].name === "endTurn"){
         socket.emit("endTurn");
+        refreshUnits();
         playing = false;
+      }
+    }
+  }
+}
+
+refreshUnits = function(){
+  for (key in hex){
+    for (var i = 0; i <= 2; i++){
+      var unitType;
+      switch(parseInt(i)){
+        case 0:
+          unitType = "workers";
+          break;
+        case 1:
+          unitType = "soldiers";
+          break;
+        case 2:
+          unitType = "mages";
+          break;
+      }
+
+      if (unitType !== undefined){
+        var unitWaitingType = unitType + "Waiting";
+
+        if (hex[key][unitWaitingType] !== 0){
+          hex[key][unitType] += hex[key][unitWaitingType];
+          hex[key][unitWaitingType] = 0;
+        }
       }
     }
   }

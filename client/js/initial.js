@@ -29,6 +29,9 @@ createMap = function(columns,mainColumnSize){
 		hex[id].workers = 0;
 		hex[id].soldiers = 0;
 		hex[id].mages = 0;
+		hex[id].workersWaiting = 0;
+		hex[id].soldiersWaiting = 0;
+		hex[id].magesWaiting = 0;
 
 		currentColPos++;
 		if (currentColPos > currentColSize){

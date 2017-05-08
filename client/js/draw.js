@@ -120,13 +120,13 @@ drawHexElements = function(){
 		}
 
 		//Units
-		if (hex[id].workers !== 0){
+		if (hex[id].workers !== 0 || hex[id].workersWaiting){
 			drawEachUnit("worker", 0.5, 0.1, id);
 		}
-		if (hex[id].soldiers !== 0){
+		if (hex[id].soldiers !== 0 || hex[id].soldiersWaiting){
 			drawEachUnit("soldier", 0, -0.2, id);
 		}
-		if (hex[id].mages !== 0){
+		if (hex[id].mages !== 0 || hex[id].magesWaiting){
 			drawEachUnit("mage", -0.5, 0.1, id);
 		}
 	}
@@ -149,6 +149,12 @@ drawEachUnit = function(type, xOff, yOff, id){
 	var x = centerX + Img[type].width/2;
 	var y = centerY + Img[type].width/2;
 	ctx.fillText(hex[id][unitVarName], x, y);
+
+	//Waiting units
+	unitWaitingVarName = unitVarName + "Waiting";
+	if (hex[id][unitWaitingVarName] !== 0){
+		ctx.fillText("+" + hex[id][unitWaitingVarName], x-3, y-18);
+	}
 }
 
 drawUI = function(){
