@@ -15,7 +15,7 @@ Img.hexTargeted.src = "../client/img/hexTargeted.png";
 Img.hexOwner1 = new Image();
 Img.hexOwner1.src = "../client/img/hexOwnerTest2.png";
 Img.hexOwner2 = new Image();
-Img.hexOwner2.src = "../client/img/hexOwnerTest3.png";
+Img.hexOwner2.src = "../client/img/hexOwnerTest1.png";
 
 //Units
 Img.worker = new Image();

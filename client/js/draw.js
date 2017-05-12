@@ -6,15 +6,6 @@ drawGame = function(){
 	drawHexagons();
 
 	drawHexagonBackground();
-	/*
-	drawHexHover();
-
-	drawHexAvailable();
-
-	drawTargetHex();
-
-	drawHexSelected();
-	*/
 
 	drawHexElements();
 
@@ -105,23 +96,7 @@ drawHexAdjacentToSelectedHex = function(key){
 
 				hexBackgroundSelected = true;
 			}
-
-			/*
-			//Highlight targeted hexagon (if hovered by mouse)
-			if (hexMoveAvailable[id] === mouseHexColliding && !showSendUnitUI){
-				ctx.drawImage(Img.hexTargeted,0,0,Img.hexTargeted.width,Img.hexTargeted.height,centerX,centerY,Img.hexTargeted.width,Img.hexTargeted.height);
-			}
-			*/
 		}
-
-		/*
-		//Highlight hexagon (if sending units)
-		if (showSendUnitUI){
-			var centerX = hex[moveUnitsToHex].x - Img.hex.width/2;
-			var centerY = hex[moveUnitsToHex].y - Img.hex.height/2;
-			ctx.drawImage(Img.hexTargeted,0,0,Img.hexTargeted.width,Img.hexTargeted.height,centerX,centerY,Img.hexTargeted.width,Img.hexTargeted.height);
-		}
-		*/
 	}
 }
 
@@ -183,81 +158,6 @@ drawOwnerBackground = function(key){
 		hexBackgroundSelected = true;
 	}
 }
-/*
-drawHexHover = function(hexId){
-  if (playing){
-    var hexId = mouseHexColliding;
-  	if (mouseHexColliding !== -1 && hexSelected === -1 && placingBuilding === -1){
-  		var centerX = hex[hexId].x - Img.hexHover.width/2;
-  		var centerY = hex[hexId].y - Img.hexHover.height/2;
-  		ctx.drawImage(Img.hexHover,0,0,Img.hexHover.width,Img.hexHover.height,centerX,centerY,Img.hexHover.width,Img.hexHover.height);
-  	}
-  }
-}
-
-drawHexAvailable = function(){
-	//Draw which hexagons are available when placing buildings
-	if (placingBuilding !== -1){
-		for(var id in hex){
-			if (hex[id].building === -1){
-				var centerX = hex[id].x - Img.hex.width/2;
-				var centerY = hex[id].y - Img.hex.height/2;
-				ctx.drawImage(Img.hexAvailable,0,0,Img.hexAvailable.width,Img.hexAvailable.height,centerX,centerY,Img.hexAvailable.width,Img.hexAvailable.height);
-			}
-		}
-	}
-}
-
-drawTargetHex = function(){
-	//Placing buildings
-	if (placingBuilding !== -1){
-		var hexId = mouseHexColliding;
-		if (hexId !== -1){
-			if (hex[hexId].building === -1){
-				var centerX = hex[hexId].x - Img.hexTargeted.width/2;
-				var centerY = hex[hexId].y - Img.hexTargeted.height/2;
-				ctx.drawImage(Img.hexTargeted,0,0,Img.hexTargeted.width,Img.hexTargeted.height,centerX,centerY,Img.hexTargeted.width,Img.hexTargeted.height);
-			}
-		}
-	}
-}
-
-drawHexSelected = function(){
-	if (hexSelected !== -1){
-		for(var id in hex){
-			if (id == hexSelected){
-				var centerX = hex[id].x - Img.hex.width/2;
-				var centerY = hex[id].y - Img.hex.height/2;
-				ctx.drawImage(Img.hexSelected,0,0,Img.hexSelected.width,Img.hexSelected.height,centerX,centerY,Img.hexSelected.width,Img.hexSelected.height);
-			}
-		}
-		drawAdjacentHexagons(hexSelected);
-	}
-}
-
-drawAdjacentHexagons = function(hexSelected){
-	//Draw available hexagons
-	if (canMoveUnits){		//If there's at least 1 unit in the selected hexagon
-		for(var id in hexMoveAvailable){
-			var centerX = hex[hexMoveAvailable[id]].x - Img.hex.width/2;
-			var centerY = hex[hexMoveAvailable[id]].y - Img.hex.height/2;
-			ctx.drawImage(Img.hexAvailable,0,0,Img.hexAvailable.width,Img.hexAvailable.height,centerX,centerY,Img.hexAvailable.width,Img.hexAvailable.height);
-
-			//Highlight targeted hexagon (if hovered by mouse)
-			if (hexMoveAvailable[id] === mouseHexColliding && !showSendUnitUI){
-				ctx.drawImage(Img.hexTargeted,0,0,Img.hexTargeted.width,Img.hexTargeted.height,centerX,centerY,Img.hexTargeted.width,Img.hexTargeted.height);
-			}
-		}
-
-		//Highlight hexagon (if sending units)
-		if (showSendUnitUI){
-			var centerX = hex[moveUnitsToHex].x - Img.hex.width/2;
-			var centerY = hex[moveUnitsToHex].y - Img.hex.height/2;
-			ctx.drawImage(Img.hexTargeted,0,0,Img.hexTargeted.width,Img.hexTargeted.height,centerX,centerY,Img.hexTargeted.width,Img.hexTargeted.height);
-		}
-	}
-}
-*/
 
 drawHexElements = function(){
 	for(var id in hex){
@@ -364,12 +264,14 @@ drawUI = function(){
 		}
 		//Foreground
 		for(var key in ui["sendingUnits"]){
-			ctx.drawImage(ui["sendingUnits"][key].image, 0, 0, ui["sendingUnits"][key].image.width, ui["sendingUnits"][key].image.height, ui["sendingUnits"][key].x, ui["sendingUnits"][key].y, ui["sendingUnits"][key].image.width, ui["sendingUnits"][key].image.height);
+			if ((!attacking) || (attacking && ui["sendingUnits"][key].name !== "writeButton") || (attacking && ui["sendingUnits"][key].name === "writeButton" && ui["sendingUnits"][key].id === 1)){		//Jednoduše řečeno - pokud se útočí, tak se nezobrazuje kolonka pro farmáře a mágy, pouze pro vojáky
+				ctx.drawImage(ui["sendingUnits"][key].image, 0, 0, ui["sendingUnits"][key].image.width, ui["sendingUnits"][key].image.height, ui["sendingUnits"][key].x, ui["sendingUnits"][key].y, ui["sendingUnits"][key].image.width, ui["sendingUnits"][key].image.height);
 
-			drawUiUnitImage(key, "sendingUnits");
+				drawUiUnitImage(key, "sendingUnits");
 
-			//Text (maximum amount of units that can be sent)
-			drawSendMaxAmount(key, hexSelected);
+				//Text (maximum amount of units that can be sent)
+				drawSendMaxAmount(key, hexSelected);
+			}
 		}
 
 		//General text
@@ -554,10 +456,15 @@ drawUIhover = function(){
 		//Sending units
 		var key = mouseUIcolliding.sendingUnits;
 		if (key !== -1 && showSendUnitUI){
-			if (ui["sendingUnits"][key].name === "writeButton")
-				ctx.drawImage(Img.writeButtonHover, 0, 0, Img.writeButtonHover.width, Img.writeButtonHover.height, ui["sendingUnits"][key].x, ui["sendingUnits"][key].y, Img.writeButtonHover.width, Img.writeButtonHover.height);
-			if (ui["sendingUnits"][key].name === "sendButton" || ui["sendingUnits"][key].name === "cancelButton")
+			if (ui["sendingUnits"][key].name === "writeButton"){
+				if ((!attacking) || (attacking && ui["sendingUnits"][key].id === 1)){		//Pokud se útočí, tak se nezobrazuje kolonka pro farmáře a mágy, pouze pro vojáky
+					ctx.drawImage(Img.writeButtonHover, 0, 0, Img.writeButtonHover.width, Img.writeButtonHover.height, ui["sendingUnits"][key].x, ui["sendingUnits"][key].y, Img.writeButtonHover.width, Img.writeButtonHover.height);
+				}
+			}
+
+			if (ui["sendingUnits"][key].name === "sendButton" || ui["sendingUnits"][key].name === "cancelButton"){
 				ctx.drawImage(Img.uiSendUnitsButtonHover, 0, 0, Img.uiSendUnitsButtonHover.width, Img.uiSendUnitsButtonHover.height, ui["sendingUnits"][key].x, ui["sendingUnits"][key].y, Img.uiSendUnitsButtonHover.width, Img.uiSendUnitsButtonHover.height);
+			}
 		}
   }
 }
@@ -609,11 +516,13 @@ drawUItopLayer = function(){
 	//Sending units
 	if (showSendUnitUI){
 		for(var key in ui["sendingUnits"]){
-			if (ui["sendingUnits"][key].name === "writeButton" && ui["sendingUnits"][key].id === sendButtonSelected){
+			if (ui["sendingUnits"][key].name === "writeButton" && ui["sendingUnits"][key].id === sendButtonSelected){			//Tady se nemusím už starat o to, jestli se útočí nebo ne, protože o to jsem se už postaral v inputu. Nevhodná pole při útočení nejsou označena.
 				ctx.drawImage(Img.writeButtonType, 0, 0, Img.writeButtonType.width, Img.writeButtonType.height, ui["sendingUnits"][key].x, ui["sendingUnits"][key].y, Img.writeButtonType.width, Img.writeButtonType.height);
 			}
 
-			drawSendButtonsText(key);
+			if ((!attacking) || (attacking && ui["sendingUnits"][key].name !== "writeButton") || (attacking && ui["sendingUnits"][key].name === "writeButton" && ui["sendingUnits"][key].id === 1)){		//Jednoduše řečeno - pokud se útočí, tak se nezobrazuje kolonka pro farmáře a mágy, pouze pro vojáky
+				drawSendButtonsText(key);
+			}
 		}
 	}
 }
@@ -685,4 +594,18 @@ selectImage = function(key){
 			break;
 	}
 	return image;
+}
+
+checkIfCanTrain = function(hexSelected){
+	for (var i in ui["main"]){
+		if (ui["main"][i].name === "building")
+			break;
+			//Vrátí i jako číslo první budovy. Další výcvikové buvody jsou i+1 a i+2.
+			//Pozn. - nutno převést i na integer
+	}
+	var i = parseInt(i);
+	if ((hex[hexSelected].building >= i) && (hex[hexSelected].building <= i+2))
+		return true;
+	else
+		return false;
 }

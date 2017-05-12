@@ -6,6 +6,7 @@ var loopGame = false;
 //Proměnné, které bude mít klient u sebe - toto budu ale muset kontrolovat i na serveru, jestli sedí (ochrana proti cheatům)
 var myID = -1;
 var playing = -1;   //kdo je na tahu
+var player = -1;    //jakou barvu má hráč a kde začíná. 1, pokud je dole. 2, pokud je nahoře. Tato hodnota se udá funkcí onStartGame(data).
 
 var mouseX = 0;
 var mouseY = 0;
@@ -24,6 +25,7 @@ var sendDigits = [[],[],[]];   //3 arraye v arrayi. 1 podarray v sobě zahrnuje 
 var hexMoveAvailable = [];		//If a hexagon is selected, it shows available moves. This array contains the id of hexagons, where the movement is possible.
 var canMoveUnits = false;     //Jestli je označen hexagon, tak tato proměnná určí, jestli se mají zvýraznit okolní hexagony kvůli pohybu jednotek. Pokud v označené zemi žádné jednotky nejsou, tak se nic nezobrazí. Mění se přes step event.
 var moveUnitsToHex = -1;      //Do jaké země se jednotky přesouvají.
+var attacking = false;        //Jestli země, do které se jednotky přesouvají, je nepřátelská. Pokud ano, bude UI pro přesouvání jednotek vypadat (a chovat se) jinak.
 
 var mapCreated = false;
 
@@ -127,8 +129,8 @@ gameLoop = function(){
   if (loopGame){
     //Create the map
   	if (mapCreated === false){
+      createUI();
   		createMap(columns,mainColumnSize);
-  		createUI();
   	}
 
     //Check collision

@@ -90,7 +90,7 @@ selectHexagon = function(){
   	if ((hexSelected !== -1) && (notUnselect === false)) {
   		var unselect = true;
   		for (var i in hexMoveAvailable){
-  			if (hexMoveAvailable[i] === mouseHexColliding){		//Označení se nezruší, pokud klikne na sousední zemi
+  			if (canMoveUnits && hexMoveAvailable[i] === mouseHexColliding){		//Označení se nezruší, pokud má v zemi vojáky, kteří se mohou pohnout, a klikne na sousední zemi
   				unselect = false;
   			}
   		}
@@ -171,7 +171,10 @@ selectSendButton = function(){
   if (mouseUIcolliding.sendingUnits !== -1 && showSendUnitUI){
     for(var key in ui["sendingUnits"]){
       if (key == mouseUIcolliding.sendingUnits && ui["sendingUnits"][key].name === "writeButton"){
-        sendButtonSelected = ui["sendingUnits"][key].id;
+        //If attacking, the id must be 1 (soldiers)
+        if (!attacking || attacking && ui["sendingUnits"][key].id === 1){
+          sendButtonSelected = ui["sendingUnits"][key].id;
+        }
       }
     }
   }
@@ -249,6 +252,9 @@ showSendUnitsUI = function(){
   		if (hexMoveAvailable[id] === mouseHexColliding){
   			showSendUnitUI = true;
         moveUnitsToHex = mouseHexColliding;
+        if (hex[moveUnitsToHex].owner !== 0 && hex[moveUnitsToHex].owner !== player){    //Pokud je cílová země nepřátelská
+          attacking = true;
+        }
         justOpened = true;
   		}
   	}
@@ -278,24 +284,133 @@ sendUnits = function(){
 
           //If the value is higher than the actual amount of units, then the value will be lowered to the amount of units
           var actualValue = sendValue[i];
+          var maxValue = sendValue[i];
             //console.log("unitType = " + unitType + "; sendValue[i] = " + sendValue[i] + "; hex[hexSelected][unitType] = " + hex[hexSelected][unitType]);
           if (sendValue[i] > hex[hexSelected][unitType]){
             actualValue = hex[hexSelected][unitType];
           }
 
-          //Subtract the units from the selected hexagon
-          hex[hexSelected][unitType] -= actualValue;
+          //Sending units to a friendly or neutral hexagon
+          if (!attacking){
+            //Subtract the units from the selected hexagon
+            hex[hexSelected][unitType] -= actualValue;
 
-          //Add the units to the recieving hexagon
-          var unitWaitingType = unitType + "Waiting";
-          hex[moveUnitsToHex][unitWaitingType] += actualValue;
+            //Add the units to the recieving hexagon
+            var unitWaitingType = unitType + "Waiting";
+            hex[moveUnitsToHex][unitWaitingType] += actualValue;
 
-          //Close the sendUnitsUI
-          showSendUnitUI = false;
+              //Gain control of the hexagon (if it was neutral)
+            if (hex[moveUnitsToHex].owner === 0){
+              hex[moveUnitsToHex].owner = player;
+            }
+          }
+          //Attacking
+          else {
+            attackingFunction(unitType, actualValue, maxValue);
+          }
         }
+
+        //Close the sendUnitsUI
+        showSendUnitUI = false;
+        attacking = false;
       }
     }
   }
+}
+
+attackingFunction = function(unitType, actualValue, maxValue){
+  if (unitType === "soldiers"){
+    var soldiersLost = 0;
+
+    //Fight with enemy soldiers
+    if (hex[moveUnitsToHex].soldiers !== 0){
+      //Enemy has more soldiers
+      if (hex[moveUnitsToHex].soldiers >= actualValue){
+        //Kill enemy soldiers
+        hex[moveUnitsToHex].soldiers -= actualValue;
+                                                            //Must be in this order (kill -> lose)
+         //Lose own soldiers
+        soldiersLost = actualValue;
+        actualValue = 0;
+      }
+
+      //Enemy has less soldiers
+      if (hex[moveUnitsToHex].soldiers < actualValue){
+        //Lose own soldiers
+        soldiersLost = hex[moveUnitsToHex].soldiers;
+        actualValue -= hex[moveUnitsToHex].soldiers;
+                                                            //Must be in this order (lose -> kill)
+        //Kill enemy soldiers
+        hex[moveUnitsToHex].soldiers = 0;
+      }
+    }
+
+    //Remove lost soldiers from the selected hexagon
+    hex[hexSelected].soldiers -= soldiersLost;
+
+    //Kill non-soldiers units   (if at least 1 soldier is alive)
+    if (actualValue !== 0){
+      var enemyUnitsCount = hex[moveUnitsToHex].workers + hex[moveUnitsToHex].mages;
+      var enemiesKilled = 0;
+      while(enemyUnitsCount !== 0){
+        //Choose a unit to kill
+        var unitToKill = chooseUnitToKill(hex[moveUnitsToHex].workers, hex[moveUnitsToHex].mages);
+
+        //Kill the chosen unit, do actions connected with this
+        hex[moveUnitsToHex][unitToKill] -= 1;
+        enemiesKilled++;
+        enemyUnitsCount--;
+
+        //Break the loop if every soldier has killed 1 unit and some units are still alive.
+        if (enemiesKilled === actualValue){
+          break;
+        }
+      }
+
+      //Soldiers that killed a unit are exhausted and need to rest.
+      hex[hexSelected].soldiersWaiting += enemiesKilled;
+      hex[hexSelected].soldiers -= enemiesKilled;
+      actualValue -= enemiesKilled;
+
+      //All enemy units are eliminated -> move remaining, not exhausted soldiers to the new hexagon
+      if (enemyUnitsCount === 0 && actualValue !== 0){
+        //Capture the hexagon
+        hex[moveUnitsToHex].owner = player;
+
+        //Move the remaining soldiers
+        hex[moveUnitsToHex].soldiersWaiting += actualValue;
+
+        //Subtract the units from the selected hexagon
+        hex[hexSelected].soldiers -= actualValue;
+      }
+    }
+  }
+}
+
+chooseUnitToKill = function(workersAmount, magesAmount){
+  //Choose a unit to kill (0 = worker; 1 = mage)
+  var unitToKill;
+  if (hex[moveUnitsToHex].workers !== 0 && hex[moveUnitsToHex].mages !== 0){
+    var unitToKill = Math.floor(Math.random()*2);
+  }
+  else if (hex[moveUnitsToHex].workers === 0){
+    unitToKill = 1;
+  }
+  else if (hex[moveUnitsToHex].mages === 0){
+    unitToKill = 0;
+  }
+
+  //Transfer the number into a string
+  switch(unitToKill){
+    case 0:
+      unitReturn = "workers";
+      break;
+    case 1:
+      unitReturn = "mages";
+      break;
+  }
+
+  return unitReturn;
 }
 
 dontShowSendUnitsUI = function(){
@@ -303,6 +418,7 @@ dontShowSendUnitsUI = function(){
     //Pokud hráč kliknul mimo lištu
     if (mouseUIcolliding.sendingUnitsBg === -1){
       showSendUnitUI = false;
+      attacking = false;
     }
 
     //Pokud hráč kiknul na tlačítko pro zrušení
@@ -310,6 +426,7 @@ dontShowSendUnitsUI = function(){
       for (var key in ui["sendingUnits"]){
         if (key == mouseUIcolliding.sendingUnits && ui["sendingUnits"][key].name === "cancelButton"){
           showSendUnitUI = false;
+          attacking = false;
         }
       }
     }

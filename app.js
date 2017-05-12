@@ -181,6 +181,9 @@ onEndTurn = function(socket){
         }
       }
     }
+    else {
+      onCaughtCheating(socket);
+    }
   });
 }
 
@@ -193,6 +196,10 @@ findOtherPlayer = function(socket, gameID){
       return gamesList[gameID].player1;
     }
   }
+}
+
+onCaughtCheating = function(socket){
+  console.log("Cheater!");
 }
 
 onPlayerDisconnect = function(socket){

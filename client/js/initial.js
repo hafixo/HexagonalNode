@@ -1,71 +1,4 @@
 //Initial functions
-createMap = function(columns,mainColumnSize){
-	//Calculate hexCount
-	var hexCount = mainColumnSize;
-	var sideColumns = (columns - 1) / 2;
-	for(var col = 1; col <= sideColumns; col++){
-		hexCount += (mainColumnSize - col) * 2;
-	}
-
-	//Create the map
-	var currentColFromMain = sideColumns;		//Jak daleko je momentální sloupec vzdálen od středu
-	var currentDist = sideColumns;					//Jak daleko je momentální sloupec vzdálen od středu - pomocná proměnná
-	var currentCol = 1;
-	var currentColPos = 1;
-	var currentColSize;
-
-	//Create the hexagon objects, set their variables
-	for(var id = 0; id < hexCount; id++){
-		hex[id] = {};
-
-		currentColSize = mainColumnSize - currentColFromMain;
-
-		//Variables
-		hex[id].x = hexXpos + (Img.hex.width*(currentCol-1) * 0.75);	//Musí se vynásobit 0.75, aby do sebe hexagony přesně zapadaly - jinak by byly daleko od sebe
-		hex[id].y = hexYpos + Img.hex.height*(currentColPos-1) - Img.hex.height*(sideColumns-currentColFromMain) / 2 - currentColPos;
-		hex[id].column = currentCol;
-		hex[id].line = currentColPos + mainColumnSize - (mainColumnSize - Math.abs(currentDist)) / 2 - mainColumnSize / 2;
-		hex[id].building = -1;
-		hex[id].workers = 0;
-		hex[id].soldiers = 0;
-		hex[id].mages = 0;
-		hex[id].workersWaiting = 0;
-		hex[id].soldiersWaiting = 0;
-		hex[id].magesWaiting = 0;
-		hex[id].owner = setHexOwner(hex[id].column, hex[id].line);			//0 = neutrální; 1 = hráč, který začínal; 2 = hráč, který nezačínal;
-
-		currentColPos++;
-		if (currentColPos > currentColSize){
-			currentColPos = 1;
-			currentDist--;
-			currentCol++;
-			currentColFromMain = Math.abs(currentDist);
-			currentColSize = mainColumnSize - currentColFromMain;
-		}
-	}
-
-	mapCreated = true;
-}
-
-setHexOwner = function(column, line){
-	var owner = 0;
-	if (column === (columns+1) / 2){		//Pokud se jedná o prostřední sloupec
-		switch(line){
-			case 1:
-				owner = 2;
-				break;
-			case mainColumnSize:
-				owner = 1;
-				break;
-			default:
-				owner = 0;
-				break;
-		}
-	}
-
-	return owner;
-}
-
 createUI = function(){
 	//struktura: createUIelements(image, name, id, x, y, subObject)
 
@@ -149,4 +82,87 @@ createUIelements = function(image, name, id, x, y, subObject){
   }
 
 	index++;		//index = global var
+}
+
+createMap = function(columns,mainColumnSize){
+	//Calculate hexCount
+	var hexCount = mainColumnSize;
+	var sideColumns = (columns - 1) / 2;
+	for(var col = 1; col <= sideColumns; col++){
+		hexCount += (mainColumnSize - col) * 2;
+	}
+
+	//Create the map
+	var currentColFromMain = sideColumns;		//Jak daleko je momentální sloupec vzdálen od středu
+	var currentDist = sideColumns;					//Jak daleko je momentální sloupec vzdálen od středu - pomocná proměnná
+	var currentCol = 1;
+	var currentColPos = 1;
+	var currentColSize;
+
+	//Create the hexagon objects, set their variables
+	for(var id = 0; id < hexCount; id++){
+		hex[id] = {};
+
+		currentColSize = mainColumnSize - currentColFromMain;
+
+		//Variables
+		hex[id].x = hexXpos + (Img.hex.width*(currentCol-1) * 0.75);	//Musí se vynásobit 0.75, aby do sebe hexagony přesně zapadaly - jinak by byly daleko od sebe
+		hex[id].y = hexYpos + Img.hex.height*(currentColPos-1) - Img.hex.height*(sideColumns-currentColFromMain) / 2 - currentColPos;
+		hex[id].column = currentCol;
+		hex[id].line = currentColPos + mainColumnSize - (mainColumnSize - Math.abs(currentDist)) / 2 - mainColumnSize / 2;
+		hex[id].building = setHexBuilding(hex[id].column, hex[id].line);
+		hex[id].workers = 10;
+		hex[id].soldiers = 10;
+		hex[id].mages = 10;
+		hex[id].workersWaiting = 0;
+		hex[id].soldiersWaiting = 0;
+		hex[id].magesWaiting = 0;
+		hex[id].owner = setHexOwner(hex[id].column, hex[id].line);			//0 = neutrální; 1 = hráč, který začínal; 2 = hráč, který nezačínal;
+
+		currentColPos++;
+		if (currentColPos > currentColSize){
+			currentColPos = 1;
+			currentDist--;
+			currentCol++;
+			currentColFromMain = Math.abs(currentDist);
+			currentColSize = mainColumnSize - currentColFromMain;
+		}
+	}
+
+	mapCreated = true;
+}
+
+setHexBuilding = function(column, line){
+	var building = -1;		//nic
+	if ((column === (columns+1) / 2) && (line === 1 || line === mainColumnSize)){		//Pokud se jedná o počáteční pole (nahoře nebo dole)
+		for (var i in ui["main"]){
+			if (ui["main"][i].name === "building"){
+				break;
+				//Vrátí i jako číslo první budovy. Další výcvikové buvody jsou i+1 a i+2.
+				//Pozn. - nutno převést i na integer
+			}
+		}
+		building = parseInt(i);
+	}
+
+	return building;
+}
+
+setHexOwner = function(column, line){
+	var owner = 0;
+	if (column === (columns+1) / 2){		//Pokud se jedná o prostřední sloupec
+		switch(line){
+			case 1:
+				owner = 2;
+				break;
+			case mainColumnSize:
+				owner = 1;
+				break;
+			default:
+				owner = 0;
+				break;
+		}
+	}
+
+	return owner;
 }
