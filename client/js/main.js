@@ -4,7 +4,6 @@ var timeout = 0;
 var loopGame = false;
 
 //Proměnné, které bude mít klient u sebe - toto budu ale muset kontrolovat i na serveru, jestli sedí (ochrana proti cheatům)
-var myID = -1;
 var playing = -1;   //kdo je na tahu
 var player = -1;    //jakou barvu má hráč a kde začíná. 1, pokud je dole. 2, pokud je nahoře. Tato hodnota se udá funkcí onStartGame(data).
 
