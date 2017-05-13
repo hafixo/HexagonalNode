@@ -29,7 +29,11 @@ Dotýkat se můžu pouze toho, co je pod touto hranicí.
 
 //Initial server variables
 var socketList = {};
-var gamesList = {};
+gamesList = {};   //vÿnecháno var, aby byla proměnná globální
+
+//Constant game variables
+columns = 5;
+mainColumnSize = 6;
 
 //Interaction with sockets
 io.sockets.on("connection", function(socket){
@@ -53,8 +57,6 @@ socketInit = function(socket){
   //Přidání socketu do objektu obsahujícího všechny sockety
   socketList[socket.id] = socket;
 
-  //Pošle ID klientu, abych je podle něho mohl odlišovat a každému posílat jiná data
-  socket.emit("id", socket.id);
   console.log("socket connection with id " + socket.id);
 }
 
@@ -73,7 +75,8 @@ matchPlayers = function(socket){
     while(Math.floor(playersSearching/2) !== 0){   //Přiřazuje k sobě hráče, dokud je nepřiřadí všechny
       var id = Math.random();
       gamesList[id] = {};
-      createGameVariables(id);
+      var create = require("./server/createGameVariables");
+      create(id, columns, mainColumnSize);
 
       for(var i in socketList){
         if (socketList[i].matched === false){
@@ -103,63 +106,6 @@ matchPlayers = function(socket){
   //Pokud nenajde soupeře, tak pošle socket "searching"
   if (socket.matched === false){
     socket.emit("searching");
-  }
-}
-
-createGameVariables = function(id){
-  gamesList[id].player1 = undefined;
-  gamesList[id].player2 = undefined;
-
-  //Hexagon object - contains objects of each hexagon, named by a number (first index is 0)
-  gamesList[id].hex = {};
-
-  columns = 5;
-  mainColumnSize = 6;
-
-  createMap(id, columns, mainColumnSize);
-}
-
-createMap = function(gameID, columns, mainColumnSize){
-  //Calculate hexCount
-  var hexCount = mainColumnSize;
-  var sideColumns = (columns - 1) / 2;
-  for(var col = 1; col <= sideColumns; col++){
-    hexCount += (mainColumnSize - col) * 2;
-  }
-
-  //Create the map
-  var currentColFromMain = sideColumns;		//Jak daleko je momentální sloupec vzdálen od středu
-  var currentDist = sideColumns;					//Jak daleko je momentální sloupec vzdálen od středu - pomocná proměnná
-  var currentCol = 1;
-  var currentColPos = 1;
-  var currentColSize;
-
-  //Create the hexagon objects, set their variables
-  for(var id = 0; id < hexCount; id++){
-    gamesList[gameID].hex[id] = {};
-
-    currentColSize = mainColumnSize - currentColFromMain;
-
-    //Variables
-    /*
-    hex[id].x = hexXpos + (Img.hex.width*(currentCol-1) * 0.75);	//Musí se vynásobit 0.75, aby do sebe hexagony přesně zapadaly - jinak by byly daleko od sebe
-    hex[id].y = hexYpos + Img.hex.height*(currentColPos-1) - Img.hex.height*(sideColumns-currentColFromMain) / 2 - currentColPos;
-    */
-    gamesList[gameID].hex[id].column = currentCol;
-    gamesList[gameID].hex[id].line = currentColPos + mainColumnSize - (mainColumnSize - Math.abs(currentDist)) / 2 - mainColumnSize / 2;
-    gamesList[gameID].hex[id].building = -1;
-    gamesList[gameID].hex[id].workers = 0;
-    gamesList[gameID].hex[id].soldiers = 0;
-    gamesList[gameID].hex[id].mages = 0;
-
-    currentColPos++;
-    if (currentColPos > currentColSize){
-      currentColPos = 1;
-      currentDist--;
-      currentCol++;
-      currentColFromMain = Math.abs(currentDist);
-      currentColSize = mainColumnSize - currentColFromMain;
-    }
   }
 }
 
