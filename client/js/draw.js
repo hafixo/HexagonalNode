@@ -343,25 +343,16 @@ drawSendMaxAmount = function(key, hexSelected){
 }
 
 getTrainingUnitImage = function(hexSelected){
-	for (var i in ui["main"]){
-		if (ui["main"][i].name === "building")
-			break;
-			//Vrátí i jako číslo první budovy. Další výcvikové buvody jsou i+1 a i+2.
-			//Pozn. - nutno převést i na integer
-	}
-	var i = parseInt(i);
-	var building = parseInt(hex[hexSelected].building);
-
+	var building = hex[hexSelected].building;
 	var image;
-	//console.log("hex[hexSelected].building = " + hex[hexSelected].building + "; i = " + i);
 	switch(building){
-		case i:
+		case 0:
 			image = Img.worker;
 			break;
-		case i+1:
+		case 1:
 			image = Img.soldier;
 			break;
-		case i+2:
+		case 2:
 			image = Img.mage;
 			break;
 	}
@@ -564,7 +555,7 @@ selectUiImage = function(key){
 
 selectImage = function(key){
 	var image;
-	switch(ui["main"][key].id){
+	switch(key){
 		case 0:
 			image = Img.farm;
 			break;
@@ -597,14 +588,7 @@ selectImage = function(key){
 }
 
 checkIfCanTrain = function(hexSelected){
-	for (var i in ui["main"]){
-		if (ui["main"][i].name === "building")
-			break;
-			//Vrátí i jako číslo první budovy. Další výcvikové buvody jsou i+1 a i+2.
-			//Pozn. - nutno převést i na integer
-	}
-	var i = parseInt(i);
-	if ((hex[hexSelected].building >= i) && (hex[hexSelected].building <= i+2))
+	if ((hex[hexSelected].building >= 0) && (hex[hexSelected].building <= 2))
 		return true;
 	else
 		return false;

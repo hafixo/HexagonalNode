@@ -135,14 +135,7 @@ createMap = function(columns,mainColumnSize){
 setHexBuilding = function(column, line){
 	var building = -1;		//nic
 	if ((column === (columns+1) / 2) && (line === 1 || line === mainColumnSize)){		//Pokud se jedná o počáteční pole (nahoře nebo dole)
-		for (var i in ui["main"]){
-			if (ui["main"][i].name === "building"){
-				break;
-				//Vrátí i jako číslo první budovy. Další výcvikové buvody jsou i+1 a i+2.
-				//Pozn. - nutno převést i na integer
-			}
-		}
-		building = parseInt(i);
+		building = 0;		//0 = farma
 	}
 
 	return building;

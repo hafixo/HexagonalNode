@@ -132,7 +132,7 @@ placeBuilding = function(){
   	//Pokud klikne na budovu v UI, budovu tím vybere.
   	if (mouseUIcolliding.main !== -1){
   		if (ui["main"][mouseUIcolliding.main].name === "building"){
-  			placingBuilding = mouseUIcolliding.main;
+  			placingBuilding = ui["main"][mouseUIcolliding.main].id;    //placingBuilding - interval mezi 0 a 8
   		}
       else {
         placingBuilding = -1;     //Označení se zruší, pokud klikne jinam do UI.
@@ -145,6 +145,7 @@ placeBuilding = function(){
   			if (placingBuilding !== -1){
   				if (hex[mouseHexColliding].building === -1){
   					hex[mouseHexColliding].building = placingBuilding;
+            console.log("hex[mouseHexColliding].building = " + hex[mouseHexColliding].building);
   				}
   			}
   		}
@@ -187,24 +188,16 @@ trainUnitsButton = function(){
         if (ui["trainingUnits"][i].name === "sendButton"){
           //Train
           if (ui["trainingUnits"][i].id === 0){
-            for (var id in ui["main"]){
-              if (ui["main"][id].name === "building")
-                break;
-                //Vrátí id jako číslo první budovy. Další výcvikové budovy jsou id+1 a id+2.
-                //Pozn. - nutno převést id na integer
-            }
-
-            var id = parseInt(id);
-            var building = parseInt(hex[hexSelected].building);
+            var building = hex[hexSelected].building;
 
             switch(building){
-              case id:    //Yellow (workers)
+              case 0:    //Yellow (workers)
                 trainUnits("workers",i);
                 break;
-              case id+1:  //Red (soldiers)
+              case 1:  //Red (soldiers)
                 trainUnits("soldiers",i);
                 break;
-              case id+2:  //Blue (games)
+              case 2:  //Blue (games)
                 trainUnits("mages",i);
                 break;
             }
