@@ -144,8 +144,15 @@ placeBuilding = function(){
   			//Pokud klikne na možnou zemi, postaví se tam budova
   			if (placingBuilding !== -1){
   				if (hex[mouseHexColliding].building === -1){
+            //Client
   					hex[mouseHexColliding].building = placingBuilding;
-            console.log("hex[mouseHexColliding].building = " + hex[mouseHexColliding].building);
+
+            //Server
+            var sendData = {
+              hex:mouseHexColliding,
+              building:placingBuilding
+            }
+            socket.emit("newBuilding", sendData);
   				}
   			}
   		}
@@ -208,18 +215,22 @@ trainUnitsButton = function(){
           if (ui["trainingUnits"][i].id === 1){
             if (hex[hexSelected].soldiers < trainValue[ui["trainingUnits"][i].id]){
               hex[hexSelected].soldiers = 0;
+              trainUnitsSocket(hexSelected, "dismiss", "soldiers", hex[hexSelected].soldiers);
             }
             else {
               hex[hexSelected].soldiers -= trainValue[ui["trainingUnits"][i].id];
+              trainUnitsSocket(hexSelected, "dismiss", "soldiers", trainValue[ui["trainingUnits"][i].id]);
             }
           }
           //Blue (mages)
           else if (ui["trainingUnits"][i].id === 2){
             if (hex[hexSelected].mages < trainValue[ui["trainingUnits"][i].id]){
               hex[hexSelected].mages = 0;
+              trainUnitsSocket(hexSelected, "dismiss", "mages", hex[hexSelected].mages);
             }
             else {
               hex[hexSelected].mages -= trainValue[ui["trainingUnits"][i].id];
+              trainUnitsSocket(hexSelected, "dismiss", "mages", trainValue[ui["trainingUnits"][i].id]);
             }
           }
 
@@ -234,8 +245,22 @@ trainUnitsButton = function(){
 
 trainUnits = function(units,i){
   //Zde budu muset později přidat kontrolu, jestli má hráč dostatek zlata
-  var unitWaitingVarName = units + "Waiting"
+  var unitWaitingVarName = units + "Waiting";
   hex[hexSelected][unitWaitingVarName] += trainValue[ui["trainingUnits"][i].id];
+
+  //Server
+  trainUnitsSocket(hexSelected, "train", units, trainValue[ui["trainingUnits"][i].id]);
+}
+
+trainUnitsSocket = function(hex, actionType, units, amount){
+  //actionType - jestli se má trénovat nebo propouštět. Nabývá hodnotu buď "train" nebo "dismiss".
+  var sendData = {
+    hex:hex,
+    actionType:actionType,
+    units:units,
+    amount:amount
+  }
+  socket.emit("trainUnits", sendData);
 }
 
 showSendUnitsUI = function(){
@@ -285,6 +310,9 @@ sendUnits = function(){
 
           //Sending units to a friendly or neutral hexagon
           if (!attacking){
+            //Send data to the server
+            sendUnitsSocket(hexSelected, moveUnitsToHex, unitType, actualValue);
+
             //Subtract the units from the selected hexagon
             hex[hexSelected][unitType] -= actualValue;
 
@@ -313,6 +341,7 @@ sendUnits = function(){
 
 attackingFunction = function(unitType, actualValue, maxValue){
   if (unitType === "soldiers"){
+    var originalSoldiersAmount = actualValue;    //this will not change and will be sent to the server
     var soldiersLost = 0;
 
     //Fight with enemy soldiers
@@ -345,6 +374,8 @@ attackingFunction = function(unitType, actualValue, maxValue){
     if (actualValue !== 0){
       var enemyUnitsCount = hex[moveUnitsToHex].workers + hex[moveUnitsToHex].mages;
       var enemiesKilled = 0;
+      var workersKilled = 0;
+      var magesKilled = 0;
       while(enemyUnitsCount !== 0){
         //Choose a unit to kill
         var unitToKill = chooseUnitToKill(hex[moveUnitsToHex].workers, hex[moveUnitsToHex].mages);
@@ -354,11 +385,20 @@ attackingFunction = function(unitType, actualValue, maxValue){
         enemiesKilled++;
         enemyUnitsCount--;
 
+          //Server actions connected with this
+        if (unitToKill === "workers")
+          workersKilled++;
+        else if (unitToKill === "mages")
+          magesKilled++;
+
+
         //Break the loop if every soldier has killed 1 unit and some units are still alive.
         if (enemiesKilled === actualValue){
           break;
         }
       }
+
+      sendUnitsSocket(hexSelected, moveUnitsToHex, unitType, originalSoldiersAmount, workersKilled, magesKilled);    //Send the data to the server
 
       //Soldiers that killed a unit are exhausted and need to rest.
       hex[hexSelected].soldiersWaiting += enemiesKilled;
@@ -378,6 +418,20 @@ attackingFunction = function(unitType, actualValue, maxValue){
       }
     }
   }
+}
+
+sendUnitsSocket = function(hex, moveUnitsToHex, unitType, amount, workersKilled, magesKilled){
+  //workersKilled and magesKilled are optional parameters. If attacking is false, these parameters will be undefined.
+
+  var sendData = {
+    hex:hex,
+    moveUnitsToHex:moveUnitsToHex,
+    unitType:unitType,
+    amount:amount,
+    workersKilled:workersKilled,
+    magesKilled:magesKilled
+  }
+  socket.emit("sendUnits", sendData);
 }
 
 chooseUnitToKill = function(workersAmount, magesAmount){

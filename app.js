@@ -28,7 +28,7 @@ Dotýkat se můžu pouze toho, co je pod touto hranicí.
 
 
 //Initial server variables
-var socketList = {};
+socketList = {};
 gamesList = {};   //vÿnecháno var, aby byla proměnná globální
 
 //Constant game variables
@@ -37,12 +37,24 @@ mainColumnSize = 6;
 
 //Interaction with sockets
 io.sockets.on("connection", function(socket){
+  //Initialize
   socketInit(socket);
 
   matchPlayers(socket);
 
+  //Game
+  var onNewBuilding = require("./server/onNewBuilding");
+  onNewBuilding(socket);
+
+  var onTrainUnits = require("./server/onTrainUnits");      //Není hotovo! Ještě tam musím udělat pár změn.
+  onTrainUnits(socket);
+
+  var onSendUnits = require("./server/onSendUnits");       //Není hotovo! Ještě tam musím udělat pár změn.
+  onSendUnits(socket);
+
   onEndTurn(socket);
 
+  //Other
   onPlayerDisconnect(socket);
 
   recieveTimeoutSocket(socket);
@@ -111,8 +123,8 @@ matchPlayers = function(socket){
 
 onEndTurn = function(socket){
   socket.on("endTurn", function(){
+    var gameID = socketList[socket.id].gameID;
     if (socket.playing){    //anticheat
-      var gameID = socketList[socket.id].gameID;
       var otherPlayer = findOtherPlayer(socket, gameID);
 
       //Switch who is playing
@@ -128,7 +140,7 @@ onEndTurn = function(socket){
       }
     }
     else {
-      onCaughtCheating(socket);
+      caughtCheating(socket);
     }
   });
 }
@@ -144,8 +156,9 @@ findOtherPlayer = function(socket, gameID){
   }
 }
 
-onCaughtCheating = function(socket){
+caughtCheating = function(socket){
   console.log("Cheater!");
+  socket.emit("caughtCheating", "https://www.youtube.com/watch?v=DLzxrzFCyOs");
 }
 
 onPlayerDisconnect = function(socket){

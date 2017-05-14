@@ -63,12 +63,6 @@ var ui = {
 
 //Definované funkce
 //Non-game socket functions
-getSocketId = function(socket){
-  socket.on("id", function(data){
-    myID = data;
-  });
-}
-
 onSearching = function(socket){
   socket.on("searching",function(data){
     //Background
@@ -119,7 +113,28 @@ onStartGame = function(socket){
 onStartTurn = function(socket){
   socket.on("startTurn", function(){
     playing = true;
-    console.log("Playing!");
+  });
+}
+
+onEnemyTrainUnits = function(socket){
+  socket.on("enemyTrainUnits", function(data){
+    //data: {hex, unitsType, unitsWaitingAmount, unitsAmount}
+    var unitsWaiting = data.unitsType + "Waiting";
+    hex[data.hex][data.unitsType] = data.unitsAmount;
+    hex[data.hex][unitsWaiting] = data.unitsWaitingAmount;
+    console.log("Socket recieved");
+  });
+}
+
+onEnemyPlaceBuilding = function(socket){
+  socket.on("enemyPlaceBuilding", function(data){
+    hex[data.hex].building = data.building;
+  });
+}
+
+onCaughtCheating = function(socket){
+  socket.on("caughtCheating", function(data){
+    window.location.replace(data);
   });
 }
 
@@ -149,14 +164,18 @@ gameLoop = function(){
   }
 }
 
-//Non-game sockets - interaction with the server
-getSocketId(socket);
-
+//Interaction with the server
 onSearching(socket);
 
 onStartGame(socket);
 
 sendTimeoutSocket(socket);
+
+onCaughtCheating(socket);
+
+onEnemyTrainUnits(socket);
+
+onEnemyPlaceBuilding(socket);
 
 onStartTurn(socket);
 

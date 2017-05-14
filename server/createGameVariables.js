@@ -35,7 +35,7 @@ createMap = function(gameID, columns, mainColumnSize){
     */
     gamesList[gameID].hex[id].column = currentCol;
     gamesList[gameID].hex[id].line = currentColPos + mainColumnSize - (mainColumnSize - Math.abs(currentDist)) / 2 - mainColumnSize / 2;
-    gamesList[gameID].hex[id].building = -1; setHexBuilding(gamesList[gameID].hex[id].column, gamesList[gameID].hex[id].line); //zde
+    gamesList[gameID].hex[id].building = setHexBuilding(gamesList[gameID].hex[id].column, gamesList[gameID].hex[id].line); //zde
     gamesList[gameID].hex[id].workers = 0;
     gamesList[gameID].hex[id].soldiers = 0;
     gamesList[gameID].hex[id].mages = 0;
@@ -58,7 +58,7 @@ createMap = function(gameID, columns, mainColumnSize){
 setHexBuilding = function(column, line){
 	var building = -1;		//nic
 	if ((column === (columns+1) / 2) && (line === 1 || line === mainColumnSize)){		//Pokud se jedná o počáteční pole (nahoře nebo dole)
-		building = 1;   //1 = farma
+		building = 0;   //0 = farma
 	}
 
 	return building;
