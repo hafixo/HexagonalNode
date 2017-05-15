@@ -303,7 +303,6 @@ sendUnits = function(){
           //If the value is higher than the actual amount of units, then the value will be lowered to the amount of units
           var actualValue = sendValue[i];
           var maxValue = sendValue[i];
-            //console.log("unitType = " + unitType + "; sendValue[i] = " + sendValue[i] + "; hex[hexSelected][unitType] = " + hex[hexSelected][unitType]);
           if (sendValue[i] > hex[hexSelected][unitType]){
             actualValue = hex[hexSelected][unitType];
           }
@@ -420,13 +419,13 @@ attackingFunction = function(unitType, actualValue, maxValue){
   }
 }
 
-sendUnitsSocket = function(hex, moveUnitsToHex, unitType, amount, workersKilled, magesKilled){
+sendUnitsSocket = function(hex, moveUnitsToHex, unitsType, amount, workersKilled, magesKilled){
   //workersKilled and magesKilled are optional parameters. If attacking is false, these parameters will be undefined.
 
   var sendData = {
     hex:hex,
     moveUnitsToHex:moveUnitsToHex,
-    unitType:unitType,
+    unitsType:unitsType,
     amount:amount,
     workersKilled:workersKilled,
     magesKilled:magesKilled
@@ -512,13 +511,11 @@ refreshUnits = function(){
           break;
       }
 
-      if (unitType !== undefined){
-        var unitWaitingType = unitType + "Waiting";
+      var unitWaitingType = unitType + "Waiting";
 
-        if (hex[key][unitWaitingType] !== 0){
-          hex[key][unitType] += hex[key][unitWaitingType];
-          hex[key][unitWaitingType] = 0;
-        }
+      if (hex[key][unitWaitingType] !== 0){
+        hex[key][unitType] += hex[key][unitWaitingType];
+        hex[key][unitWaitingType] = 0;
       }
     }
   }

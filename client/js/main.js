@@ -113,6 +113,7 @@ onStartGame = function(socket){
 onStartTurn = function(socket){
   socket.on("startTurn", function(){
     playing = true;
+    refreshUnits();     //definováno v input.js
   });
 }
 
@@ -122,7 +123,16 @@ onEnemyTrainUnits = function(socket){
     var unitsWaiting = data.unitsType + "Waiting";
     hex[data.hex][data.unitsType] = data.unitsAmount;
     hex[data.hex][unitsWaiting] = data.unitsWaitingAmount;
-    console.log("Socket recieved");
+  });
+}
+
+onEnemySendUnits = function(socket){
+  socket.on("enemySendUnits", function(data){
+    //data: {currentHex, targetHex, unitsType, targetHexOwner, unitsCurrentAmount, unitsTargetWaitingAmount}
+    var unitsWaiting = data.unitsType + "Waiting";
+    hex[data.currentHex][data.unitsType] = data.unitsCurrentAmount;
+    hex[data.targetHex][unitsWaiting] = data.unitsTargetWaitingAmount;
+    hex[data.targetHex].owner = data.targetHexOwner;
   });
 }
 
@@ -174,6 +184,8 @@ sendTimeoutSocket(socket);
 onCaughtCheating(socket);
 
 onEnemyTrainUnits(socket);
+
+onEnemySendUnits(socket);
 
 onEnemyPlaceBuilding(socket);
 

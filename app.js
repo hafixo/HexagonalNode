@@ -52,6 +52,7 @@ io.sockets.on("connection", function(socket){
   var onSendUnits = require("./server/onSendUnits");       //Není hotovo! Ještě tam musím udělat pár změn.
   onSendUnits(socket);
 
+  var onEndTurn = require("./server/onEndTurn");
   onEndTurn(socket);
 
   //Other
@@ -98,10 +99,12 @@ matchPlayers = function(socket){
 
           if (gamesList[id].player1 === undefined){
             gamesList[id].player1 = socketList[i].id;
+            gamesList[id].owner1 = socketList[i].id;
             socketList[i].playing = true;
           }
           else {
             gamesList[id].player2 = socketList[i].id;
+            gamesList[id].owner2 = socketList[i].id;
             socketList[i].playing = false;
           }
 
@@ -121,6 +124,7 @@ matchPlayers = function(socket){
   }
 }
 
+/*
 onEndTurn = function(socket){
   socket.on("endTurn", function(){
     var gameID = socketList[socket.id].gameID;
@@ -144,6 +148,7 @@ onEndTurn = function(socket){
     }
   });
 }
+*/
 
 findOtherPlayer = function(socket, gameID){
   for(var i in gamesList[gameID]){
