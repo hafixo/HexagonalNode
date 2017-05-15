@@ -99,7 +99,6 @@ sendTrainInfoToOtherPlayer = function(socket, data, gameID){
         unitsWaitingAmount:gamesList[gameID].hex[data.hex][unitsWaiting],
         unitsAmount:gamesList[gameID].hex[data.hex][data.units]
       }
-      console.log("Socket sent!");
       sock.emit("enemyTrainUnits", sendData);
     }
   }

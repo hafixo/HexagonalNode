@@ -5,16 +5,15 @@ var onSendUnits = function(socket){
     var gameID = socketList[socket.id].gameID;
     if (sendUnitsAnticheat(socket, data, gameID)){
       sendUnitsFunction(socket, data, gameID);
+      sendSendInfoToOtherPlayer(socket, data, gameID);
     }
     else {
-      //caughtCheating(socket);
+      caughtCheating(socket);
     }
   });
 }
 
 sendUnitsAnticheat = function(socket, data, gameID){
-  //console.log("Data amount = " + data.amount);
-  //console.log("Server amount = " + gamesList[gameID].hex[data.hex][data.unitsType]);
   if (socket.playing &&
     gamesList[gameID].hex[data.hex] !== undefined &&
     data.amount <= gamesList[gameID].hex[data.hex][data.unitsType] &&
@@ -71,11 +70,65 @@ sendUnitsFunction = function(socket, data, gameID){
 
   //Attacking
   else {
+    //Anticheat
+    additionalAnticheat(socket, data, gameID);
 
+    var soldiersLost = 0;
+    //Fight with enemy soldiers
+    if (gamesList[gameID].hex[data.moveUnitsToHex].soldiers !== 0){
+      //Enemy has more soldiers
+      if (gamesList[gameID].hex[data.moveUnitsToHex].soldiers >= data.amount){
+        //Kill enemy soldiers
+        gamesList[gameID].hex[data.moveUnitsToHex].soldiers -= data.amount;
+                                                            //Must be in this order (kill -> lose)
+         //Lose own soldiers
+        soldiersLost = data.amount;
+        data.amount = 0;
+      }
+
+      //Enemy has less soldiers
+      if (gamesList[gameID].hex[data.moveUnitsToHex].soldiers < data.amount){
+        //Lose own soldiers
+        soldiersLost = gamesList[gameID].hex[data.moveUnitsToHex].soldiers;
+        data.amount -= gamesList[gameID].hex[data.moveUnitsToHex].soldiers;
+                                                            //Must be in this order (lose -> kill)
+        //Kill enemy soldiers
+        gamesList[gameID].hex[data.moveUnitsToHex].soldiers = 0;
+      }
+    }
+
+    //Remove lost soldiers from the selected hexagon
+    gamesList[gameID].hex[data.hex].soldiers -= soldiersLost;
+
+    //Kill non-soldiers units
+    gamesList[gameID].hex[data.moveUnitsToHex].workers -= data.workersKilled;
+    gamesList[gameID].hex[data.moveUnitsToHex].mages -= data.magesKilled;
+
+    //Soldiers that killed a unit are exhausted and need to rest.
+    var enemiesKilled = data.workersKilled + data.magesKilled;
+    gamesList[gameID].hex[data.hex].soldiersWaiting += enemiesKilled;
+    gamesList[gameID].hex[data.hex].soldiers -= enemiesKilled;
+    data.amount -= enemiesKilled;
+
+    //All enemy units are eliminated -> move remaining, not exhausted soldiers to the new hexagon
+    var enemyHex = gamesList[gameID].hex[data.moveUnitsToHex];
+    var enemyUnitsCount = enemyHex.workers + enemyHex.soldiers + enemyHex.mages;
+    if (enemyUnitsCount === 0 && data.amount !== 0){
+      //Capture the hexagon
+      gamesList[gameID].hex[data.moveUnitsToHex].owner = ownerInfo.type;
+
+      //Move the remaining soldiers
+      gamesList[gameID].hex[data.moveUnitsToHex].soldiersWaiting += data.amount;
+
+      //Subtract the units from the selected hexagon
+      gamesList[gameID].hex[data.hex].soldiers -= data.amount;
+    }
+
+    console.log("This hexagon: soldiers = " + gamesList[gameID].hex[data.hex].soldiers + "; soldiersWaiting = " + gamesList[gameID].hex[data.hex].soldiersWaiting);
+    console.log("Enemy hexagon: soldiers = " + gamesList[gameID].hex[data.moveUnitsToHex].soldiers + "; soldiersWaiting = " + gamesList[gameID].hex[data.moveUnitsToHex].soldiersWaiting);
+    console.log("Enemy hexagon: workers = " + gamesList[gameID].hex[data.moveUnitsToHex].workers + "; mages = " + gamesList[gameID].hex[data.moveUnitsToHex].mages);
+    console.log("Was the attack successful? 1 = yes, 2 = no. " + gamesList[gameID].hex[data.moveUnitsToHex].owner);
   }
-
-  //Send information to the other player
-  sendSendInfoToOtherPlayer(socket, data, gameID);
 }
 
 getOwnerInfo = function(socket, data, gameID){
@@ -105,13 +158,40 @@ getOwnerInfo = function(socket, data, gameID){
   return ownerInfo;
 }
 
+additionalAnticheat = function(socket, data, gameID){
+  //Check if the amount of soldiers who will kill a non-soldier unit corresponds with the sum of workersKilled and magesKilled
+  var soldiersWillKillAmount = data.amount - gamesList[gameID].hex[data.moveUnitsToHex][data.unitsType];
+  var soldiersCanKillUpTo = gamesList[gameID].hex[data.moveUnitsToHex].workers + gamesList[gameID].hex[data.moveUnitsToHex].mages;
+  var shouldKill = data.workersKilled + data.magesKilled;
+
+  if (!checkIfNumberIsNatural(data.workersKilled) || !checkIfNumberIsNatural(data.magesKilled)){
+    caughtCheating(socket);
+  }
+
+  if (soldiersWillKillAmount <= soldiersCanKillUpTo){
+    if (shouldKill !== soldiersWillKillAmount){
+      caughtCheating(socket);
+    }
+  }
+  else {
+    if (shouldKill !== soldiersCanKillUpTo){
+      caughtCheating(socket);
+    }
+  }
+}
+
+checkIfNumberIsNatural = function(number){
+  if (number >= 0 && number % 1 === 0){
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
 sendSendInfoToOtherPlayer = function(socket, data, gameID){
-  var otherPlayer = findOtherPlayer(socket, gameID);
-
-  //console.log(data.moveUnitsToHex);
-  //console.log(gamesList[gameID].hex[data.moveUnitsToHex]);
   //Send information to the other player
-
+  var otherPlayer = findOtherPlayer(socket, gameID);
   for(var i in socketList){
     if (parseFloat(i) === otherPlayer){
       var sock = socketList[i];
@@ -120,14 +200,20 @@ sendSendInfoToOtherPlayer = function(socket, data, gameID){
         currentHex:data.hex,
         targetHex:data.moveUnitsToHex,
         unitsType:data.unitsType,
-        targetHexOwner:gamesList[gameID].hex[data.moveUnitsToHex].owner,
         unitsCurrentAmount:gamesList[gameID].hex[data.hex][data.unitsType],
-        unitsTargetWaitingAmount:gamesList[gameID].hex[data.moveUnitsToHex][unitsWaiting]
+        unitsTargetWaitingAmount:gamesList[gameID].hex[data.moveUnitsToHex][unitsWaiting],
+
+        //Variables connected with attacking
+        targetHexOwner:gamesList[gameID].hex[data.moveUnitsToHex].owner,
+        unitsCurrentWaitingAmount:gamesList[gameID].hex[data.hex][unitsWaiting],
+        unitsTargetWorkers:gamesList[gameID].hex[data.moveUnitsToHex].workers,
+        unitsTargetSoldiers:gamesList[gameID].hex[data.moveUnitsToHex].soldiers,
+        unitsTargetMages:gamesList[gameID].hex[data.moveUnitsToHex].mages,
       }
       sock.emit("enemySendUnits", sendData);
     }
   }
-  
+
 }
 
 //Export

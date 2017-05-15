@@ -128,11 +128,18 @@ onEnemyTrainUnits = function(socket){
 
 onEnemySendUnits = function(socket){
   socket.on("enemySendUnits", function(data){
-    //data: {currentHex, targetHex, unitsType, targetHexOwner, unitsCurrentAmount, unitsTargetWaitingAmount}
+    //data: {currentHex, targetHex, unitsType, unitsCurrentAmount, unitsTargetWaitingAmount, targetHexOwner, unitsCurrentWaitingAmount, unitsTargetWorkers, unitsTargetSoldiers, unitsTargetMages}
+    console.log("Socket recieved");
     var unitsWaiting = data.unitsType + "Waiting";
     hex[data.currentHex][data.unitsType] = data.unitsCurrentAmount;
     hex[data.targetHex][unitsWaiting] = data.unitsTargetWaitingAmount;
+
+    //Variables connected with attacking
     hex[data.targetHex].owner = data.targetHexOwner;
+    hex[data.currentHex][unitsWaiting] = data.unitsCurrentWaitingAmount;
+    hex[data.targetHex].workers = data.unitsTargetWorkers;
+    hex[data.targetHex].soldiers = data.unitsTargetSoldiers;
+    hex[data.targetHex].mages = data.unitsTargetMages;
   });
 }
 
