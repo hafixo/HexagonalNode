@@ -79,8 +79,8 @@ selectHexagon = function(){
   	var notUnselect = false;		//Zajistí, aby se země neodznačila hned po to, co je označena.
   	//Klikne na zemi a nestaví budovu
   	if ((mouseHexColliding !== -1) && (placingBuilding === -1)){
-  		//Pokud klikne na zemi, tak danou zemi označí.
-  		if (hexSelected === -1){
+  		//Pokud klikne na svou zemi, tak danou zemi označí.
+  		if (hexSelected === -1 && hex[mouseHexColliding].owner === player){
   			hexSelected = mouseHexColliding;
   			notUnselect = true;
         hexMoveAvailable = findAdjacentHexagons(hexSelected);
@@ -142,18 +142,16 @@ placeBuilding = function(){
   		//Kliknutí na zemi
   		if (mouseHexColliding !== -1){
   			//Pokud klikne na možnou zemi, postaví se tam budova
-  			if (placingBuilding !== -1){
-  				if (hex[mouseHexColliding].building === -1){
-            //Client
-  					hex[mouseHexColliding].building = placingBuilding;
+  			if (placingBuilding !== -1 && hex[mouseHexColliding].owner === player && hex[mouseHexColliding].building === -1){
+          //Client
+  				hex[mouseHexColliding].building = placingBuilding;
 
-            //Server
-            var sendData = {
-              hex:mouseHexColliding,
-              building:placingBuilding
-            }
-            socket.emit("newBuilding", sendData);
-  				}
+          //Server
+          var sendData = {
+            hex:mouseHexColliding,
+            building:placingBuilding
+          }
+          socket.emit("newBuilding", sendData);
   			}
   		}
   		placingBuilding = -1;			//Pokud budovu postaví nebo ji má vybranou a klikne mimo možnou zemi, tak se zruší označení budovy.

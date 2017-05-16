@@ -29,7 +29,10 @@ drawHexagons = function(){
 
 drawHexagonBackground = function(){
 	for(var key in hex){
-		//Set counter. If there's a correct background, counter will be changed and no other background will be drawn.
+		//This will be always drawn
+		drawOwnerBackground(key);
+
+		//Set a counter. If there's a correct background, counter will be changed and no other background will be drawn.
 		hexBackgroundSelected = false;		//global var
 
 		//Go through each layer
@@ -40,7 +43,6 @@ drawHexagonBackground = function(){
 		drawHexPlacingBuildingHover(key);
 		drawHexPlacingBuildingAvailable(key);
 		drawHexHover(key);
-		drawOwnerBackground(key);
 	}
 }
 
@@ -104,7 +106,7 @@ drawHexPlacingBuildingHover = function(key){
 	//Draw background if mouse is hovering over a hexagon where a building can be built
 	if (playing && placingBuilding !== -1 && hexBackgroundSelected === false){
 		if (key === mouseHexColliding){		//check for collision
-			if (hex[mouseHexColliding].building === -1){	 //check if it's possible to build here
+			if (hex[mouseHexColliding].owner === player && hex[mouseHexColliding].building === -1){	 //check if it's possible to build here
 				var centerX = hex[mouseHexColliding].x - Img.hexTargeted.width/2;
 				var centerY = hex[mouseHexColliding].y - Img.hexTargeted.height/2;
 				ctx.drawImage(Img.hexTargeted,0,0,Img.hexTargeted.width,Img.hexTargeted.height,centerX,centerY,Img.hexTargeted.width,Img.hexTargeted.height);
@@ -118,7 +120,7 @@ drawHexPlacingBuildingHover = function(key){
 drawHexPlacingBuildingAvailable = function(key){
 	//Draw background if a building can be placed here (when the player wants to build)
 	if (playing && placingBuilding !== -1 && hexBackgroundSelected === false){
-		if (hex[key].building === -1){
+		if (hex[key].owner === player && hex[key].building === -1){
 			var centerX = hex[key].x - Img.hex.width/2;
 			var centerY = hex[key].y - Img.hex.height/2;
 			ctx.drawImage(Img.hexAvailable,0,0,Img.hexAvailable.width,Img.hexAvailable.height,centerX,centerY,Img.hexAvailable.width,Img.hexAvailable.height);
@@ -131,7 +133,7 @@ drawHexPlacingBuildingAvailable = function(key){
 drawHexHover = function(key){
 	//Draw mouse hovering over a normal hexagon with no other background (except owner's bachground)
 	if (playing && hexBackgroundSelected === false){
-  	if (mouseHexColliding === key && hexSelected === -1 && placingBuilding === -1){
+  	if (mouseHexColliding === key && hex[mouseHexColliding].owner === player && hexSelected === -1 && placingBuilding === -1){
   		var centerX = hex[mouseHexColliding].x - Img.hexHover.width/2;
   		var centerY = hex[mouseHexColliding].y - Img.hexHover.height/2;
   		ctx.drawImage(Img.hexHover,0,0,Img.hexHover.width,Img.hexHover.height,centerX,centerY,Img.hexHover.width,Img.hexHover.height);
@@ -143,19 +145,16 @@ drawHexHover = function(key){
 
 drawOwnerBackground = function(key){
 	//Draw standard owner's background
-	if (hexBackgroundSelected === false){
-		var image = undefined;
-		if (hex[key].owner === 1)
-			image = Img.hexOwner1;
-		if (hex[key].owner === 2)
-			image = Img.hexOwner2;
+	var image = undefined;
+	if (hex[key].owner === 1)
+		image = Img.hexOwner1;
+	if (hex[key].owner === 2)
+		image = Img.hexOwner2;
 
-		if (image !== undefined){
-			var centerX = hex[key].x - Img.hex.width/2;
-			var centerY = hex[key].y - Img.hex.height/2;
-			ctx.drawImage(image,0,0,image.width,image.height,centerX,centerY,image.width,image.height);
-		}
-		hexBackgroundSelected = true;
+	if (image !== undefined){
+		var centerX = hex[key].x - Img.hex.width/2;
+		var centerY = hex[key].y - Img.hex.height/2;
+		ctx.drawImage(image,0,0,image.width,image.height,centerX,centerY,image.width,image.height);
 	}
 }
 

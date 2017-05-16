@@ -129,7 +129,6 @@ onEnemyTrainUnits = function(socket){
 onEnemySendUnits = function(socket){
   socket.on("enemySendUnits", function(data){
     //data: {currentHex, targetHex, unitsType, unitsCurrentAmount, unitsTargetWaitingAmount, targetHexOwner, unitsCurrentWaitingAmount, unitsTargetWorkers, unitsTargetSoldiers, unitsTargetMages}
-    console.log("Socket recieved");
     var unitsWaiting = data.unitsType + "Waiting";
     hex[data.currentHex][data.unitsType] = data.unitsCurrentAmount;
     hex[data.targetHex][unitsWaiting] = data.unitsTargetWaitingAmount;
@@ -172,12 +171,6 @@ gameLoop = function(){
 
   	//Draw
   	drawGame();
-
-    //test
-    /*
-    if (showUnitUI)
-      console.log(hex[hexSelected].building);
-    */
   }
 }
 

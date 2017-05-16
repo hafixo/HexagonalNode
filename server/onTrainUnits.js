@@ -13,9 +13,14 @@ var onTrainUnits = function(socket){
   });
 }
 
-//Zde bude potřeba přidat ještě ochranu proti trénování jednotek v cizí zemi. Zatím ale není hotové vlastnictví zemí, proto to nechávám na později.
 trainUnitsAnticheat = function(socket, data, gameID){
-  if (socket.playing && gamesList[gameID].hex[data.hex] !== undefined){
+  checkForOwner = require("./checkForOwner");
+  var owner = checkForOwner(socket, gameID);
+
+  if (socket.playing &&
+    gamesList[gameID].hex[data.hex] !== undefined &&
+    gamesList[gameID].hex[data.hex].owner === owner){
+
     switch(data.actionType){
       case "train":
         switch(gamesList[gameID].hex[data.hex].building){

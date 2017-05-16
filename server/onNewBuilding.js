@@ -1,7 +1,7 @@
 var onNewBuilding = function(socket){
   socket.on("newBuilding", function(data){
     var gameID = socketList[socket.id].gameID;
-    if (socket.playing && gamesList[gameID].hex[data.hex] !== undefined && gamesList[gameID].hex[data.hex].building === -1){    //anticheat
+    if (newBuildingAnticheat(socket, data, gameID)){
       console.log(data);
       var otherPlayer = findOtherPlayer(socket, gameID);
 
@@ -25,6 +25,18 @@ var onNewBuilding = function(socket){
       caughtCheating(socket);
     }
   });
+}
+
+newBuildingAnticheat = function(socket, data, gameID){
+  checkForOwner = require("./checkForOwner");
+  var owner = checkForOwner(socket, gameID);
+  if (socket.playing &&
+    gamesList[gameID].hex[data.hex] !== undefined &&
+    gamesList[gameID].hex[data.hex].building === -1 &&
+    gamesList[gameID].hex[data.hex].owner === owner){
+      return true;
+    }
+  else return false;
 }
 
 //Export

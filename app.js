@@ -46,7 +46,7 @@ io.sockets.on("connection", function(socket){
   var onNewBuilding = require("./server/onNewBuilding");
   onNewBuilding(socket);
 
-  var onTrainUnits = require("./server/onTrainUnits");      //Není hotovo! Ještě tam musím udělat pár změn.
+  var onTrainUnits = require("./server/onTrainUnits");
   onTrainUnits(socket);
 
   var onSendUnits = require("./server/onSendUnits");       //Není hotovo! Ještě tam musím udělat pár změn.
@@ -124,32 +124,6 @@ matchPlayers = function(socket){
   }
 }
 
-/*
-onEndTurn = function(socket){
-  socket.on("endTurn", function(){
-    var gameID = socketList[socket.id].gameID;
-    if (socket.playing){    //anticheat
-      var otherPlayer = findOtherPlayer(socket, gameID);
-
-      //Switch who is playing
-      socketList[socket.id].playing = false;
-      socketList[otherPlayer].playing = true;
-
-      //Send socket to the player who is now playing
-      for(var i in socketList){
-        if (parseFloat(i) === otherPlayer){
-          var sock = socketList[i];
-          sock.emit("startTurn");
-        }
-      }
-    }
-    else {
-      caughtCheating(socket);
-    }
-  });
-}
-*/
-
 findOtherPlayer = function(socket, gameID){
   for(var i in gamesList[gameID]){
     if (socket.id === gamesList[gameID].player1){
@@ -163,7 +137,16 @@ findOtherPlayer = function(socket, gameID){
 
 caughtCheating = function(socket){
   console.log("Cheater!");
-  socket.emit("caughtCheating", "https://www.youtube.com/watch?v=DLzxrzFCyOs");
+  var url;
+  switch(Math.round(Math.random())){
+    case 0:
+      url = "https://www.youtube.com/watch?v=DLzxrzFCyOs";    //Never gonna give you up
+      break;
+    case 1:
+      url = "https://www.youtube.com/watch?v=djV11Xbc914";    //Take On Me
+      break;
+  }
+  socket.emit("caughtCheating", url);
 }
 
 onPlayerDisconnect = function(socket){

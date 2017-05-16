@@ -14,9 +14,13 @@ var onSendUnits = function(socket){
 }
 
 sendUnitsAnticheat = function(socket, data, gameID){
+  checkForOwner = require("./checkForOwner");
+  var owner = checkForOwner(socket, gameID);
+
   if (socket.playing &&
     gamesList[gameID].hex[data.hex] !== undefined &&
     data.amount <= gamesList[gameID].hex[data.hex][data.unitsType] &&
+    gamesList[gameID].hex[data.hex].owner === owner &&
     checkIfTargetHexIsAdjacent(data.hex, data.moveUnitsToHex, gameID)){
       return true;
   }
