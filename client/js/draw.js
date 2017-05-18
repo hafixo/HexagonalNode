@@ -308,7 +308,7 @@ drawUiUnitImage = function(key, uiType){
 		}
 
 		if (image !== undefined)			//Zabrání vykreslování neexistujícího obrázku, pokud nelze v dané zemi trénovat jednotky
-			ctx.drawImage(image, 0, 0, ui[uiType][key].image.width, ui[uiType][key].image.height, x, y, ui[uiType][key].image.width, ui[uiType][key].image.height);
+			ctx.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height);
 		}
 }
 
@@ -357,6 +357,125 @@ getTrainingUnitImage = function(hexSelected){
 	}
 
 	return image;
+}
+
+drawUIhover = function(){
+  if (playing){
+		//Main
+    if (mouseUIcolliding.main !== -1){
+      var key = mouseUIcolliding.main;
+			if (!showSendUnitUI){
+				if (ui["main"][key].name === "building")
+	        ctx.drawImage(Img.uiBuildingHover, 0, 0, Img.uiBuildingHover.width, Img.uiBuildingHover.height, ui["main"][key].x, ui["main"][key].y, Img.uiBuildingHover.width, Img.uiBuildingHover.height);
+	      if (ui["main"][key].name === "endTurn")
+	        ctx.drawImage(Img.uiEndTurnHover, 0, 0, Img.uiEndTurnHover.width, Img.uiEndTurnHover.height, ui["main"][key].x, ui["main"][key].y, Img.uiEndTurnHover.width, Img.uiEndTurnHover.height);
+				}
+      }
+
+    //Training units
+    var keyHidden = mouseUIcolliding.trainingUnits;
+    if (keyHidden !== -1 && showUnitUI && !showSendUnitUI){
+			if ((ui["trainingUnits"][keyHidden].id !== 0) || (ui["trainingUnits"][keyHidden].id === 0 && checkIfCanTrain(hexSelected))){
+				if (ui["trainingUnits"][keyHidden].name === "writeButton")
+	        ctx.drawImage(Img.writeButtonHover, 0, 0, Img.writeButtonHover.width, Img.writeButtonHover.height, ui["trainingUnits"][keyHidden].x, ui["trainingUnits"][keyHidden].y, Img.writeButtonHover.width, Img.writeButtonHover.height);
+				if (ui["trainingUnits"][keyHidden].name === "sendButton")
+					ctx.drawImage(Img.sendButtonHover, 0, 0, Img.sendButtonHover.width, Img.sendButtonHover.height, ui["trainingUnits"][keyHidden].x, ui["trainingUnits"][keyHidden].y, Img.sendButtonHover.width, Img.sendButtonHover.height);
+			}
+    }
+
+		//Sending units
+		var key = mouseUIcolliding.sendingUnits;
+		if (key !== -1 && showSendUnitUI){
+			if (ui["sendingUnits"][key].name === "writeButton"){
+				if ((!attacking) || (attacking && ui["sendingUnits"][key].id === 1)){		//Pokud se útočí, tak se nezobrazuje kolonka pro farmáře a mágy, pouze pro vojáky
+					ctx.drawImage(Img.writeButtonHover, 0, 0, Img.writeButtonHover.width, Img.writeButtonHover.height, ui["sendingUnits"][key].x, ui["sendingUnits"][key].y, Img.writeButtonHover.width, Img.writeButtonHover.height);
+				}
+			}
+
+			if (ui["sendingUnits"][key].name === "sendButton" || ui["sendingUnits"][key].name === "cancelButton"){
+				ctx.drawImage(Img.uiSendUnitsButtonHover, 0, 0, Img.uiSendUnitsButtonHover.width, Img.uiSendUnitsButtonHover.height, ui["sendingUnits"][key].x, ui["sendingUnits"][key].y, Img.uiSendUnitsButtonHover.width, Img.uiSendUnitsButtonHover.height);
+			}
+		}
+  }
+}
+
+drawUItopLayer = function(){
+	//Main
+	for(var key in ui["main"]){
+    //Draw images of buildings
+		if (ui["main"][key].name === "building"){
+			var image = selectUiImage(key);
+
+			if (image !== undefined){
+				var xOffset = 10;		//O kolik bude obrázek posunut doleva od pravého okraje
+				var x = ui["main"][key].x + ui["main"][key].image.width - image.width - xOffset;
+				var y = ui["main"][key].y + ui["main"][key].image.height/2 - image.height/2;
+
+				ctx.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height);
+			}
+		}
+
+		//Draw info images
+		if (ui["main"][key].name === "info"){
+			var x = 10;
+			var y = 5;
+			ctx.drawImage(Img.uiGoldIcon, 0, 0, Img.uiGoldIcon.width, Img.uiGoldIcon.height, x, y, Img.uiGoldIcon.width, Img.uiGoldIcon.height);
+
+			var x = 10;
+			var y = 55;
+			ctx.drawImage(Img.uiManaIcon, 0, 0, Img.uiManaIcon.width, Img.uiManaIcon.height, x, y, Img.uiManaIcon.width, Img.uiManaIcon.height);
+
+			//Draw info text
+			ctx.font = "20px Arial";
+			ctx.fillStyle = "black";
+			ctx.textAlign="left";
+			ctx.textBaseline="top";
+
+			var x = 45;
+			var y = 8;
+			ctx.fillText(goldAmount, x, y);
+		}
+
+    //End turn text
+    if (ui["main"][key].name === "endTurn"){
+      ctx.font = "32px Arial";
+      ctx.fillStyle = "black";
+      ctx.textAlign="center";
+      ctx.textBaseline="middle";
+      var x = ui["main"][key].x + (ui["main"][key].image.width / 2);
+      var y = ui["main"][key].y + (ui["main"][key].image.height / 2);
+      var text1;
+      var text2 = "turn"
+      if (playing) text1 = "End";
+      if (!playing) text1 = "Enemy"
+      ctx.fillText(text1,x,y-18);
+      ctx.fillText(text2,x,y+18);
+    }
+	}
+
+  //Training units
+  if (showUnitUI){
+    for(var key in ui["trainingUnits"]){
+			if (ui["trainingUnits"][key].name === "writeButton" && ui["trainingUnits"][key].id === trainButtonSelected){
+				ctx.drawImage(Img.writeButtonType, 0, 0, Img.writeButtonType.width, Img.writeButtonType.height, ui["trainingUnits"][key].x, ui["trainingUnits"][key].y, Img.writeButtonType.width, Img.writeButtonType.height);
+			}
+
+      drawTrainButtonsText(key);
+    }
+  }
+
+	//Sending units
+	if (showSendUnitUI){
+		for(var key in ui["sendingUnits"]){
+			if (ui["sendingUnits"][key].name === "writeButton" && ui["sendingUnits"][key].id === sendButtonSelected){			//Tady se nemusím už starat o to, jestli se útočí nebo ne, protože o to jsem se už postaral v inputu. Nevhodná pole při útočení nejsou označena.
+				ctx.drawImage(Img.writeButtonType, 0, 0, Img.writeButtonType.width, Img.writeButtonType.height, ui["sendingUnits"][key].x, ui["sendingUnits"][key].y, Img.writeButtonType.width, Img.writeButtonType.height);
+			}
+
+			if ((!attacking) || (attacking && ui["sendingUnits"][key].name !== "writeButton") || (attacking && ui["sendingUnits"][key].name === "writeButton" && ui["sendingUnits"][key].id === 1)){		//Jednoduše řečeno - pokud se útočí, tak se nezobrazuje kolonka pro farmáře a mágy, pouze pro vojáky
+				drawSendButtonsText(key);
+			}
+		}
+	}
 }
 
 drawTrainButtonsText = function(key){
@@ -416,104 +535,6 @@ drawSendButtonsText = function(key){
 		  var value = sendValue[ui["sendingUnits"][key].id];
 		 	ctx.fillText(value,x,y);
 	  }
-	}
-}
-
-drawUIhover = function(){
-  if (playing){
-		//Main
-    if (mouseUIcolliding.main !== -1){
-      var key = mouseUIcolliding.main;
-			if (!showSendUnitUI){
-				if (ui["main"][key].name === "building")
-	        ctx.drawImage(Img.uiBuildingHover, 0, 0, Img.uiBuildingHover.width, Img.uiBuildingHover.height, ui["main"][key].x, ui["main"][key].y, Img.uiBuildingHover.width, Img.uiBuildingHover.height);
-	      if (ui["main"][key].name === "endTurn")
-	        ctx.drawImage(Img.uiEndTurnHover, 0, 0, Img.uiEndTurnHover.width, Img.uiEndTurnHover.height, ui["main"][key].x, ui["main"][key].y, Img.uiEndTurnHover.width, Img.uiEndTurnHover.height);
-				}
-      }
-
-    //Training units
-    var keyHidden = mouseUIcolliding.trainingUnits;
-    if (keyHidden !== -1 && showUnitUI && !showSendUnitUI){
-			if ((ui["trainingUnits"][keyHidden].id !== 0) || (ui["trainingUnits"][keyHidden].id === 0 && checkIfCanTrain(hexSelected))){
-				if (ui["trainingUnits"][keyHidden].name === "writeButton")
-	        ctx.drawImage(Img.writeButtonHover, 0, 0, Img.writeButtonHover.width, Img.writeButtonHover.height, ui["trainingUnits"][keyHidden].x, ui["trainingUnits"][keyHidden].y, Img.writeButtonHover.width, Img.writeButtonHover.height);
-				if (ui["trainingUnits"][keyHidden].name === "sendButton")
-					ctx.drawImage(Img.sendButtonHover, 0, 0, Img.sendButtonHover.width, Img.sendButtonHover.height, ui["trainingUnits"][keyHidden].x, ui["trainingUnits"][keyHidden].y, Img.sendButtonHover.width, Img.sendButtonHover.height);
-			}
-    }
-
-		//Sending units
-		var key = mouseUIcolliding.sendingUnits;
-		if (key !== -1 && showSendUnitUI){
-			if (ui["sendingUnits"][key].name === "writeButton"){
-				if ((!attacking) || (attacking && ui["sendingUnits"][key].id === 1)){		//Pokud se útočí, tak se nezobrazuje kolonka pro farmáře a mágy, pouze pro vojáky
-					ctx.drawImage(Img.writeButtonHover, 0, 0, Img.writeButtonHover.width, Img.writeButtonHover.height, ui["sendingUnits"][key].x, ui["sendingUnits"][key].y, Img.writeButtonHover.width, Img.writeButtonHover.height);
-				}
-			}
-
-			if (ui["sendingUnits"][key].name === "sendButton" || ui["sendingUnits"][key].name === "cancelButton"){
-				ctx.drawImage(Img.uiSendUnitsButtonHover, 0, 0, Img.uiSendUnitsButtonHover.width, Img.uiSendUnitsButtonHover.height, ui["sendingUnits"][key].x, ui["sendingUnits"][key].y, Img.uiSendUnitsButtonHover.width, Img.uiSendUnitsButtonHover.height);
-			}
-		}
-  }
-}
-
-drawUItopLayer = function(){
-	//Main
-	for(var key in ui["main"]){
-    //Draw images of buildings
-		if (ui["main"][key].name === "building"){
-			var image = selectUiImage(key);
-
-			if (image !== undefined){
-				var xOffset = 10;		//O kolik bude obrázek posunut doleva od pravého okraje
-				var x = ui["main"][key].x + ui["main"][key].image.width - image.width - xOffset;
-				var y = ui["main"][key].y + ui["main"][key].image.height/2 - image.height/2;
-
-				ctx.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height);
-			}
-		}
-
-    //End turn text
-    if (ui["main"][key].name === "endTurn"){
-      ctx.font = "32px Arial";
-      ctx.fillStyle = "black";
-      ctx.textAlign="center";
-      ctx.textBaseline="middle";
-      var x = ui["main"][key].x + (ui["main"][key].image.width / 2);
-      var y = ui["main"][key].y + (ui["main"][key].image.height / 2);
-      var text1;
-      var text2 = "turn"
-      if (playing) text1 = "End";
-      if (!playing) text1 = "Enemy"
-      ctx.fillText(text1,x,y-18);
-      ctx.fillText(text2,x,y+18);
-    }
-	}
-
-  //Training units
-  if (showUnitUI){
-    for(var key in ui["trainingUnits"]){
-			if (ui["trainingUnits"][key].name === "writeButton" && ui["trainingUnits"][key].id === trainButtonSelected){
-				ctx.drawImage(Img.writeButtonType, 0, 0, Img.writeButtonType.width, Img.writeButtonType.height, ui["trainingUnits"][key].x, ui["trainingUnits"][key].y, Img.writeButtonType.width, Img.writeButtonType.height);
-			}
-
-      drawTrainButtonsText(key);
-    }
-  }
-
-	//Sending units
-	if (showSendUnitUI){
-		for(var key in ui["sendingUnits"]){
-			if (ui["sendingUnits"][key].name === "writeButton" && ui["sendingUnits"][key].id === sendButtonSelected){			//Tady se nemusím už starat o to, jestli se útočí nebo ne, protože o to jsem se už postaral v inputu. Nevhodná pole při útočení nejsou označena.
-				ctx.drawImage(Img.writeButtonType, 0, 0, Img.writeButtonType.width, Img.writeButtonType.height, ui["sendingUnits"][key].x, ui["sendingUnits"][key].y, Img.writeButtonType.width, Img.writeButtonType.height);
-			}
-
-			if ((!attacking) || (attacking && ui["sendingUnits"][key].name !== "writeButton") || (attacking && ui["sendingUnits"][key].name === "writeButton" && ui["sendingUnits"][key].id === 1)){		//Jednoduše řečeno - pokud se útočí, tak se nezobrazuje kolonka pro farmáře a mágy, pouze pro vojáky
-				drawSendButtonsText(key);
-			}
-		}
 	}
 }
 

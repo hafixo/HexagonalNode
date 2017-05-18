@@ -1,7 +1,6 @@
 //Initial functions
 createUI = function(){
 	//struktura: createUIelements(image, name, id, x, y, subObject)
-
 	//Main
 		//Levý horní roh
 	createUIelements(Img.uiInfo, "info", 0, 0, 0, "main");
@@ -36,7 +35,7 @@ createUI = function(){
 
 	//Sending units BG
 		//Background
-	var x = Math.round(120+(WIDTH-120) / 2 - Img.uiSendUnitsBg.width / 2);
+	var x = Math.round(120+(WIDTH-120) / 2 - Img.uiSendUnitsBg.width / 2);			//může se stát, že se obrázky nenačtou dřív, než je proveden tento příkaz. dochází tím k chybám. nutno opravit.
 	var y = Math.round(100+(HEIGHT-100) / 2 - Img.uiSendUnitsBg.height / 2);
 	createUIelements(Img.uiSendUnitsBg, "sendUnitsBg", 0, x, y, "sendingUnitsBg");
 
