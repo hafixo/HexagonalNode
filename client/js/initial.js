@@ -25,13 +25,13 @@ createUI = function(){
 		//Horní lišta - skryté ikony
 		//Levá část
 	createUIelements(Img.writeButton, "writeButton", 0, 180, 55, "trainingUnits");
-	createUIelements(Img.sendButton, "sendButton", 0, 270, 55, "trainingUnits");
+	createUIelements(Img.sendButton, "sendButton", 0, 280, 55, "trainingUnits");
 
 		//Pravá část
 	createUIelements(Img.writeButton, "writeButton", 1, 400, 40, "trainingUnits");
-	createUIelements(Img.sendButton, "sendButton", 1, 490, 40, "trainingUnits");
+	createUIelements(Img.sendButton, "sendButton", 1, 500, 40, "trainingUnits");
 	createUIelements(Img.writeButton, "writeButton", 2, 400, 70, "trainingUnits");
-	createUIelements(Img.sendButton, "sendButton", 2, 490, 70, "trainingUnits");
+	createUIelements(Img.sendButton, "sendButton", 2, 500, 70, "trainingUnits");
 
 	//Sending units BG
 		//Background

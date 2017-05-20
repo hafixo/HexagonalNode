@@ -145,6 +145,7 @@ placeBuilding = function(){
   			if (placingBuilding !== -1 && hex[mouseHexColliding].owner === player && hex[mouseHexColliding].building === -1){
           //Client
   				hex[mouseHexColliding].building = placingBuilding;
+          changeIncome();
 
           //Server
           var sendData = {
@@ -219,6 +220,8 @@ trainUnitsButton = function(){
               hex[hexSelected].soldiers -= trainValue[ui["trainingUnits"][i].id];
               trainUnitsSocket(hexSelected, "dismiss", "soldiers", trainValue[ui["trainingUnits"][i].id]);
             }
+
+            changeIncome();
           }
           //Blue (mages)
           else if (ui["trainingUnits"][i].id === 2){
@@ -230,6 +233,8 @@ trainUnitsButton = function(){
               hex[hexSelected].mages -= trainValue[ui["trainingUnits"][i].id];
               trainUnitsSocket(hexSelected, "dismiss", "mages", trainValue[ui["trainingUnits"][i].id]);
             }
+
+            changeIncome();
           }
 
           //Reset value
@@ -243,11 +248,41 @@ trainUnitsButton = function(){
 
 trainUnits = function(units,i){
   //Zde budu muset později přidat kontrolu, jestli má hráč dostatek zlata
+  var amount = adjustTrainValueToCost(trainValue[ui["trainingUnits"][i].id], units);
   var unitWaitingVarName = units + "Waiting";
-  hex[hexSelected][unitWaitingVarName] += trainValue[ui["trainingUnits"][i].id];
+  hex[hexSelected][unitWaitingVarName] += amount;
+  var goldSpent = getUnitCost(units) * amount;
+  goldAmount -= goldSpent;
+  changeIncome();
 
   //Server
   trainUnitsSocket(hexSelected, "train", units, trainValue[ui["trainingUnits"][i].id]);
+}
+
+adjustTrainValueToCost = function(trainValue, units){
+  var cost = getUnitCost(units);
+  if (trainValue * cost > goldAmount){
+    trainValue = Math.floor(goldAmount / cost);
+  }
+
+  return trainValue;
+}
+
+getUnitCost = function(units){
+  var cost;
+  switch(units){
+    case "workers":
+      cost = balance.workerCost;
+      break;
+    case "soldiers":
+      cost = balance.soldierCost;
+      break;
+    case "mages":
+      cost = balance.mageCost;
+      break;
+  }
+
+  return cost;
 }
 
 trainUnitsSocket = function(hex, actionType, units, amount){
@@ -326,6 +361,9 @@ sendUnits = function(){
           else {
             attackingFunction(unitType, actualValue, maxValue);
           }
+
+          //Change income (if necessary)
+          changeIncome();
         }
 
         //Close the sendUnitsUI
@@ -487,6 +525,8 @@ endTurn = function(socket){
       if (ui["main"][mouseUIcolliding.main].name === "endTurn"){
         socket.emit("endTurn");
         refreshUnits();
+        goldAmount += goldIncome;
+        manaAmount += manaIncome;
         playing = false;
       }
     }

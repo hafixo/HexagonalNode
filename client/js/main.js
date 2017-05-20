@@ -6,10 +6,11 @@ var loopGame = false;
 //Proměnné, které bude mít klient u sebe - toto budu ale muset kontrolovat i na serveru, jestli sedí (ochrana proti cheatům)
 var playing = -1;   //kdo je na tahu
 var player = -1;    //jakou barvu má hráč a kde začíná. 1, pokud je dole. 2, pokud je nahoře. Tato hodnota se udá funkcí onStartGame(data).
-var goldAmount = 0;
+var goldAmount = 2500;
 var manaAmount = 0;
 var goldIncome = 0;
 var manaIncome = 0;
+var balance = createBalanceVariables();
 
 var mouseX = 0;
 var mouseY = 0;

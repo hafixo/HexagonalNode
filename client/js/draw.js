@@ -426,14 +426,27 @@ drawUItopLayer = function(){
 			ctx.drawImage(Img.uiManaIcon, 0, 0, Img.uiManaIcon.width, Img.uiManaIcon.height, x, y, Img.uiManaIcon.width, Img.uiManaIcon.height);
 
 			//Draw info text
-			ctx.font = "20px Arial";
+			ctx.font = "18px Arial";
 			ctx.fillStyle = "black";
 			ctx.textAlign="left";
 			ctx.textBaseline="top";
 
 			var x = 45;
-			var y = 8;
+			var y = 9;
 			ctx.fillText(goldAmount, x, y);
+
+			var x = 45;
+			var y = 59;
+			ctx.fillText(manaAmount, x, y);
+
+			ctx.font = "14px Arial";
+			var x = 45;
+			var y = 26;
+			ctx.fillText(" + " + goldIncome, x, y);
+
+			var x = 45;
+			var y = 76;
+			ctx.fillText(" + " + manaIncome, x, y);
 		}
 
     //End turn text
@@ -460,7 +473,11 @@ drawUItopLayer = function(){
 				ctx.drawImage(Img.writeButtonType, 0, 0, Img.writeButtonType.width, Img.writeButtonType.height, ui["trainingUnits"][key].x, ui["trainingUnits"][key].y, Img.writeButtonType.width, Img.writeButtonType.height);
 			}
 
+			//Draw train / dismiss amount
       drawTrainButtonsText(key);
+
+			//Draw max amount of units to train / dismiss
+			drawTrainMaxAmount(key);
     }
   }
 
@@ -475,6 +492,51 @@ drawUItopLayer = function(){
 				drawSendButtonsText(key);
 			}
 		}
+	}
+}
+
+drawTrainMaxAmount = function(key){
+	if (ui["trainingUnits"][key].name === "writeButton"){
+		//Get max amount
+		var maxAmount;
+		switch(ui["trainingUnits"][key].id){
+			case 0:
+				//Zjistit, o jakou jednotku se jedná
+				var cost;
+				switch(hex[hexSelected].building){
+					case 0:
+						cost = balance.workerCost;
+						break;
+					case 1:
+						cost = balance.soldierCost;
+						break;
+					case 2:
+						cost = balance.mageCost;
+						break;
+				}
+				maxAmount = Math.floor(goldAmount / cost);
+				break;
+
+			case 1:
+				maxAmount = hex[hexSelected].soldiers;
+				break;
+
+			case 2:
+				maxAmount = hex[hexSelected].mages;
+				break;
+		}
+
+		//Draw the text
+		ctx.font="16px Arial";
+		ctx.fillStyle = "black";
+		ctx.textAlign="left";
+		ctx.textBaseline="middle";
+
+		var xOffset = 55;
+		var yOffset = 0;
+		var x = Math.round(ui["trainingUnits"][key].x + xOffset);
+		var y = Math.round((ui["trainingUnits"][key].y + ui["trainingUnits"][key].image.height/2) + yOffset);
+		ctx.fillText("/ " + maxAmount, x, y);
 	}
 }
 
