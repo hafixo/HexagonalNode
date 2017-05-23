@@ -40,13 +40,13 @@ createUI = function(){
 	createUIelements(Img.uiSendUnitsBg, "sendUnitsBg", 0, x, y, "sendingUnitsBg");
 
 	//Sending units
-		//Buttons - cancel, send
+		//Buttons - send, cancel
 	var newX = Math.round(x + Img.uiSendUnitsBg.width * 0.7);
 	var newY = Math.round(y + Img.uiSendUnitsBg.height * 0.45);
-	createUIelements(Img.uiSendUnitsButton, "cancelButton", 0, newX, newY, "sendingUnits");
+	createUIelements(Img.uiSendUnitsButton, "sendButton", 0, newX, newY, "sendingUnits");
 	var newX = Math.round(x + Img.uiSendUnitsBg.width * 0.7);
 	var newY = Math.round(y + Img.uiSendUnitsBg.height * 0.7);
-	createUIelements(Img.uiSendUnitsButton, "sendButton", 0, newX, newY, "sendingUnits");
+	createUIelements(Img.uiSendUnitsButton, "cancelButton", 0, newX, newY, "sendingUnits");
 
 		//Buttons - choosing the amount
 	var newX = Math.round(x + Img.uiSendUnitsBg.width * 0.25);

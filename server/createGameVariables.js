@@ -2,6 +2,14 @@ var createGameVariables = function(gameID, columns, mainColumnSize){
   gamesList[gameID].player1 = undefined;
   gamesList[gameID].player2 = undefined;
 
+  gamesList[gameID].player = {};
+  gamesList[gameID].player[1] = {};
+  gamesList[gameID].player[1].gold = 2500;
+  gamesList[gameID].player[1].mana = 0;
+  gamesList[gameID].player[2] = {};
+  gamesList[gameID].player[2].gold = 2500;
+  gamesList[gameID].player[2].mana = 0;
+
   gamesList[gameID].hex = {};       //Hexagon object - contains objects of each hexagon, named by a number (first index is 0)
 
   createMap(gameID, columns, mainColumnSize);
@@ -35,14 +43,14 @@ createMap = function(gameID, columns, mainColumnSize){
     */
     gamesList[gameID].hex[id].column = currentCol;
     gamesList[gameID].hex[id].line = currentColPos + mainColumnSize - (mainColumnSize - Math.abs(currentDist)) / 2 - mainColumnSize / 2;
-    gamesList[gameID].hex[id].building = setHexBuilding(gamesList[gameID].hex[id].column, gamesList[gameID].hex[id].line); //zde
+    gamesList[gameID].hex[id].building = setHexBuilding(gamesList[gameID].hex[id].column, gamesList[gameID].hex[id].line);
     gamesList[gameID].hex[id].workers = 0;
     gamesList[gameID].hex[id].soldiers = 0;
     gamesList[gameID].hex[id].mages = 0;
     gamesList[gameID].hex[id].workersWaiting = 0;
 		gamesList[gameID].hex[id].soldiersWaiting = 0;
 		gamesList[gameID].hex[id].magesWaiting = 0;
-    gamesList[gameID].hex[id].owner = setHexOwner(gamesList[gameID].hex[id].column, gamesList[gameID].hex[id].line);	//zde
+    gamesList[gameID].hex[id].owner = setHexOwner(gamesList[gameID].hex[id].column, gamesList[gameID].hex[id].line);
 
     currentColPos++;
     if (currentColPos > currentColSize){

@@ -35,6 +35,9 @@ gamesList = {};   //vÿnecháno var, aby byla proměnná globální
 columns = 5;
 mainColumnSize = 6;
 
+var createBalanceVariables = require("./server/createBalanceVariables");
+balance = createBalanceVariables();
+
 //Interaction with sockets
 io.sockets.on("connection", function(socket){
   //Initialize
@@ -70,6 +73,9 @@ socketInit = function(socket){
   //Přidání socketu do objektu obsahujícího všechny sockety
   socketList[socket.id] = socket;
 
+  //Pošle balance variables klientovi
+  socket.emit("createBalanceVariables", balance);
+
   console.log("socket connection with id " + socket.id);
 }
 
@@ -88,8 +94,8 @@ matchPlayers = function(socket){
     while(Math.floor(playersSearching/2) !== 0){   //Přiřazuje k sobě hráče, dokud je nepřiřadí všechny
       var id = Math.random();
       gamesList[id] = {};
-      var create = require("./server/createGameVariables");
-      create(id, columns, mainColumnSize);
+      var createGameVariables = require("./server/createGameVariables");
+      createGameVariables(id, columns, mainColumnSize);
 
       for(var i in socketList){
         if (socketList[i].matched === false){

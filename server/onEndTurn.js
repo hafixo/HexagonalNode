@@ -11,6 +11,12 @@ var onEndTurn = function(socket){
       //Refresh units
       refreshUnits(gameID);
 
+      //Refresh gold and mana
+      var refreshGoldAndMana = require("./refreshGoldAndMana");
+      var checkForOwner = require("./checkForOwner");
+      var owner = checkForOwner(socket, gameID);
+      refreshGoldAndMana(gameID, owner);
+
       //Send socket to the player who is now playing
       for(var i in socketList){
         if (parseFloat(i) === otherPlayer){

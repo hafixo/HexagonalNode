@@ -10,7 +10,6 @@ var goldAmount = 2500;
 var manaAmount = 0;
 var goldIncome = 0;
 var manaIncome = 0;
-var balance = createBalanceVariables();
 
 var mouseX = 0;
 var mouseY = 0;
@@ -115,6 +114,12 @@ onStartGame = function(socket){
 }
 
 //Game socket functions
+onCreateBalanceVariables = function(socket){
+  socket.on("createBalanceVariables", function(data){
+    balance = data;
+  });
+}
+
 onStartTurn = function(socket){
   socket.on("startTurn", function(){
     playing = true;
@@ -185,6 +190,8 @@ onSearching(socket);
 onStartGame(socket);
 
 sendTimeoutSocket(socket);
+
+onCreateBalanceVariables(socket);
 
 onCaughtCheating(socket);
 

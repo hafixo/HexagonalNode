@@ -415,8 +415,9 @@ drawUItopLayer = function(){
 			}
 		}
 
-		//Draw info images
+		//Draw info
 		if (ui["main"][key].name === "info"){
+			//Draw info images
 			var x = 10;
 			var y = 5;
 			ctx.drawImage(Img.uiGoldIcon, 0, 0, Img.uiGoldIcon.width, Img.uiGoldIcon.height, x, y, Img.uiGoldIcon.width, Img.uiGoldIcon.height);
@@ -442,7 +443,14 @@ drawUItopLayer = function(){
 			ctx.font = "14px Arial";
 			var x = 45;
 			var y = 26;
-			ctx.fillText(" + " + goldIncome, x, y);
+			var goldText;
+			if (goldIncome >= 0){
+				goldText = " + ";
+			}
+			else {
+				goldText = " - ";
+			}
+			ctx.fillText(goldText + Math.abs(goldIncome), x, y);
 
 			var x = 45;
 			var y = 76;
@@ -495,51 +503,6 @@ drawUItopLayer = function(){
 	}
 }
 
-drawTrainMaxAmount = function(key){
-	if (ui["trainingUnits"][key].name === "writeButton"){
-		//Get max amount
-		var maxAmount;
-		switch(ui["trainingUnits"][key].id){
-			case 0:
-				//Zjistit, o jakou jednotku se jedná
-				var cost;
-				switch(hex[hexSelected].building){
-					case 0:
-						cost = balance.workerCost;
-						break;
-					case 1:
-						cost = balance.soldierCost;
-						break;
-					case 2:
-						cost = balance.mageCost;
-						break;
-				}
-				maxAmount = Math.floor(goldAmount / cost);
-				break;
-
-			case 1:
-				maxAmount = hex[hexSelected].soldiers;
-				break;
-
-			case 2:
-				maxAmount = hex[hexSelected].mages;
-				break;
-		}
-
-		//Draw the text
-		ctx.font="16px Arial";
-		ctx.fillStyle = "black";
-		ctx.textAlign="left";
-		ctx.textBaseline="middle";
-
-		var xOffset = 55;
-		var yOffset = 0;
-		var x = Math.round(ui["trainingUnits"][key].x + xOffset);
-		var y = Math.round((ui["trainingUnits"][key].y + ui["trainingUnits"][key].image.height/2) + yOffset);
-		ctx.fillText("/ " + maxAmount, x, y);
-	}
-}
-
 drawTrainButtonsText = function(key){
 	if ((ui["trainingUnits"][key].id === 0 && checkIfCanTrain(hexSelected)) || ui["trainingUnits"][key].id !== 0){
 		if (ui["trainingUnits"][key].name === "sendButton"){
@@ -564,6 +527,55 @@ drawTrainButtonsText = function(key){
 		    ctx.fillText(value,x,y);
 			}
 	  }
+	}
+}
+
+drawTrainMaxAmount = function(key){
+	if (ui["trainingUnits"][key].name === "writeButton"){
+		//Get max amount
+		var maxAmount;
+		switch(ui["trainingUnits"][key].id){
+			case 0:
+				//Zjistit, o jakou jednotku se jedná
+				var cost;
+				switch(hex[hexSelected].building){
+					case 0:
+						cost = balance.workerCost;
+						break;
+					case 1:
+						cost = balance.soldierCost;
+						break;
+					case 2:
+						cost = balance.mageCost;
+						break;
+				}
+				if (cost !== undefined){
+					maxAmount = Math.floor(goldAmount / cost);
+				}
+				break;
+
+			case 1:
+				maxAmount = hex[hexSelected].soldiers;
+				break;
+
+			case 2:
+				maxAmount = hex[hexSelected].mages;
+				break;
+		}
+
+		//Draw the text
+		ctx.font="16px Arial";
+		ctx.fillStyle = "black";
+		ctx.textAlign="left";
+		ctx.textBaseline="middle";
+
+		var xOffset = 55;
+		var yOffset = 0;
+		var x = Math.round(ui["trainingUnits"][key].x + xOffset);
+		var y = Math.round((ui["trainingUnits"][key].y + ui["trainingUnits"][key].image.height/2) + yOffset);
+		if (maxAmount !== undefined){		//Zabrání zobrazování textu NaN, pokud v zemi nelze trénovat jednotky
+			ctx.fillText("/ " + maxAmount, x, y);
+		}
 	}
 }
 

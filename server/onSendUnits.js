@@ -19,6 +19,9 @@ sendUnitsAnticheat = function(socket, data, gameID){
 
   if (socket.playing &&
     gamesList[gameID].hex[data.hex] !== undefined &&
+    gamesList[gameID].hex[data.moveUnitsToHex] !== undefined &&
+    typeof data.amount === "number" &&
+    checkIfNumberIsNatural(data.amount) && 
     data.amount <= gamesList[gameID].hex[data.hex][data.unitsType] &&
     gamesList[gameID].hex[data.hex].owner === owner &&
     checkIfTargetHexIsAdjacent(data.hex, data.moveUnitsToHex, gameID)){

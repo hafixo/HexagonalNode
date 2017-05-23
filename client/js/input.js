@@ -141,23 +141,62 @@ placeBuilding = function(){
   	else {
   		//Kliknutí na zemi
   		if (mouseHexColliding !== -1){
-  			//Pokud klikne na možnou zemi, postaví se tam budova
+  			//Pokud klikne na možnou zemi a má dostatek peněz, postaví tam budovu
   			if (placingBuilding !== -1 && hex[mouseHexColliding].owner === player && hex[mouseHexColliding].building === -1){
-          //Client
-  				hex[mouseHexColliding].building = placingBuilding;
-          changeIncome();
+          var cost = getBuildingCost(placingBuilding);
+          if (goldAmount >= cost){
+            //Client
+    				hex[mouseHexColliding].building = placingBuilding;
+            goldAmount -= cost;
+            changeIncome();
 
-          //Server
-          var sendData = {
-            hex:mouseHexColliding,
-            building:placingBuilding
+            //Server
+            var sendData = {
+              hex:mouseHexColliding,
+              building:placingBuilding
+            }
+            socket.emit("newBuilding", sendData);
           }
-          socket.emit("newBuilding", sendData);
   			}
   		}
   		placingBuilding = -1;			//Pokud budovu postaví nebo ji má vybranou a klikne mimo možnou zemi, tak se zruší označení budovy.
   	}
   }
+}
+
+getBuildingCost = function(building){
+  var cost;
+  switch(building){
+    case 0:
+      cost = balance.farmCost;
+      break;
+    case 1:
+      cost = balance.barracksCost;
+      break;
+    case 2:
+      cost = balance.schoolOfMagicCost;
+      break;
+    case 3:
+      cost = balance.millCost;
+      break;
+    case 4:
+      cost = balance.wellCost;
+      break;
+    case 5:
+      cost = balance.schoolOfMagicCost;
+      break;
+    case 6:
+      cost = balance.yellowCrystalCost;
+      break;
+    case 7:
+      cost = balance.redCrystalCost;
+      break;
+    case 8:
+      cost = balance.blueCrystalCost;
+      break;
+   }
+
+  return cost;
 }
 
 selectTrainButton = function(){
@@ -256,7 +295,7 @@ trainUnits = function(units,i){
   changeIncome();
 
   //Server
-  trainUnitsSocket(hexSelected, "train", units, trainValue[ui["trainingUnits"][i].id]);
+  trainUnitsSocket(hexSelected, "train", units, amount);
 }
 
 adjustTrainValueToCost = function(trainValue, units){
