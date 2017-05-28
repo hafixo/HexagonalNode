@@ -7,9 +7,10 @@ var loopGame = false;
 var playing = -1;   //kdo je na tahu
 var player = -1;    //jakou barvu má hráč a kde začíná. 1, pokud je dole. 2, pokud je nahoře. Tato hodnota se udá funkcí onStartGame(data).
 var goldAmount = 2500;
-var manaAmount = 0;
+var manaAmount = 100;
 var goldIncome = 0;
 var manaIncome = 0;
+var happinessMultiplier = 1;
 
 var mouseX = 0;
 var mouseY = 0;
@@ -32,6 +33,8 @@ var attacking = false;        //Jestli země, do které se jednotky přesouvají
 
 var mapCreated = false;
 
+var buildingOrSpell = "building";   //Jestli se mají zobrazovat budovy nebo kouzla
+
 var columns = 5;
 var mainColumnSize = 6;
 
@@ -44,17 +47,23 @@ var mouseUIcolliding = {
   main:-1,
   trainingUnits:-1,
   sendingUnitsBg:-1,
-  sendingUnits:-1
+  sendingUnits:-1,
+  confirmSpellBg:-1,
+  confirmSpell:-1
 };
 
-var placingBuilding = -1;		//What building player has selected. If none, -1. 	//ID stavby = id stavby v UI.
+var placingBuilding = -1;		//What building the player has selected. If none, -1. 	//ID stavby = id stavby v UI.
+var castingSpell = -1;      //What spell the player has selected. If none, -1.
+var confirmCasting = false;   //Zda se má zobrazovat UI pro potvrzení seslání kouzla
 
 var hexSelected = -1;		//What hexagon player has selected. If none, -1.
 
 var showUnitUI = false;		//Jestli se má zobrazovat lišta pro trénování jednotek (zobrazuje se, pokud je označena nějaká země a je v ní budovu pro výcvik).
 var showSendUnitUI = false;  //Jestli se má zobrazovat lišta pro přemístění jednotek (zobrazuje se při přemisťování jednotek).
+var showConfirmSpellUI = false;
 
-var justOpened = false;   //Využití u funkce showSendUnitsUI(). Slouží k tomu, aby se UI nezavřela hned potom, co se otevře.
+var justOpenedSendUI = false;   //Využití u funkce showSendUnitsUI(). Slouží k tomu, aby se UI nezavřela hned potom, co se otevře.
+var justOpenedConfirmSpellUI = false;
 
 
 //UI
@@ -62,7 +71,9 @@ var ui = {
   main:{},
   trainingUnits:{},
   sendingUnitsBg:{},
-  sendingUnits:{}
+  sendingUnits:{},
+  confirmSpell:{},
+  confirmSpellBg:{}
 };
 
 //Definované funkce
@@ -123,6 +134,8 @@ onCreateBalanceVariables = function(socket){
 onStartTurn = function(socket){
   socket.on("startTurn", function(){
     playing = true;
+    happinessMultiplier = 1;
+    changeIncome();
     refreshUnits();     //definováno v input.js
   });
 }
@@ -149,6 +162,8 @@ onEnemySendUnits = function(socket){
     hex[data.targetHex].workers = data.unitsTargetWorkers;
     hex[data.targetHex].soldiers = data.unitsTargetSoldiers;
     hex[data.targetHex].mages = data.unitsTargetMages;
+
+    changeIncome();
   });
 }
 

@@ -35,7 +35,7 @@ createUI = function(){
 
 	//Sending units BG
 		//Background
-	var x = Math.round(120+(WIDTH-120) / 2 - Img.uiSendUnitsBg.width / 2);			//může se stát, že se obrázky nenačtou dřív, než je proveden tento příkaz. dochází tím k chybám. nutno opravit.
+	var x = Math.round(120+(WIDTH-120) / 2 - Img.uiSendUnitsBg.width / 2);
 	var y = Math.round(100+(HEIGHT-100) / 2 - Img.uiSendUnitsBg.height / 2);
 	createUIelements(Img.uiSendUnitsBg, "sendUnitsBg", 0, x, y, "sendingUnitsBg");
 
@@ -58,6 +58,17 @@ createUI = function(){
 	var newX = Math.round(x + Img.uiSendUnitsBg.width * 0.25);
 	var newY = Math.round(y + Img.uiSendUnitsBg.height * 0.775);
 	createUIelements(Img.writeButton, "writeButton", 2, newX, newY, "sendingUnits");
+
+	//Confirm spell
+	var x = Math.round(120+(WIDTH-120) / 2 - Img.uiConfirmCastingSpellBg.width / 2);
+	var y = Math.round(100+(HEIGHT-100) / 2 - Img.uiConfirmCastingSpellBg.height / 2);
+	createUIelements(Img.uiConfirmCastingSpellBg, "confirmSpellBg", 0, x, y, "confirmSpellBg");
+	var newX = Math.round(x + Img.uiSendUnitsBg.width * 0.2);
+	var newY = Math.round(y + Img.uiSendUnitsBg.height * 0.7);
+	createUIelements(Img.uiConfirmCastingSpellButton, "yesButton", 0, newX, newY, "confirmSpell");
+	var newX = Math.round(x + Img.uiSendUnitsBg.width * 0.8 - Img.uiConfirmCastingSpellButton.width);
+	var newY = Math.round(y + Img.uiSendUnitsBg.height * 0.7);
+	createUIelements(Img.uiConfirmCastingSpellButton, "noButton", 0, newX, newY, "confirmSpell");
 }
 
 createUIelements = function(image, name, id, x, y, subObject){

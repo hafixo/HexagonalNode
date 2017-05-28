@@ -10,6 +10,9 @@ input = function(){
     if (mouseX >= 0 && mouseX <= WIDTH && mouseY >= 0 && mouseY <= HEIGHT){
       selectHexagon();
     	placeBuilding();		//Kvůli proměnné placingBuilding musí být až po selectHexagon
+      castSpell();        //Samostatný soubor - spells.js
+      confirmSpell();
+      buildingSpellSwitchFunction();
       selectTrainButton();
       selectSendButton();
       trainUnitsButton();
@@ -17,6 +20,7 @@ input = function(){
       sendUnits();
       endTurn(socket);
       dontShowSendUnitsUI();    //Musí být na konci
+      dontShowConfirmSpellUI();
     }
   }
 
@@ -75,7 +79,7 @@ input = function(){
 }
 
 selectHexagon = function(){
-  if (playing && !showSendUnitUI){
+  if (playing && !showSendUnitUI && !showConfirmSpellUI){
   	var notUnselect = false;		//Zajistí, aby se země neodznačila hned po to, co je označena.
   	//Klikne na zemi a nestaví budovu
   	if ((mouseHexColliding !== -1) && (placingBuilding === -1)){
@@ -128,10 +132,10 @@ findAdjacentHexagons = function(currentHex){
 }
 
 placeBuilding = function(){
-  if (playing && !showSendUnitUI){
+  if (playing && !showSendUnitUI && !showConfirmSpellUI){
   	//Pokud klikne na budovu v UI, budovu tím vybere.
   	if (mouseUIcolliding.main !== -1){
-  		if (ui["main"][mouseUIcolliding.main].name === "building"){
+  		if (ui["main"][mouseUIcolliding.main].name === "building" && buildingOrSpell === "building" && goldAmount >= getBuildingCost(ui["main"][mouseUIcolliding.main].id)){
   			placingBuilding = ui["main"][mouseUIcolliding.main].id;    //placingBuilding - interval mezi 0 a 8
   		}
       else {
@@ -199,9 +203,24 @@ getBuildingCost = function(building){
   return cost;
 }
 
+buildingSpellSwitchFunction = function(){
+  if (mouseUIcolliding.main !== -1){
+    if (ui["main"][mouseUIcolliding.main].name === "buildingSpellSwitch"){
+      switch(ui["main"][mouseUIcolliding.main].id){
+        case 0:
+          buildingOrSpell = "spell";
+          break;
+        case 1:
+          buildingOrSpell = "building";
+          break;
+      }
+    }
+  }
+}
+
 selectTrainButton = function(){
   trainButtonSelected = -1;
-  if (mouseUIcolliding.trainingUnits !== -1 && !showSendUnitUI){
+  if (mouseUIcolliding.trainingUnits !== -1 && !showSendUnitUI && !showConfirmSpellUI){
     for(var key in ui["trainingUnits"]){
       if (key == mouseUIcolliding.trainingUnits && ui["trainingUnits"][key].name === "writeButton"){
         if ((ui["trainingUnits"][key].id !== 0) || (ui["trainingUnits"][key].id === 0 && checkIfCanTrain(hexSelected))){
@@ -214,7 +233,7 @@ selectTrainButton = function(){
 
 selectSendButton = function(){
   sendButtonSelected = -1;
-  if (mouseUIcolliding.sendingUnits !== -1 && showSendUnitUI){
+  if (mouseUIcolliding.sendingUnits !== -1 && showSendUnitUI && !showConfirmSpellUI){
     for(var key in ui["sendingUnits"]){
       if (key == mouseUIcolliding.sendingUnits && ui["sendingUnits"][key].name === "writeButton"){
         //If attacking, the id must be 1 (soldiers)
@@ -345,7 +364,7 @@ showSendUnitsUI = function(){
         if (hex[moveUnitsToHex].owner !== 0 && hex[moveUnitsToHex].owner !== player){    //Pokud je cílová země nepřátelská
           attacking = true;
         }
-        justOpened = true;
+        justOpenedSendUI = true;
   		}
   	}
   }
@@ -380,29 +399,31 @@ sendUnits = function(){
           }
 
           //Sending units to a friendly or neutral hexagon
-          if (!attacking){
-            //Send data to the server
-            sendUnitsSocket(hexSelected, moveUnitsToHex, unitType, actualValue);
+          if (actualValue !== 0){
+            if (!attacking){
+              //Send data to the server
+              sendUnitsSocket(hexSelected, moveUnitsToHex, unitType, actualValue);
 
-            //Subtract the units from the selected hexagon
-            hex[hexSelected][unitType] -= actualValue;
+              //Subtract the units from the selected hexagon
+              hex[hexSelected][unitType] -= actualValue;
 
-            //Add the units to the recieving hexagon
-            var unitWaitingType = unitType + "Waiting";
-            hex[moveUnitsToHex][unitWaitingType] += actualValue;
+              //Add the units to the recieving hexagon
+              var unitWaitingType = unitType + "Waiting";
+              hex[moveUnitsToHex][unitWaitingType] += actualValue;
 
-              //Gain control of the hexagon (if it was neutral)
-            if (hex[moveUnitsToHex].owner === 0){
-              hex[moveUnitsToHex].owner = player;
+                //Gain control of the hexagon (if it was neutral)
+              if (hex[moveUnitsToHex].owner === 0){
+                hex[moveUnitsToHex].owner = player;
+              }
             }
-          }
-          //Attacking
-          else {
-            attackingFunction(unitType, actualValue, maxValue);
-          }
+            //Attacking
+            else {
+              attackingFunction(unitType, actualValue, maxValue);
+            }
 
-          //Change income (if necessary)
-          changeIncome();
+            //Change income (if necessary)
+            changeIncome();
+          }
         }
 
         //Close the sendUnitsUI
@@ -445,11 +466,11 @@ attackingFunction = function(unitType, actualValue, maxValue){
     hex[hexSelected].soldiers -= soldiersLost;
 
     //Kill non-soldiers units   (if at least 1 soldier is alive)
+    var workersKilled = 0;
+    var magesKilled = 0;
     if (actualValue !== 0){
       var enemyUnitsCount = hex[moveUnitsToHex].workers + hex[moveUnitsToHex].mages;
       var enemiesKilled = 0;
-      var workersKilled = 0;
-      var magesKilled = 0;
       while(enemyUnitsCount !== 0){
         //Choose a unit to kill
         var unitToKill = chooseUnitToKill(hex[moveUnitsToHex].workers, hex[moveUnitsToHex].mages);
@@ -490,6 +511,10 @@ attackingFunction = function(unitType, actualValue, maxValue){
         //Subtract the units from the selected hexagon
         hex[hexSelected].soldiers -= actualValue;
       }
+    }
+    //If no attacking soldier is alive, no non-soldier units will be killed. Data about this need to be sent to the server.
+    else {
+      sendUnitsSocket(hexSelected, moveUnitsToHex, unitType, originalSoldiersAmount, workersKilled, magesKilled);
     }
   }
 }
@@ -535,7 +560,7 @@ chooseUnitToKill = function(workersAmount, magesAmount){
 }
 
 dontShowSendUnitsUI = function(){
-  if (showSendUnitUI && !justOpened){
+  if (showSendUnitUI && !justOpenedSendUI){
     //Pokud hráč kliknul mimo lištu
     if (mouseUIcolliding.sendingUnitsBg === -1){
       showSendUnitUI = false;
@@ -553,13 +578,29 @@ dontShowSendUnitsUI = function(){
     }
   }
 
+  //Reset
+  justOpenedSendUI = false;
+}
+
+dontShowConfirmSpellUI = function(){
+  if (showConfirmSpellUI && !justOpenedConfirmSpellUI){
+    //Pokud hráč kliknul mimo lištu
+    if (mouseUIcolliding.confirmSpellBg === -1){
+      showConfirmSpellUI = false;
+    }
+
+    //Pokud hráč kiknul na tlačítko pro zrušení
+    if (mouseUIcolliding.confirmSpell !== -1 && ui["confirmSpell"][mouseUIcolliding.confirmSpell].name === "noButton"){
+      showConfirmSpellUI = false;
+    }
+  }
 
   //Reset
-  justOpened = false;
+  justOpenedConfirmSpellUI = false;
 }
 
 endTurn = function(socket){
-  if (playing && !showSendUnitUI){
+  if (playing && !showSendUnitUI && !showConfirmSpellUI){
     if (mouseUIcolliding.main !== -1){
       if (ui["main"][mouseUIcolliding.main].name === "endTurn"){
         socket.emit("endTurn");

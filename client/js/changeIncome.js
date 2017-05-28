@@ -15,11 +15,11 @@ calculateGoldIncome = function(key){
   var thisHexGoldIncome = 0;
   //Workers
   var allWorkers = hex[key].workers + hex[key].workersWaiting;
-  thisHexGoldIncome += allWorkers * balance.workerIncome;
+  thisHexGoldIncome += allWorkers * balance.workerIncome * happinessMultiplier;
 
   //Building
   if (hex[key].building === 3){
-    thisHexGoldIncome += balance.millIncome;
+    thisHexGoldIncome += balance.millIncome * happinessMultiplier;
   }
 
   //Soldiers fee, mages fee

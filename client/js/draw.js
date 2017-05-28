@@ -76,7 +76,7 @@ drawHexAdjacentToSelectedHexHover = function(key){
 	//Highlight targeted hexagon (if hovered by mouse)
 	if (canMoveUnits && hexBackgroundSelected === false){		//If there's at least 1 unit in the selected hexagon
 		for(var id in hexMoveAvailable){
-			if (key === hexMoveAvailable[id] && key === mouseHexColliding && !showSendUnitUI){
+			if (key === hexMoveAvailable[id] && key === mouseHexColliding && !showSendUnitUI && !showConfirmSpellUI){
 				var centerX = hex[key].x - Img.hex.width/2;
 				var centerY = hex[key].y - Img.hex.height/2;
 				ctx.drawImage(Img.hexTargeted,0,0,Img.hexTargeted.width,Img.hexTargeted.height,centerX,centerY,Img.hexTargeted.width,Img.hexTargeted.height);
@@ -132,7 +132,7 @@ drawHexPlacingBuildingAvailable = function(key){
 
 drawHexHover = function(key){
 	//Draw mouse hovering over a normal hexagon with no other background (except owner's bachground)
-	if (playing && hexBackgroundSelected === false){
+	if (playing && hexBackgroundSelected === false && !showConfirmSpellUI){
   	if (mouseHexColliding === key && hex[mouseHexColliding].owner === player && hexSelected === -1 && placingBuilding === -1){
   		var centerX = hex[mouseHexColliding].x - Img.hexHover.width/2;
   		var centerY = hex[mouseHexColliding].y - Img.hexHover.height/2;
@@ -212,7 +212,12 @@ drawUI = function(){
 	//Main
 	for(var key in ui["main"]){
     //Images
-		ctx.drawImage(ui["main"][key].image, 0, 0, ui["main"][key].image.width, ui["main"][key].image.height, ui["main"][key].x, ui["main"][key].y, ui["main"][key].image.width, ui["main"][key].image.height);
+		if (ui["main"][key].name === "building" && buildingOrSpell === "spell"){
+			drawSpellBackground(key);
+		}
+		else {
+			ctx.drawImage(ui["main"][key].image, 0, 0, ui["main"][key].image.width, ui["main"][key].image.height, ui["main"][key].x, ui["main"][key].y, ui["main"][key].image.width, ui["main"][key].image.height);
+		}
 	}
 
 	//Training units
@@ -282,6 +287,33 @@ drawUI = function(){
 		var y = 100+(HEIGHT-100) / 2 - Img.uiSendUnitsBg.height / 2 + 15;		//poslední číslo = odsazení od horního okraje
 		ctx.fillText("How many units to send?", x, y);
 	}
+
+	//Confirm spell
+	if (showConfirmSpellUI){
+		//Images
+		//Background
+		for(var key in ui["confirmSpellBg"]){
+			ctx.drawImage(ui["confirmSpellBg"][key].image, 0, 0, ui["confirmSpellBg"][key].image.width, ui["confirmSpellBg"][key].image.height, ui["confirmSpellBg"][key].x, ui["confirmSpellBg"][key].y, ui["confirmSpellBg"][key].image.width, ui["confirmSpellBg"][key].image.height);
+		}
+		//Foreground
+		for(var key in ui["confirmSpell"]){
+			ctx.drawImage(ui["confirmSpell"][key].image, 0, 0, ui["confirmSpell"][key].image.width, ui["confirmSpell"][key].image.height, ui["confirmSpell"][key].x, ui["confirmSpell"][key].y, ui["confirmSpell"][key].image.width, ui["confirmSpell"][key].image.height);
+		}
+	}
+}
+
+drawSpellBackground = function(key){
+	if (ui["main"][key].id >= 0 && ui["main"][key].id <= 2){
+		var image = Img.uiEconomicSpellBg;
+	}
+	if (ui["main"][key].id >= 3 && ui["main"][key].id <= 5){
+		var image = Img.uiDestructiveSpellBg;
+	}
+	if (ui["main"][key].id >= 6 && ui["main"][key].id <= 8){
+		var image = Img.uiSupportiveSpellBg;
+	}
+
+	ctx.drawImage(image, 0, 0, image.width, image.height, ui["main"][key].x, ui["main"][key].y, image.width, image.height);
 }
 
 drawUiUnitImage = function(key, uiType){
@@ -360,30 +392,48 @@ getTrainingUnitImage = function(hexSelected){
 }
 
 drawUIhover = function(){
-  if (playing){
-		//Main
-    if (mouseUIcolliding.main !== -1){
-      var key = mouseUIcolliding.main;
-			if (!showSendUnitUI){
-				if (ui["main"][key].name === "building")
-	        ctx.drawImage(Img.uiBuildingHover, 0, 0, Img.uiBuildingHover.width, Img.uiBuildingHover.height, ui["main"][key].x, ui["main"][key].y, Img.uiBuildingHover.width, Img.uiBuildingHover.height);
-	      if (ui["main"][key].name === "endTurn")
+	//Main
+  if (mouseUIcolliding.main !== -1){
+    var key = mouseUIcolliding.main;
+		if (!showSendUnitUI && !showConfirmSpellUI){
+			if (ui["main"][key].name === "building"){
+				if (playing){
+					//Change colour when hovered
+					if (buildingOrSpell === "building"){
+						ctx.drawImage(Img.uiBuildingHover, 0, 0, Img.uiBuildingHover.width, Img.uiBuildingHover.height, ui["main"][key].x, ui["main"][key].y, Img.uiBuildingHover.width, Img.uiBuildingHover.height);
+					}
+					else {
+						drawSpellHover(key);
+					}
+				}
+				//Show description (doesn't need to be playing)
+				drawBuildingDescription(key);
+			}
+
+			if (playing){
+				if (ui["main"][key].name === "endTurn")
 	        ctx.drawImage(Img.uiEndTurnHover, 0, 0, Img.uiEndTurnHover.width, Img.uiEndTurnHover.height, ui["main"][key].x, ui["main"][key].y, Img.uiEndTurnHover.width, Img.uiEndTurnHover.height);
 				}
-      }
+			if (ui["main"][key].name === "buildingSpellSwitch")
+		    ctx.drawImage(Img.uiBuildingSpellSwitchHover, 0, 0, Img.uiBuildingSpellSwitchHover.width, Img.uiBuildingSpellSwitchHover.height, ui["main"][key].x, ui["main"][key].y, Img.uiBuildingSpellSwitchHover.width, Img.uiBuildingSpellSwitchHover.height);
+    }
+  }
 
-    //Training units
-    var keyHidden = mouseUIcolliding.trainingUnits;
-    if (keyHidden !== -1 && showUnitUI && !showSendUnitUI){
+  //Training units
+	if (playing){
+	  var keyHidden = mouseUIcolliding.trainingUnits;
+	  if (keyHidden !== -1 && showUnitUI && !showSendUnitUI && !showConfirmSpellUI){
 			if ((ui["trainingUnits"][keyHidden].id !== 0) || (ui["trainingUnits"][keyHidden].id === 0 && checkIfCanTrain(hexSelected))){
 				if (ui["trainingUnits"][keyHidden].name === "writeButton")
 	        ctx.drawImage(Img.writeButtonHover, 0, 0, Img.writeButtonHover.width, Img.writeButtonHover.height, ui["trainingUnits"][keyHidden].x, ui["trainingUnits"][keyHidden].y, Img.writeButtonHover.width, Img.writeButtonHover.height);
 				if (ui["trainingUnits"][keyHidden].name === "sendButton")
 					ctx.drawImage(Img.sendButtonHover, 0, 0, Img.sendButtonHover.width, Img.sendButtonHover.height, ui["trainingUnits"][keyHidden].x, ui["trainingUnits"][keyHidden].y, Img.sendButtonHover.width, Img.sendButtonHover.height);
 			}
-    }
+	  }
+	}
 
-		//Sending units
+	//Sending units
+	if (playing){
 		var key = mouseUIcolliding.sendingUnits;
 		if (key !== -1 && showSendUnitUI){
 			if (ui["sendingUnits"][key].name === "writeButton"){
@@ -396,22 +446,217 @@ drawUIhover = function(){
 				ctx.drawImage(Img.uiSendUnitsButtonHover, 0, 0, Img.uiSendUnitsButtonHover.width, Img.uiSendUnitsButtonHover.height, ui["sendingUnits"][key].x, ui["sendingUnits"][key].y, Img.uiSendUnitsButtonHover.width, Img.uiSendUnitsButtonHover.height);
 			}
 		}
-  }
+	}
+
+	//Confirm spell
+	if (playing){
+		var key = mouseUIcolliding.confirmSpell;
+		if (key !== -1 && showConfirmSpellUI){
+			ctx.drawImage(Img.uiConfirmCastingSpellButtonHover, 0, 0, Img.uiConfirmCastingSpellButtonHover.width, Img.uiConfirmCastingSpellButtonHover.height, ui["confirmSpell"][key].x, ui["confirmSpell"][key].y, Img.uiConfirmCastingSpellButtonHover.width, Img.uiConfirmCastingSpellButtonHover.height);
+		}
+	}
+}
+
+drawSpellHover = function(key){
+	if (ui["main"][key].id >= 0 && ui["main"][key].id <= 2){
+		var image = Img.uiEconomicSpellHover;
+	}
+	if (ui["main"][key].id >= 3 && ui["main"][key].id <= 5){
+		var image = Img.uiDestructiveSpellHover;
+	}
+	if (ui["main"][key].id >= 6 && ui["main"][key].id <= 8){
+		var image = Img.uiSupportiveSpellHover;
+	}
+
+	ctx.drawImage(image, 0, 0, image.width, image.height, ui["main"][key].x, ui["main"][key].y, image.width, image.height);
+}
+
+drawBuildingDescription = function(key){
+	//Choose text
+	var description = chooseDescriptionText(ui["main"][key].id);
+
+	//Modify font
+	ctx.font = "18px Arial";
+	ctx.fillStyle = "black";
+	ctx.textAlign="left";
+	ctx.textBaseline="top";
+
+	//Set position
+	var spaceFromEdge = 15;		//Jak blízko může být text okraji canvasu
+	var spaceFromUI = 15;			//Jak blízko bude text UI tlačítkům
+
+	var x = ui["main"][key].x + spaceFromUI + ui["main"][key].image.width;
+	var y = ui["main"][key].y - ui["main"][key].image.height;
+	if (y + spaceFromEdge + Img.uiBuildingDescription.height > HEIGHT){
+		y = HEIGHT - spaceFromEdge - Img.uiBuildingDescription.height;
+	}
+
+	ctx.drawImage(Img.uiBuildingDescription, 0, 0, Img.uiBuildingDescription.width, Img.uiBuildingDescription.height, x, y, Img.uiBuildingDescription.width, Img.uiBuildingDescription.height);
+	for(var i in description.row){
+		var textX = x + 10;
+		var textY = y + 10 + i*30;
+		ctx.fillText(description.row[i], textX, textY);
+	}
+}
+
+chooseDescriptionText = function(id){
+	var description = {};
+	description.row = [];
+
+	//Buildings
+	if (buildingOrSpell === "building"){
+		switch(id){
+			case 0:
+				description.row.push("Farm");
+				description.row.push("Price: " + balance.farmCost + " gold");
+				description.row.push("Allows you to train farmers. Farmers cost");
+				description.row.push(balance.workerCost + " gold and increase your gold income");
+				description.row.push("by " + balance.workerIncome + ".");
+				break;
+			case 1:
+				description.row.push("Barracks");
+				description.row.push("Price: " + balance.barracksCost + " gold");
+				description.row.push("Allows you to train soldiers. Soldiers cost");
+				description.row.push(balance.soldierCost + " gold and decrease your gold income");
+				description.row.push("by " + balance.soldierFee + ". They can attack and defend.");
+				break;
+			case 2:
+				description.row.push("School of magic");
+				description.row.push("Price: " + balance.schoolOfMagicCost + " gold");
+				description.row.push("Allows you to train mages. Mages cost");
+				description.row.push(balance.mageCost + " gold. They decrease your gold income");
+				description.row.push("by " + balance.mageFee + " and increase your mana income by 1.");
+				break;
+			case 3:
+				description.row.push("Mill");
+				description.row.push("Price: " + balance.millCost + " gold");
+				description.row.push("Increases your gold income by " + balance.millIncome + ".");
+				break;
+			case 4:
+				description.row.push("Well");
+				description.row.push("Price: " + balance.wellCost + " gold");
+				description.row.push("Increases your mana income by " + balance.wellIncome + ".");
+				break;
+			case 5:
+				description.row.push("Temple");
+				description.row.push("Price: " + balance.templeCost + " gold");
+				description.row.push("Doubles the mana income from mages in");
+				description.row.push("this hexagon.");
+				break;
+			case 6:
+				description.row.push("Yellow crystal");
+				description.row.push("Price: " + balance.yellowCrystalCost + " gold");
+				description.row.push("Allows you to cast yellow (economic)");
+				description.row.push("spells.");
+				break;
+			case 7:
+				description.row.push("Red crystal");
+				description.row.push("Price: " + balance.redCrystalCost + " gold");
+				description.row.push("Allows you to cast red (destructive) spells.");
+				break;
+			case 8:
+				description.row.push("Blue crystal");
+				description.row.push("Price: " + balance.blueCrystalCost + " gold");
+				description.row.push("Allows you to cast blue (supportive) spells.");
+				break;
+		}
+	}
+	//Spells
+	else {
+		switch(id){
+			case 0:
+				description.row.push("Happiness");
+				description.row.push("Price: " + balance.happinessCost + " mana");
+				description.row.push("Increases your gold income by " + balance.happinessMultiplier*100 + " % this");
+				description.row.push("turn. Casting this spell multiple times does");
+				description.row.push("not stack.");
+				break;
+			case 1:
+				description.row.push("Greed");
+				description.row.push("Price: " + balance.greedCost + " mana");
+				description.row.push("The enemy pays " + balance.greedMultiplier + " times higher fee for");
+				description.row.push("their units. Casting this spell multiple");
+				description.row.push("times does not stack.");
+				break;
+			case 2:
+				description.row.push("Efficiency");
+				description.row.push("Price: " + balance.efficiencyCost + " mana");
+				description.row.push("The next building you build costs " + balance.efficiencySale*100 + " %");
+				description.row.push("less.");
+				break;
+			case 3:
+				description.row.push("Black magic");
+				description.row.push("Price: " + balance.blackMagicCost + " mana");
+				description.row.push("Kills " + balance.blackMagicKills*100 + " % of mages in a selected hexagon.");
+				break;
+			case 4:
+				description.row.push("Poisonous plants");
+				description.row.push("Price: " + balance.poisonousPlantsCost + " mana");
+				description.row.push("Kills " + balance.poisonousPlantsKillsMain*100 + " % of farmers in a selected");
+				description.row.push("hexagon and " + balance.poisonousPlantsKillsAdjacent*100 + " % of farmers in all");
+				description.row.push("adjacent hexagons.");
+				break;
+			case 5:
+				description.row.push("Armageddon");
+				description.row.push("Price: " + balance.armageddonCost + " mana");
+				description.row.push("Kills " + balance.armageddonKills*100 + " % of ALL units.");
+				break;
+			case 6:
+				description.row.push("Energy boost");
+				description.row.push("Price: " + balance.energyBoostCost + " mana");
+				description.row.push("All units in a selected hexagon can move");
+				description.row.push("and attack. If they already moved or");
+				description.row.push("attacked, they can do it again.");
+				break;
+			case 7:
+				description.row.push("Magic wind");
+				description.row.push("Price: " + balance.magicWindCost + " mana");
+				description.row.push("Moves all units from a selected hexagon to");
+				description.row.push("an adjacent hexagon of that player. Units");
+				description.row.push("are not exhausted by moving this way.");
+				break;
+			case 8:
+				description.row.push("Recycling");
+				description.row.push("Price: " + balance.recyclingCost + " mana");
+				description.row.push("Destroys your own building. Refunds the");
+				description.row.push("original cost of the building.");
+				break;
+		}
+	}
+
+	return description;
 }
 
 drawUItopLayer = function(){
 	//Main
 	for(var key in ui["main"]){
-    //Draw images of buildings
+    //Draw images of buildings or names of spells
 		if (ui["main"][key].name === "building"){
-			var image = selectUiImage(key);
+			//Buildings
+			if (buildingOrSpell === "building"){
+				var image = selectUiImage(key);
 
-			if (image !== undefined){
-				var xOffset = 10;		//O kolik bude obrázek posunut doleva od pravého okraje
-				var x = ui["main"][key].x + ui["main"][key].image.width - image.width - xOffset;
-				var y = ui["main"][key].y + ui["main"][key].image.height/2 - image.height/2;
+				if (image !== undefined){
+					var xOffset = 10;		//O kolik bude obrázek posunut doleva od pravého okraje
+					var x = ui["main"][key].x + ui["main"][key].image.width - image.width - xOffset;
+					var y = ui["main"][key].y + ui["main"][key].image.height/2 - image.height/2;
 
-				ctx.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height);
+					ctx.drawImage(image, 0, 0, image.width, image.height, x, y, image.width, image.height);
+				}
+			}
+			//Spells
+			else {
+				ctx.font = "14px Arial";
+				ctx.fillStyle = "black";
+				ctx.textAlign="right";
+				ctx.textBaseline="middle";
+
+				var xFromEdge = 7;
+				var x = ui["main"][key].x + ui["main"][key].image.width - xFromEdge;
+				var y = ui["main"][key].y + ui["main"][key].image.height / 2;
+
+				var name = getSpellName(ui["main"][key].id);
+				ctx.fillText(name, x, y);
 			}
 		}
 
@@ -472,6 +717,44 @@ drawUItopLayer = function(){
       ctx.fillText(text1,x,y-18);
       ctx.fillText(text2,x,y+18);
     }
+
+		//Building / spell switch
+    if (ui["main"][key].name === "buildingSpellSwitch"){
+			//Text
+      ctx.font = "40px Arial";
+      ctx.fillStyle = "black";
+      ctx.textAlign="center";
+      ctx.textBaseline="middle";
+      var x = ui["main"][key].x + (ui["main"][key].image.width / 2);
+      var y = ui["main"][key].y + (ui["main"][key].image.height / 2);
+
+			var text;
+			switch(ui["main"][key].id){
+				case 0:
+					text = "S";
+					break;
+				case 1:
+					text = "B";
+					break;
+			}
+      ctx.fillText(text, x, y);
+
+			//Image
+			var i;
+			switch(buildingOrSpell){
+				case "building":
+					i = 1;
+					break;
+				case "spell":
+					i = 0;
+					break;
+			}
+			if (ui["main"][key].id === 0){		//Zajistí, aby se vykreslovalo pouze jednou
+				var x = ui["main"][key].x + ui["main"][key].image.width*i;
+				var y = ui["main"][key].y;
+				ctx.drawImage(Img.uiBuildingSpellSwitchSelected, 0, 0, Img.uiBuildingSpellSwitchSelected.width, Img.uiBuildingSpellSwitchSelected.height, x, y, Img.uiBuildingSpellSwitchSelected.width, Img.uiBuildingSpellSwitchSelected.height);
+			}
+		}
 	}
 
   //Training units
@@ -501,6 +784,79 @@ drawUItopLayer = function(){
 			}
 		}
 	}
+
+	//Confirm spell
+	if (showConfirmSpellUI){
+		//Background
+		ctx.font = "34px Arial";
+		ctx.fillStyle = "black";
+		ctx.textAlign="center";
+		ctx.textBaseline="top";
+
+		var spellName;
+		switch(castingSpell){
+			case 0:
+				spellName = "Happiness";
+		}
+		var x = 120+(WIDTH-120) / 2;
+		var y = 100+(HEIGHT-100) / 2 - Img.uiSendUnitsBg.height / 2 + 15;		//poslední číslo = odsazení od horního okraje
+		ctx.fillText("Are you sure you want to", x, y);
+		ctx.fillText("cast " + spellName + "?", x, y+38);
+
+		//Buttons
+		for(var key in ui["confirmSpell"]){
+			var text;
+			if (ui["confirmSpell"][key].name === "noButton"){
+				text = "No";
+			}
+			else if (ui["confirmSpell"][key].name === "yesButton"){
+				text = "Yes";
+			}
+
+			ctx.font = "22px Arial";
+			ctx.fillStyle = "black";
+			ctx.textAlign="center";
+			ctx.textBaseline="middle";
+			var x = ui["confirmSpell"][key].x + ui["confirmSpell"][key].image.width / 2;
+			var y = ui["confirmSpell"][key].y + ui["confirmSpell"][key].image.height / 2;
+			ctx.fillText(text, x, y);
+		}
+	}
+}
+
+getSpellName = function(id){
+	var name;
+	switch(id){
+		case 0:
+			name = "Happiness";
+			break;
+		case 1:
+			name = "Greed";
+			break;
+		case 2:
+			name = "Efficiency";
+			break;
+		case 3:
+			name = "Black magic";
+			break;
+		case 4:
+			name = "Poisonous plants";
+			break;
+		case 5:
+			name = "Armageddon";
+			break;
+		case 6:
+			name = "Energy boost";
+			break;
+		case 7:
+			name = "Magic wind";
+			break;
+		case 8:
+			name = "Recycling";
+			break;
+	}
+
+	return name;
 }
 
 drawTrainButtonsText = function(key){

@@ -65,6 +65,12 @@ loadImage("uiBuildingHover");
 Img.uiBuildingSpellSwitch = new Image();
 Img.uiBuildingSpellSwitch.src = "../client/img/uiBuildingSpellSwitch.png";
 loadImage("uiBuildingSpellSwitch");
+Img.uiBuildingSpellSwitchHover = new Image();
+Img.uiBuildingSpellSwitchHover.src = "../client/img/uiBuildingSpellSwitchHover.png";
+loadImage("uiBuildingSpellSwitchHover");
+Img.uiBuildingSpellSwitchSelected = new Image();
+Img.uiBuildingSpellSwitchSelected.src = "../client/img/uiBuildingSpellSwitchSelected.png";
+loadImage("uiBuildingSpellSwitchSelected");
 Img.uiInfo = new Image();
 Img.uiInfo.src = "../client/img/uiInfo.png";
 loadImage("uiInfo");
@@ -83,6 +89,9 @@ loadImage("uiEndTurn");
 Img.uiEndTurnHover = new Image();
 Img.uiEndTurnHover.src = "../client/img/uiEndTurnHover.png";
 loadImage("uiEndTurnHover");
+Img.uiBuildingDescription = new Image();
+Img.uiBuildingDescription.src = "../client/img/uiBuildingDescription.png";
+loadImage("uiBuildingDescription");
 
 //UI Main - buildings
 Img.uiFarm = new Image();
@@ -113,6 +122,26 @@ Img.uiBlueCrystal = new Image();
 Img.uiBlueCrystal.src = "../client/img/uiBlueCrystal.png";
 loadImage("uiBlueCrystal");
 
+//UI Main - spell backgrounds
+Img.uiEconomicSpellBg = new Image();
+Img.uiEconomicSpellBg.src = "../client/img/uiEconomicSpellBg.png";
+loadImage("uiEconomicSpellBg");
+Img.uiEconomicSpellHover = new Image();
+Img.uiEconomicSpellHover.src = "../client/img/uiEconomicSpellHover.png";
+loadImage("uiEconomicSpellHover");
+Img.uiDestructiveSpellBg = new Image();
+Img.uiDestructiveSpellBg.src = "../client/img/uiDestructiveSpellBg.png";
+loadImage("uiDestructiveSpellBg");
+Img.uiDestructiveSpellHover = new Image();
+Img.uiDestructiveSpellHover.src = "../client/img/uiDestructiveSpellHover.png";
+loadImage("uiDestructiveSpellHover");
+Img.uiSupportiveSpellBg = new Image();
+Img.uiSupportiveSpellBg.src = "../client/img/uiSupportiveSpellBg.png";
+loadImage("uiSupportiveSpellBg");
+Img.uiSupportiveSpellHover = new Image();
+Img.uiSupportiveSpellHover.src = "../client/img/uiSupportiveSpellHover.png";
+loadImage("uiSupportiveSpellHover");
+
 //UI Training units
 Img.writeButton = new Image();
 Img.writeButton.src = "../client/img/writeButton.png";
@@ -140,6 +169,17 @@ loadImage("uiSendUnitsButton");
 Img.uiSendUnitsButtonHover = new Image();
 Img.uiSendUnitsButtonHover.src = "../client/img/uiSendUnitsButtonHover.png";
 loadImage("uiSendUnitsButtonHover");
+
+//UI Confirm spell
+Img.uiConfirmCastingSpellBg = new Image();
+Img.uiConfirmCastingSpellBg.src = "../client/img/uiConfirmCastingSpellBg.png";
+loadImage("uiConfirmCastingSpellBg");
+Img.uiConfirmCastingSpellButton = new Image();
+Img.uiConfirmCastingSpellButton.src = "../client/img/uiConfirmCastingSpellButton.png";
+loadImage("uiConfirmCastingSpellButton");
+Img.uiConfirmCastingSpellButtonHover = new Image();
+Img.uiConfirmCastingSpellButtonHover.src = "../client/img/uiConfirmCastingSpellButtonHover.png";
+loadImage("uiConfirmCastingSpellButtonHover");
 
 //Buildings
 Img.farm = new Image();

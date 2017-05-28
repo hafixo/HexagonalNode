@@ -21,7 +21,25 @@ var createBalanceVariables = function(){
     templeMultiplier:2,
     yellowCrystalCost:400,
     redCrystalCost:400,
-    blueCrystalCost:400
+    blueCrystalCost:400,
+
+    //Spells
+    happinessCost:30,
+    happinessMultiplier:0.5,
+    greedCost:20,
+    greedMultiplier:2,
+    efficiencyCost:20,
+    efficiencySale:0.5,
+    blackMagicCost:40,
+    blackMagicKills:0.5,
+    poisonousPlantsCost:75,
+    poisonousPlantsKillsMain:1,
+    poisonousPlantsKillsAdjacent:0.5,
+    armageddonCost:50,
+    armageddonKills:0.5,
+    energyBoostCost:30,
+    magicWindCost:20,
+    recyclingCost:5
   };
 
   return balance;

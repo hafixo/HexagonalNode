@@ -37,6 +37,8 @@ checkMouseUIcollision = function(){
 	checkEachUIcollision("trainingUnits", mouseX, mouseY);
 	checkEachUIcollision("sendingUnitsBg", mouseX, mouseY);
 	checkEachUIcollision("sendingUnits", mouseX, mouseY);
+	checkEachUIcollision("confirmSpell", mouseX, mouseY);
+	checkEachUIcollision("confirmSpellBg", mouseX, mouseY);
 }
 
 checkEachUIcollision = function(uiTypeName, mouseX, mouseY){
