@@ -5,25 +5,25 @@ var refreshGoldAndMana = function(gameID, owner){
 
   for (var key in hex){
     if (hex[key].owner === owner){
-      goldIncome += calculateGoldIncome(key, gameID);
-      manaIncome += calculateManaIncome(key, gameID);
+      goldIncome += calculateGoldIncome(key, gameID, owner);
+      manaIncome += calculateManaIncome(key, gameID, owner);
     }
   }
 
   gamesList[gameID].player[owner].gold += goldIncome;
   gamesList[gameID].player[owner].mana += manaIncome;
-  //console.log("Player " + owner + " has " + gamesList[gameID].player[owner].gold + " gold and " + gamesList[gameID].player[owner].mana + " mana.");
+  console.log("Player " + owner + " has " + gamesList[gameID].player[owner].gold + " gold and " + gamesList[gameID].player[owner].mana + " mana.");
 }
 
-calculateGoldIncome = function(key, gameID){
+calculateGoldIncome = function(key, gameID, owner){
   var thisHexGoldIncome = 0;
   //Workers
   var allWorkers = gamesList[gameID].hex[key].workers + gamesList[gameID].hex[key].workersWaiting;
-  thisHexGoldIncome += allWorkers * balance.workerIncome;
+  thisHexGoldIncome += allWorkers * balance.workerIncome * gamesList[gameID].player[owner].happinessMultiplier;
 
   //Building
   if (gamesList[gameID].hex[key].building === 3){
-    thisHexGoldIncome += balance.millIncome;
+    thisHexGoldIncome += balance.millIncome * gamesList[gameID].player[owner].happinessMultiplier;
   }
 
   //Soldiers fee, mages fee

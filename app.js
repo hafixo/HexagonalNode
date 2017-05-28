@@ -55,6 +55,9 @@ io.sockets.on("connection", function(socket){
   var onSendUnits = require("./server/onSendUnits");       //Není hotovo! Ještě tam musím udělat pár změn.
   onSendUnits(socket);
 
+  var onSpellCast = require("./server/onSpellCast");
+  onSpellCast(socket);
+
   var onEndTurn = require("./server/onEndTurn");
   onEndTurn(socket);
 
@@ -149,7 +152,7 @@ caughtCheating = function(socket){
       url = "https://www.youtube.com/watch?v=DLzxrzFCyOs";    //Never gonna give you up
       break;
     case 1:
-      url = "https://www.youtube.com/watch?v=djV11Xbc914";    //Take On Me
+      url = "https://www.youtube.com/watch?v=djV11Xbc914";    //a-ha Take On Me
       break;
   }
   socket.emit("caughtCheating", url);

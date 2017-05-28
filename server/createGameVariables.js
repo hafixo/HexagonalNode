@@ -2,13 +2,20 @@ var createGameVariables = function(gameID, columns, mainColumnSize){
   gamesList[gameID].player1 = undefined;
   gamesList[gameID].player2 = undefined;
 
+  //Common variables
   gamesList[gameID].player = {};
-  gamesList[gameID].player[1] = {};
+  for (var i = 1; i <= 2; i++){
+    gamesList[gameID].player[i] = {};
+    gamesList[gameID].player[i].happinessMultiplier = 1;
+  }
+
+  //May be different variables
   gamesList[gameID].player[1].gold = 2500;
-  gamesList[gameID].player[1].mana = 0;
-  gamesList[gameID].player[2] = {};
+  gamesList[gameID].player[1].mana = 100;
   gamesList[gameID].player[2].gold = 2500;
-  gamesList[gameID].player[2].mana = 0;
+  gamesList[gameID].player[2].mana = 100;
+
+
 
   gamesList[gameID].hex = {};       //Hexagon object - contains objects of each hexagon, named by a number (first index is 0)
 

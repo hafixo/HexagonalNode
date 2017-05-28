@@ -9,7 +9,6 @@ var onNewBuilding = function(socket){
       var owner = checkForOwner(socket, gameID);
 
       gamesList[gameID].player[owner].gold -= getBuildingCost(data.building);
-      console.log("Player " + owner + " now has " + gamesList[gameID].player[owner].gold + " gold.");
 
       //Add the building to the hex object
       gamesList[gameID].hex[data.hex].building = data.building;

@@ -11,7 +11,6 @@ input = function(){
       selectHexagon();
     	placeBuilding();		//Kvůli proměnné placingBuilding musí být až po selectHexagon
       castSpell();        //Samostatný soubor - spells.js
-      confirmSpell();
       buildingSpellSwitchFunction();
       selectTrainButton();
       selectSendButton();

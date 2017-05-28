@@ -17,6 +17,13 @@ var onEndTurn = function(socket){
       var owner = checkForOwner(socket, gameID);
       refreshGoldAndMana(gameID, owner);
 
+      //End temporary spells
+      for (var i = 1; i <= 2; i++){
+        if (i !== owner){   //Projeví se u hráče, který neukončil kolo
+          gamesList[gameID].player[i].happinessMultiplier = 1;
+        }
+      }
+
       //Send socket to the player who is now playing
       for(var i in socketList){
         if (parseFloat(i) === otherPlayer){

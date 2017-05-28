@@ -99,6 +99,7 @@ castHappiness = function(){
 confirmSpell = function(){
   if (mouseUIcolliding.confirmSpell !== -1 && showConfirmSpellUI){
     if (ui["confirmSpell"][mouseUIcolliding.confirmSpell].name === "yesButton"){
+      sendSpellSocket(castingSpell);
       confirmedSpellEffect(castingSpell);
       manaAmount -= getSpellCost(castingSpell);
       showConfirmSpellUI = false;
@@ -106,11 +107,22 @@ confirmSpell = function(){
   }
 }
 
+sendSpellSocket = function(castingSpell){
+  var sendData = {
+    spell:castingSpell
+  }
+  socket.emit("spellCast", sendData);
+}
+
 confirmedSpellEffect = function(castingSpell){
   switch(castingSpell){
     case 0:
-      happinessMultiplier = 1 + balance.happinessMultiplier;
-      changeIncome();
+      happinessEffect();
       break;
   }
+}
+
+happinessEffect = function(){
+  happinessMultiplier = 1 + balance.happinessMultiplier;
+  changeIncome();
 }

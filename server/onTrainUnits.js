@@ -111,7 +111,6 @@ changeHexagonValues = function(socket, data, gameID){
     var unitCost = getUnitCost(data.units)
 
     gamesList[gameID].player[owner].gold -= unitCost*data.amount;
-    console.log("Player " + owner + " now has " + gamesList[gameID].player[owner].gold + " gold.");
 
     //Create units
     var unitsWaiting = data.units + "Waiting";
