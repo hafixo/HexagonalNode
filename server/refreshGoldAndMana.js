@@ -28,9 +28,9 @@ calculateGoldIncome = function(key, gameID, owner){
 
   //Soldiers fee, mages fee
   var allSoldiers = gamesList[gameID].hex[key].soldiers + gamesList[gameID].hex[key].soldiersWaiting;
-  thisHexGoldIncome -= allSoldiers * balance.soldierFee;
+  thisHexGoldIncome -= allSoldiers * balance.soldierFee * gamesList[gameID].player[owner].greedMultiplier;
   var allMages = gamesList[gameID].hex[key].mages + gamesList[gameID].hex[key].magesWaiting;
-  thisHexGoldIncome -= allMages * balance.mageFee;
+  thisHexGoldIncome -= allMages * balance.mageFee * gamesList[gameID].player[owner].greedMultiplier;
 
   //Return
   return thisHexGoldIncome;

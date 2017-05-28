@@ -793,11 +793,7 @@ drawUItopLayer = function(){
 		ctx.textAlign="center";
 		ctx.textBaseline="top";
 
-		var spellName;
-		switch(castingSpell){
-			case 0:
-				spellName = "Happiness";
-		}
+		var spellName = getSpellName(castingSpell);
 		var x = 120+(WIDTH-120) / 2;
 		var y = 100+(HEIGHT-100) / 2 - Img.uiSendUnitsBg.height / 2 + 15;		//poslední číslo = odsazení od horního okraje
 		ctx.fillText("Are you sure you want to", x, y);

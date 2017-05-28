@@ -7,6 +7,7 @@ var createGameVariables = function(gameID, columns, mainColumnSize){
   for (var i = 1; i <= 2; i++){
     gamesList[gameID].player[i] = {};
     gamesList[gameID].player[i].happinessMultiplier = 1;
+    gamesList[gameID].player[i].greedMultiplier = 1;
   }
 
   //May be different variables

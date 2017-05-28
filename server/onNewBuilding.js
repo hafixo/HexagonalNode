@@ -2,8 +2,6 @@ var onNewBuilding = function(socket){
   socket.on("newBuilding", function(data){
     var gameID = socketList[socket.id].gameID;
     if (newBuildingAnticheat(socket, data, gameID)){
-      var otherPlayer = findOtherPlayer(socket, gameID);
-
       //Subtract gold
       checkForOwner = require("./checkForOwner");
       var owner = checkForOwner(socket, gameID);
@@ -14,6 +12,7 @@ var onNewBuilding = function(socket){
       gamesList[gameID].hex[data.hex].building = data.building;
 
       //Send information about the new building to the other player
+      var otherPlayer = findOtherPlayer(socket, gameID);
       for(var i in socketList){
         if (parseFloat(i) === otherPlayer){
           var sock = socketList[i];

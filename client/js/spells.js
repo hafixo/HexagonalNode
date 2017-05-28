@@ -3,7 +3,7 @@ castSpell = function(){
   if (proceed){
     selectTargetOrConfirm();
   }
-  confirmSpell();
+  performSpell();
 }
 
 selectSpell = function(){
@@ -13,7 +13,6 @@ selectSpell = function(){
     if (mouseUIcolliding.main !== -1){
       if (ui["main"][mouseUIcolliding.main].name === "building" && buildingOrSpell === "spell" && checkForCrystal() && manaAmount >= getSpellCost(ui["main"][mouseUIcolliding.main].id)){
         castingSpell = ui["main"][mouseUIcolliding.main].id;    //castingSpell - interval mezi 0 a 8
-        console.log("Casting spell " + castingSpell);
         proceed = true;
       }
       else {
@@ -87,16 +86,27 @@ selectTargetOrConfirm = function(){
     case 0:
       castHappiness();
       break;
+    case 1:
+      castGreed();
+      break;
   }
 }
 
-castHappiness = function(){
+waitForConfirmation = function(){
   showConfirmSpellUI = true;
   justOpenedConfirmSpellUI = true;
   //Wait for confirmation
 }
 
-confirmSpell = function(){
+castHappiness = function(){
+  waitForConfirmation();
+}
+
+castGreed = function(){
+  waitForConfirmation();
+}
+
+performSpell = function(){
   if (mouseUIcolliding.confirmSpell !== -1 && showConfirmSpellUI){
     if (ui["confirmSpell"][mouseUIcolliding.confirmSpell].name === "yesButton"){
       sendSpellSocket(castingSpell);
@@ -119,10 +129,20 @@ confirmedSpellEffect = function(castingSpell){
     case 0:
       happinessEffect();
       break;
+    //case 1 - no effect on the player who cast it
   }
 }
 
 happinessEffect = function(){
   happinessMultiplier = 1 + balance.happinessMultiplier;
   changeIncome();
+}
+
+//Recieve sockets
+onGreedCast = function(socket){
+  socket.on("greedCast", function(data){
+    greedMultiplier = balance.greedMultiplier;
+    console.log("Recieved!");
+    changeIncome();
+  });
 }

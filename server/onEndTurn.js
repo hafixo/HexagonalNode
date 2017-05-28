@@ -19,6 +19,10 @@ var onEndTurn = function(socket){
 
       //End temporary spells
       for (var i = 1; i <= 2; i++){
+        if (i === owner){   //Projeví se u hráče, který ukončil kolo
+          gamesList[gameID].player[i].greedMultiplier = 1;
+        }
+
         if (i !== owner){   //Projeví se u hráče, který neukončil kolo
           gamesList[gameID].player[i].happinessMultiplier = 1;
         }

@@ -606,6 +606,8 @@ endTurn = function(socket){
         refreshUnits();
         goldAmount += goldIncome;
         manaAmount += manaIncome;
+        greedMultiplier = 1;
+        changeIncome();
         playing = false;
       }
     }

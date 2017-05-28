@@ -11,6 +11,7 @@ var manaAmount = 100;     //POZOR! na serveru je také manaAmount 100
 var goldIncome = 0;
 var manaIncome = 0;
 var happinessMultiplier = 1;
+var greedMultiplier = 1;
 
 var mouseX = 0;
 var mouseY = 0;
@@ -217,6 +218,8 @@ onEnemySendUnits(socket);
 onEnemyPlaceBuilding(socket);
 
 onStartTurn(socket);
+
+onGreedCast(socket);    //spells.js
 
 //Inputs
 input();

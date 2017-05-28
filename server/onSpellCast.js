@@ -6,7 +6,7 @@ var onSpellCast = function(socket){
     var owner = checkForOwner(socket, gameID);
 
     if (spellCastAnticheat(socket, owner, data, gameID)){
-      spellEffect(owner, data, gameID);
+      spellEffect(socket, owner, data, gameID);
     }
     else {
       caughtCheating(socket);
@@ -20,8 +20,7 @@ spellCastAnticheat = function(socket, owner, data, gameID){
     data.spell % 1 === 0 && data.spell >= 0 && data.spell <= 8 &&              //jestli se jedná o povolené číslo spellu
     checkIfEnoughMana(data, gamesList[gameID].player[owner].mana) &&
     checkForCrystal(owner, data, gameID) &&
-    checkForAdditionalConditionsBasedOnSpell(data, gameID)
-      ){
+    checkForAdditionalConditionsBasedOnSpell(data, gameID)){
       return true;
   }
   else
@@ -99,20 +98,43 @@ checkForAdditionalConditionsBasedOnSpell = function(data, gameID){
     case 0:
       return true;
       break;
+    case 1:
+      return true;
+      break;
   }
 }
 
-spellEffect = function(owner, data, gameID){
+spellEffect = function(socket, owner, data, gameID){
   gamesList[gameID].player[owner].mana -= getSpellCost(data.spell);
   switch(data.spell){
     case 0:
       happinessEffect(owner, gameID);
+      break;
+    case 1:
+      greedEffect(socket, owner, gameID);
       break;
   }
 }
 
 happinessEffect = function(owner, gameID){
   gamesList[gameID].player[owner].happinessMultiplier = 1 + balance.happinessMultiplier;
+}
+
+greedEffect = function(socket, owner, gameID){
+  for (var i = 1; i <= 2; i++){
+    if (i !== owner){
+      gamesList[gameID].player[i].greedMultiplier = balance.greedMultiplier;
+
+      //Send info to the other player
+      var otherPlayer = findOtherPlayer(socket, gameID);
+      for(var j in socketList){
+        if (parseFloat(j) === otherPlayer){
+          var sock = socketList[j];
+          sock.emit("greedCast");
+        }
+      }
+    }
+  }
 }
 
 //Export

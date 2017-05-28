@@ -24,9 +24,9 @@ calculateGoldIncome = function(key){
 
   //Soldiers fee, mages fee
   var allSoldiers = hex[key].soldiers + hex[key].soldiersWaiting;
-  thisHexGoldIncome -= allSoldiers * balance.soldierFee;
+  thisHexGoldIncome -= allSoldiers * balance.soldierFee * greedMultiplier;
   var allMages = hex[key].mages + hex[key].magesWaiting;
-  thisHexGoldIncome -= allMages * balance.mageFee;
+  thisHexGoldIncome -= allMages * balance.mageFee * greedMultiplier;
 
   //Return
   return thisHexGoldIncome;
