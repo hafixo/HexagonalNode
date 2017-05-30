@@ -12,6 +12,7 @@ var goldIncome = 0;
 var manaIncome = 0;
 var happinessMultiplier = 1;
 var greedMultiplier = 1;
+var buildingSale = 1;
 
 var mouseX = 0;
 var mouseY = 0;
@@ -65,6 +66,7 @@ var showConfirmSpellUI = false;
 
 var justOpenedSendUI = false;   //Využití u funkce showSendUnitsUI(). Slouží k tomu, aby se UI nezavřela hned potom, co se otevře.
 var justOpenedConfirmSpellUI = false;
+var justStartedTargeting = false;   //spells.js
 
 
 //UI
@@ -220,6 +222,7 @@ onEnemyPlaceBuilding(socket);
 onStartTurn(socket);
 
 onGreedCast(socket);    //spells.js
+onBlackMagicCast(socket);
 
 //Inputs
 input();

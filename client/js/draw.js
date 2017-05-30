@@ -40,6 +40,8 @@ drawHexagonBackground = function(){
 		drawHexAdjacentToSelectedHexHover(key);
 		drawHexAdjacentToSelectedHexIfSendingUnits(key);
 		drawHexAdjacentToSelectedHex(key);
+		drawHexTargetingSpellHover(key);
+		drawHexTargetingSpellAvailable(key);
 		drawHexPlacingBuildingHover(key);
 		drawHexPlacingBuildingAvailable(key);
 		drawHexHover(key);
@@ -59,19 +61,6 @@ drawHexSelected = function(key){
 	}
 }
 
-drawHexAdjacentToSelectedHexIfSendingUnits = function(key){
-	//Highlight targeted hexagon (if sending units)
- 	if (canMoveUnits && showSendUnitUI && hexBackgroundSelected === false){
-		if (key === moveUnitsToHex){
-	 		var centerX = hex[moveUnitsToHex].x - Img.hex.width/2;
-	 		var centerY = hex[moveUnitsToHex].y - Img.hex.height/2;
-	 		ctx.drawImage(Img.hexTargeted,0,0,Img.hexTargeted.width,Img.hexTargeted.height,centerX,centerY,Img.hexTargeted.width,Img.hexTargeted.height);
-
-			hexBackgroundSelected = true;
-		}
- 	}
-}
-
 drawHexAdjacentToSelectedHexHover = function(key){
 	//Highlight targeted hexagon (if hovered by mouse)
 	if (canMoveUnits && hexBackgroundSelected === false){		//If there's at least 1 unit in the selected hexagon
@@ -87,6 +76,19 @@ drawHexAdjacentToSelectedHexHover = function(key){
 	}
 }
 
+drawHexAdjacentToSelectedHexIfSendingUnits = function(key){
+	//Highlight targeted hexagon (if sending units)
+ 	if (canMoveUnits && showSendUnitUI && hexBackgroundSelected === false){
+		if (key === moveUnitsToHex){
+	 		var centerX = hex[moveUnitsToHex].x - Img.hex.width/2;
+	 		var centerY = hex[moveUnitsToHex].y - Img.hex.height/2;
+	 		ctx.drawImage(Img.hexTargeted,0,0,Img.hexTargeted.width,Img.hexTargeted.height,centerX,centerY,Img.hexTargeted.width,Img.hexTargeted.height);
+
+			hexBackgroundSelected = true;
+		}
+ 	}
+}
+
 drawHexAdjacentToSelectedHex = function(key){
 	//Draw hexagons which are available for unit to move into.
 	if (canMoveUnits && hexBackgroundSelected === false){		//If there's at least 1 unit in the selected hexagon
@@ -94,6 +96,36 @@ drawHexAdjacentToSelectedHex = function(key){
 			if (key == hexMoveAvailable[id]){
 				var centerX = hex[hexMoveAvailable[id]].x - Img.hex.width/2;
 				var centerY = hex[hexMoveAvailable[id]].y - Img.hex.height/2;
+				ctx.drawImage(Img.hexAvailable,0,0,Img.hexAvailable.width,Img.hexAvailable.height,centerX,centerY,Img.hexAvailable.width,Img.hexAvailable.height);
+
+				hexBackgroundSelected = true;
+			}
+		}
+	}
+}
+
+drawHexTargetingSpellHover = function(key){
+	//Draw background if a a spell can target this hexagon and mouse is hovering over this hexagon
+	if (playing && typeof possibleSpellTarget !== "undefined" && key === mouseHexColliding && hexBackgroundSelected === false){
+		for (var targetKey in possibleSpellTarget){
+			if (key === possibleSpellTarget[targetKey]){
+				var centerX = hex[key].x - Img.hex.width/2;
+				var centerY = hex[key].y - Img.hex.height/2;
+				ctx.drawImage(Img.hexTargeted,0,0,Img.hexTargeted.width,Img.hexTargeted.height,centerX,centerY,Img.hexTargeted.width,Img.hexTargeted.height);
+
+				hexBackgroundSelected = true;
+			}
+		}
+	}
+}
+
+drawHexTargetingSpellAvailable = function(key){
+	//Draw background if a a spell can target this hexagon
+	if (playing && typeof possibleSpellTarget !== "undefined" && hexBackgroundSelected === false){
+		for (var targetKey in possibleSpellTarget){
+			if (key === possibleSpellTarget[targetKey]){
+				var centerX = hex[key].x - Img.hex.width/2;
+				var centerY = hex[key].y - Img.hex.height/2;
 				ctx.drawImage(Img.hexAvailable,0,0,Img.hexAvailable.width,Img.hexAvailable.height,centerX,centerY,Img.hexAvailable.width,Img.hexAvailable.height);
 
 				hexBackgroundSelected = true;
@@ -132,7 +164,7 @@ drawHexPlacingBuildingAvailable = function(key){
 
 drawHexHover = function(key){
 	//Draw mouse hovering over a normal hexagon with no other background (except owner's bachground)
-	if (playing && hexBackgroundSelected === false && !showConfirmSpellUI){
+	if (playing && typeof possibleSpellTarget === "undefined" && !showConfirmSpellUI && hexBackgroundSelected === false){
   	if (mouseHexColliding === key && hex[mouseHexColliding].owner === player && hexSelected === -1 && placingBuilding === -1){
   		var centerX = hex[mouseHexColliding].x - Img.hexHover.width/2;
   		var centerY = hex[mouseHexColliding].y - Img.hexHover.height/2;
@@ -508,55 +540,55 @@ chooseDescriptionText = function(id){
 		switch(id){
 			case 0:
 				description.row.push("Farm");
-				description.row.push("Price: " + balance.farmCost + " gold");
+				description.row.push("Price: " + Math.round(balance.farmCost*buildingSale) + " gold");
 				description.row.push("Allows you to train farmers. Farmers cost");
 				description.row.push(balance.workerCost + " gold and increase your gold income");
 				description.row.push("by " + balance.workerIncome + ".");
 				break;
 			case 1:
 				description.row.push("Barracks");
-				description.row.push("Price: " + balance.barracksCost + " gold");
+				description.row.push("Price: " + Math.round(balance.barracksCost*buildingSale) + " gold");
 				description.row.push("Allows you to train soldiers. Soldiers cost");
 				description.row.push(balance.soldierCost + " gold and decrease your gold income");
 				description.row.push("by " + balance.soldierFee + ". They can attack and defend.");
 				break;
 			case 2:
 				description.row.push("School of magic");
-				description.row.push("Price: " + balance.schoolOfMagicCost + " gold");
+				description.row.push("Price: " + Math.round(balance.schoolOfMagicCost*buildingSale) + " gold");
 				description.row.push("Allows you to train mages. Mages cost");
 				description.row.push(balance.mageCost + " gold. They decrease your gold income");
 				description.row.push("by " + balance.mageFee + " and increase your mana income by 1.");
 				break;
 			case 3:
 				description.row.push("Mill");
-				description.row.push("Price: " + balance.millCost + " gold");
+				description.row.push("Price: " + Math.round(balance.millCost*buildingSale) + " gold");
 				description.row.push("Increases your gold income by " + balance.millIncome + ".");
 				break;
 			case 4:
 				description.row.push("Well");
-				description.row.push("Price: " + balance.wellCost + " gold");
+				description.row.push("Price: " + Math.round(balance.wellCost*buildingSale) + " gold");
 				description.row.push("Increases your mana income by " + balance.wellIncome + ".");
 				break;
 			case 5:
 				description.row.push("Temple");
-				description.row.push("Price: " + balance.templeCost + " gold");
+				description.row.push("Price: " + Math.round(balance.templeCost*buildingSale) + " gold");
 				description.row.push("Doubles the mana income from mages in");
 				description.row.push("this hexagon.");
 				break;
 			case 6:
 				description.row.push("Yellow crystal");
-				description.row.push("Price: " + balance.yellowCrystalCost + " gold");
+				description.row.push("Price: " + Math.round(balance.yellowCrystalCost*buildingSale) + " gold");
 				description.row.push("Allows you to cast yellow (economic)");
 				description.row.push("spells.");
 				break;
 			case 7:
 				description.row.push("Red crystal");
-				description.row.push("Price: " + balance.redCrystalCost + " gold");
+				description.row.push("Price: " + Math.round(balance.redCrystalCost*buildingSale) + " gold");
 				description.row.push("Allows you to cast red (destructive) spells.");
 				break;
 			case 8:
 				description.row.push("Blue crystal");
-				description.row.push("Price: " + balance.blueCrystalCost + " gold");
+				description.row.push("Price: " + Math.round(balance.blueCrystalCost*buildingSale) + " gold");
 				description.row.push("Allows you to cast blue (supportive) spells.");
 				break;
 		}

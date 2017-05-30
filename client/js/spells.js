@@ -89,13 +89,13 @@ selectTargetOrConfirm = function(){
     case 1:
       castGreed();
       break;
+    case 2:
+      castEfficiency();
+      break;
+    case 3:
+      castBlackMagic();
+      break;
   }
-}
-
-waitForConfirmation = function(){
-  showConfirmSpellUI = true;
-  justOpenedConfirmSpellUI = true;
-  //Wait for confirmation
 }
 
 castHappiness = function(){
@@ -106,7 +106,30 @@ castGreed = function(){
   waitForConfirmation();
 }
 
+castEfficiency = function(){
+  waitForConfirmation();
+}
+
+castBlackMagic = function(){
+  //Označí všechny nepřátelské země - vytvoří global array se všemi možnými cílenými zeměmi (array bude později smazána)
+  possibleSpellTarget = [];
+  for (var key in hex){
+    if (hex[key].owner !== player && hex[key].owner !== 0){
+      possibleSpellTarget.push(key);
+    }
+  }
+
+  justStartedTargeting = true;
+}
+
+waitForConfirmation = function(){
+  showConfirmSpellUI = true;
+  justOpenedConfirmSpellUI = true;
+  //Wait for confirmation (input.js)
+}
+
 performSpell = function(){
+  //Confirm
   if (mouseUIcolliding.confirmSpell !== -1 && showConfirmSpellUI){
     if (ui["confirmSpell"][mouseUIcolliding.confirmSpell].name === "yesButton"){
       sendSpellSocket(castingSpell);
@@ -115,21 +138,50 @@ performSpell = function(){
       showConfirmSpellUI = false;
     }
   }
+
+  //Select target
+  if (typeof possibleSpellTarget !== "undefined"){
+    var targetSelected = false;
+    for (var key in possibleSpellTarget){
+      if (possibleSpellTarget[key] === mouseHexColliding){
+        //1 target
+        sendSpellSocket(castingSpell, mouseHexColliding);
+        confirmedSpellEffect(castingSpell, mouseHexColliding);
+        manaAmount -= getSpellCost(castingSpell);
+
+        targetSelected = true;
+        delete possibleSpellTarget;
+        break;
+      }
+    }
+    //Unselect
+    if (!targetSelected && !justStartedTargeting){
+      delete possibleSpellTarget;
+    }
+  }
+  justStartedTargeting = false;
 }
 
-sendSpellSocket = function(castingSpell){
+sendSpellSocket = function(castingSpell, target1){
   var sendData = {
-    spell:castingSpell
+    spell:castingSpell,
+    target1:target1
   }
   socket.emit("spellCast", sendData);
 }
 
-confirmedSpellEffect = function(castingSpell){
+confirmedSpellEffect = function(castingSpell, targetHex){
   switch(castingSpell){
     case 0:
       happinessEffect();
       break;
     //case 1 - no effect on the player who cast it
+    case 2:
+      efficiencyEffect();
+      break;
+    case 3:
+      blackMagicEffect(targetHex);
+      break;
   }
 }
 
@@ -138,11 +190,25 @@ happinessEffect = function(){
   changeIncome();
 }
 
+efficiencyEffect = function(){
+  buildingSale *= balance.efficiencySale;
+}
+
+blackMagicEffect = function(key){
+  hex[key].mages = Math.floor(hex[key].mages - balance.blackMagicKills * hex[key].mages);
+}
+
 //Recieve sockets
 onGreedCast = function(socket){
   socket.on("greedCast", function(data){
     greedMultiplier = balance.greedMultiplier;
-    console.log("Recieved!");
+    changeIncome();
+  });
+}
+
+onBlackMagicCast = function(socket){
+  socket.on("blackMagicCast", function(data){
+    hex[data.hex].mages = Math.floor(hex[data.hex].mages - balance.blackMagicKills * hex[data.hex].mages);
     changeIncome();
   });
 }

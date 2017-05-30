@@ -1,6 +1,6 @@
 var onSpellCast = function(socket){
   socket.on("spellCast", function(data){
-    //Data: {spell}
+    //Data: {spell, target1}
     checkForOwner = require("./checkForOwner");
     var gameID = socketList[socket.id].gameID;
     var owner = checkForOwner(socket, gameID);
@@ -20,7 +20,7 @@ spellCastAnticheat = function(socket, owner, data, gameID){
     data.spell % 1 === 0 && data.spell >= 0 && data.spell <= 8 &&              //jestli se jedná o povolené číslo spellu
     checkIfEnoughMana(data, gamesList[gameID].player[owner].mana) &&
     checkForCrystal(owner, data, gameID) &&
-    checkForAdditionalConditionsBasedOnSpell(data, gameID)){
+    checkForAdditionalConditionsBasedOnSpell(owner, data, gameID)){
       return true;
   }
   else
@@ -93,13 +93,26 @@ checkForCrystal = function(owner, data, gameID){
   return crystalExists;
 }
 
-checkForAdditionalConditionsBasedOnSpell = function(data, gameID){
+checkForAdditionalConditionsBasedOnSpell = function(owner, data, gameID){
   switch(data.spell){
     case 0:
       return true;
       break;
     case 1:
       return true;
+      break;
+    case 2:
+      return true;
+      break;
+    case 3:
+      if (gamesList[gameID].hex[data.target1] !== undefined &&
+        gamesList[gameID].hex[data.target1].owner !== 0 &&
+        gamesList[gameID].hex[data.target1].owner !== owner){
+          return true;
+      }
+      else {
+        return false
+      }
       break;
   }
 }
@@ -113,6 +126,13 @@ spellEffect = function(socket, owner, data, gameID){
     case 1:
       greedEffect(socket, owner, gameID);
       break;
+    case 2:
+      efficiencyEffect(owner, gameID);
+      break;
+    case 3:
+      blackMagicEffect(socket, data, gameID);
+      break;
+
   }
 }
 
@@ -133,6 +153,26 @@ greedEffect = function(socket, owner, gameID){
           sock.emit("greedCast");
         }
       }
+    }
+  }
+}
+
+efficiencyEffect = function(owner, gameID){
+  gamesList[gameID].player[owner].buildingSale *= balance.efficiencySale;
+}
+
+blackMagicEffect = function(socket, data, gameID){
+  gamesList[gameID].hex[data.target1].mages = Math.floor(gamesList[gameID].hex[data.target1].mages - balance.blackMagicKills * gamesList[gameID].hex[data.target1].mages);
+
+  //Send info to the other player
+  var otherPlayer = findOtherPlayer(socket, gameID);
+  for(var i in socketList){
+    if (parseFloat(i) === otherPlayer){
+      var sock = socketList[i];
+      var sendData = {
+        hex:data.target1
+      }
+      sock.emit("blackMagicCast", sendData);
     }
   }
 }

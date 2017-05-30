@@ -151,6 +151,7 @@ placeBuilding = function(){
             //Client
     				hex[mouseHexColliding].building = placingBuilding;
             goldAmount -= cost;
+            buildingSale = 1;   //Reset sale from casting efficiency
             changeIncome();
 
             //Server
@@ -198,6 +199,8 @@ getBuildingCost = function(building){
       cost = balance.blueCrystalCost;
       break;
    }
+
+  cost = Math.round(cost * buildingSale);
 
   return cost;
 }

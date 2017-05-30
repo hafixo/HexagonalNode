@@ -8,6 +8,8 @@ var createGameVariables = function(gameID, columns, mainColumnSize){
     gamesList[gameID].player[i] = {};
     gamesList[gameID].player[i].happinessMultiplier = 1;
     gamesList[gameID].player[i].greedMultiplier = 1;
+    gamesList[gameID].player[i].greedMultiplier = 1;
+    gamesList[gameID].player[i].buildingSale = 1;
   }
 
   //May be different variables
