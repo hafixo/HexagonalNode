@@ -323,9 +323,14 @@ trainUnits = function(units,i){
 }
 
 adjustTrainValueToCost = function(trainValue, units){
-  var cost = getUnitCost(units);
-  if (trainValue * cost > goldAmount){
-    trainValue = Math.floor(goldAmount / cost);
+  if (goldAmount >= 0){
+    var cost = getUnitCost(units);
+    if (trainValue * cost > goldAmount){
+      trainValue = Math.floor(goldAmount / cost);
+    }
+  }
+  else {
+    trainValue = 0;
   }
 
   return trainValue;

@@ -935,7 +935,12 @@ drawTrainMaxAmount = function(key){
 						break;
 				}
 				if (cost !== undefined){
-					maxAmount = Math.floor(goldAmount / cost);
+					if (goldAmount >= 0){
+						maxAmount = Math.floor(goldAmount / cost);
+					}
+					else {
+						maxAmount = 0;
+					}
 				}
 				break;
 

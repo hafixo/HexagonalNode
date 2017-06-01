@@ -224,6 +224,7 @@ onStartTurn(socket);
 onGreedCast(socket);    //spells.js
 onBlackMagicCast(socket);
 onPoisonousPlantsCast(socket);
+onArmageddonCast(socket);
 
 //Inputs
 input();

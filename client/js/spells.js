@@ -98,6 +98,9 @@ selectTargetOrConfirm = function(){
     case 4:
       castPoisonousPlants();
       break;
+    case 5:
+      castArmageddon();
+      break;
   }
 }
 
@@ -123,6 +126,10 @@ castBlackMagic = function(){
   }
 
   justStartedTargeting = true;
+}
+
+castArmageddon = function(){
+  waitForConfirmation();
 }
 
 castPoisonousPlants = function(){
@@ -198,6 +205,9 @@ confirmedSpellEffect = function(castingSpell, targetHex){
     case 4:
       poisonousPlantsEffect(targetHex);
       break;
+    case 5:
+      armageddonEffect(targetHex);
+      break;
   }
 }
 
@@ -229,6 +239,18 @@ poisonousPlantsEffect = function(key){
   changeIncome();
 }
 
+armageddonEffect = function(){
+  for (var key in hex){
+    hex[key].workers = Math.floor(hex[key].workers - balance.armageddonKills * hex[key].workers);
+    hex[key].workersWaiting = Math.floor(hex[key].workersWaiting - balance.armageddonKills * hex[key].workersWaiting);
+    hex[key].soldiers = Math.floor(hex[key].soldiers - balance.armageddonKills * hex[key].soldiers);
+    hex[key].soldiersWaiting = Math.floor(hex[key].soldiersWaiting - balance.armageddonKills * hex[key].soldiersWaiting);
+    hex[key].mages = Math.floor(hex[key].mages - balance.armageddonKills * hex[key].mages);
+    hex[key].magesWaiting = Math.floor(hex[key].magesWaiting - balance.armageddonKills * hex[key].magesWaiting);
+  }
+  changeIncome();
+}
+
 //Recieve sockets
 onGreedCast = function(socket){
   socket.on("greedCast", function(data){
@@ -257,6 +279,20 @@ onPoisonousPlantsCast = function(socket){
       hex[adjacentHexagons[i]].workersWaiting = Math.floor(hex[adjacentHexagons[i]].workersWaiting - balance.poisonousPlantsKillsAdjacent * hex[adjacentHexagons[i]].workersWaiting);
     }
 
+    changeIncome();
+  });
+}
+
+onArmageddonCast = function(socket){
+  socket.on("armageddonCast", function(data){
+    for (var key in hex){
+      hex[key].workers = Math.floor(hex[key].workers - balance.armageddonKills * hex[key].workers);
+      hex[key].workersWaiting = Math.floor(hex[key].workersWaiting - balance.armageddonKills * hex[key].workersWaiting);
+      hex[key].soldiers = Math.floor(hex[key].soldiers - balance.armageddonKills * hex[key].soldiers);
+      hex[key].soldiersWaiting = Math.floor(hex[key].soldiersWaiting - balance.armageddonKills * hex[key].soldiersWaiting);
+      hex[key].mages = Math.floor(hex[key].mages - balance.armageddonKills * hex[key].mages);
+      hex[key].magesWaiting = Math.floor(hex[key].magesWaiting - balance.armageddonKills * hex[key].magesWaiting);
+    }
     changeIncome();
   });
 }
