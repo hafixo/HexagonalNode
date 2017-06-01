@@ -114,6 +114,13 @@ checkForAdditionalConditionsBasedOnSpell = function(owner, data, gameID){
         return false
       }
       break;
+    case 4:
+      if (gamesList[gameID].hex[data.target1] !== undefined){
+        return true;
+      }
+      else {
+        return false;
+      }
   }
 }
 
@@ -132,7 +139,9 @@ spellEffect = function(socket, owner, data, gameID){
     case 3:
       blackMagicEffect(socket, data, gameID);
       break;
-
+    case 4:
+      poisonousPlantsEffect(socket, data, gameID);
+      break;
   }
 }
 
@@ -175,6 +184,50 @@ blackMagicEffect = function(socket, data, gameID){
       sock.emit("blackMagicCast", sendData);
     }
   }
+}
+
+poisonousPlantsEffect = function(socket, data, gameID){
+  //Main hexagon
+  gamesList[gameID].hex[data.target1].workers = Math.floor(gamesList[gameID].hex[data.target1].workers - balance.poisonousPlantsKillsMain * gamesList[gameID].hex[data.target1].workers);
+  gamesList[gameID].hex[data.target1].workersWaiting = Math.floor(gamesList[gameID].hex[data.target1].workersWaiting - balance.poisonousPlantsKillsMain * gamesList[gameID].hex[data.target1].workersWaiting);
+
+  //Adjacent hexagons
+  var adjacentHexagons = findAdjacentHexagons(data.target1, gameID);
+  for (var i in adjacentHexagons){
+    gamesList[gameID].hex[adjacentHexagons[i]].workers = Math.floor(gamesList[gameID].hex[adjacentHexagons[i]].workers - balance.poisonousPlantsKillsAdjacent * gamesList[gameID].hex[adjacentHexagons[i]].workers);
+    gamesList[gameID].hex[adjacentHexagons[i]].workersWaiting = Math.floor(gamesList[gameID].hex[adjacentHexagons[i]].workersWaiting - balance.poisonousPlantsKillsAdjacent * gamesList[gameID].hex[adjacentHexagons[i]].workersWaiting);
+  }
+
+  //Send info to the other player
+  var otherPlayer = findOtherPlayer(socket, gameID);
+  for(var i in socketList){
+    if (parseFloat(i) === otherPlayer){
+      var sock = socketList[i];
+      var sendData = {
+        hex:data.target1
+      }
+      sock.emit("poisonousPlantsCast", sendData);
+    }
+  }
+}
+
+findAdjacentHexagons = function(key, gameID){
+	var adjacentHexagons = []; 	//sem budu zapisovat id hexagonů, které s daným hexagonem sousedí
+
+  var hex = gamesList[gameID].hex;
+	for(var id in hex){
+		//Přiřadí hexagony z vedlejších sloupců
+		if (Math.abs(hex[key].column - hex[id].column) === 1)
+			if (Math.abs(hex[key].line - hex[id].line) === 0.5)
+				adjacentHexagons.push(id);
+
+		//Přiřadí hexagony ze stejného sloupce
+		if (hex[key].column === hex[id].column)
+			if (Math.abs(hex[key].line - hex[id].line) === 1)
+				adjacentHexagons.push(id);
+	}
+	//console.log(adjacentHexagons.join(" "));
+	return adjacentHexagons;
 }
 
 //Export

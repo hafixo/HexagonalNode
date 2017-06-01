@@ -29,6 +29,9 @@ input = function(){
     	hexSelected = -1;
       canMoveUnits = false;
     }
+    if (typeof possibleSpellTarget !== "undefined"){
+      delete possibleSpellTarget;
+    }
 
     dontShowSendUnitsUI();
 

@@ -95,6 +95,9 @@ selectTargetOrConfirm = function(){
     case 3:
       castBlackMagic();
       break;
+    case 4:
+      castPoisonousPlants();
+      break;
   }
 }
 
@@ -117,6 +120,16 @@ castBlackMagic = function(){
     if (hex[key].owner !== player && hex[key].owner !== 0){
       possibleSpellTarget.push(key);
     }
+  }
+
+  justStartedTargeting = true;
+}
+
+castPoisonousPlants = function(){
+  //Označí všechny země
+  possibleSpellTarget = [];
+  for (var key in hex){
+    possibleSpellTarget.push(key);
   }
 
   justStartedTargeting = true;
@@ -182,6 +195,9 @@ confirmedSpellEffect = function(castingSpell, targetHex){
     case 3:
       blackMagicEffect(targetHex);
       break;
+    case 4:
+      poisonousPlantsEffect(targetHex);
+      break;
   }
 }
 
@@ -198,6 +214,21 @@ blackMagicEffect = function(key){
   hex[key].mages = Math.floor(hex[key].mages - balance.blackMagicKills * hex[key].mages);
 }
 
+poisonousPlantsEffect = function(key){
+  //Main hexagon
+  hex[key].workers = Math.floor(hex[key].workers - balance.poisonousPlantsKillsMain * hex[key].workers);
+  hex[key].workersWaiting = Math.floor(hex[key].workersWaiting - balance.poisonousPlantsKillsMain * hex[key].workersWaiting);
+
+  //Adjacent hexagons
+  var adjacentHexagons = findAdjacentHexagons(key);
+  for (var i in adjacentHexagons){
+    hex[adjacentHexagons[i]].workers = Math.floor(hex[adjacentHexagons[i]].workers - balance.poisonousPlantsKillsAdjacent * hex[adjacentHexagons[i]].workers);
+    hex[adjacentHexagons[i]].workersWaiting = Math.floor(hex[adjacentHexagons[i]].workersWaiting - balance.poisonousPlantsKillsAdjacent * hex[adjacentHexagons[i]].workersWaiting);
+  }
+
+  changeIncome();
+}
+
 //Recieve sockets
 onGreedCast = function(socket){
   socket.on("greedCast", function(data){
@@ -209,6 +240,23 @@ onGreedCast = function(socket){
 onBlackMagicCast = function(socket){
   socket.on("blackMagicCast", function(data){
     hex[data.hex].mages = Math.floor(hex[data.hex].mages - balance.blackMagicKills * hex[data.hex].mages);
+    changeIncome();
+  });
+}
+
+onPoisonousPlantsCast = function(socket){
+  socket.on("poisonousPlantsCast", function(data){
+    //Main hexagon
+    hex[data.hex].workers = Math.floor(hex[data.hex].workers - balance.poisonousPlantsKillsMain * hex[data.hex].workers);
+    hex[data.hex].workersWaiting = Math.floor(hex[data.hex].workersWaiting - balance.poisonousPlantsKillsMain * hex[data.hex].workersWaiting);
+
+    //Adjacent hexagons
+    var adjacentHexagons = findAdjacentHexagons(data.hex);
+    for (var i in adjacentHexagons){
+      hex[adjacentHexagons[i]].workers = Math.floor(hex[adjacentHexagons[i]].workers - balance.poisonousPlantsKillsAdjacent * hex[adjacentHexagons[i]].workers);
+      hex[adjacentHexagons[i]].workersWaiting = Math.floor(hex[adjacentHexagons[i]].workersWaiting - balance.poisonousPlantsKillsAdjacent * hex[adjacentHexagons[i]].workersWaiting);
+    }
+
     changeIncome();
   });
 }

@@ -619,7 +619,8 @@ chooseDescriptionText = function(id){
 			case 3:
 				description.row.push("Black magic");
 				description.row.push("Price: " + balance.blackMagicCost + " mana");
-				description.row.push("Kills " + balance.blackMagicKills*100 + " % of mages in a selected hexagon.");
+				description.row.push("Kills " + balance.blackMagicKills*100 + " % of mages in a selected");
+				description.row.push("enemy hexagon.");
 				break;
 			case 4:
 				description.row.push("Poisonous plants");
