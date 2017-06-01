@@ -121,6 +121,9 @@ checkForAdditionalConditionsBasedOnSpell = function(owner, data, gameID){
       else {
         return false;
       }
+    case 5:
+      return true;
+      break;
   }
 }
 
@@ -141,6 +144,9 @@ spellEffect = function(socket, owner, data, gameID){
       break;
     case 4:
       poisonousPlantsEffect(socket, data, gameID);
+      break;
+    case 5:
+      armageddonEffect(socket, gameID);
       break;
   }
 }
@@ -228,6 +234,27 @@ findAdjacentHexagons = function(key, gameID){
 	}
 	//console.log(adjacentHexagons.join(" "));
 	return adjacentHexagons;
+}
+
+armageddonEffect = function(socket, gameID){
+  var hex = gamesList[gameID].hex;
+  for (var key in hex){
+    hex[key].workers = Math.floor(hex[key].workers - balance.armageddonKills * hex[key].workers);
+    hex[key].workersWaiting = Math.floor(hex[key].workersWaiting - balance.armageddonKills * hex[key].workersWaiting);
+    hex[key].soldiers = Math.floor(hex[key].soldiers - balance.armageddonKills * hex[key].soldiers);
+    hex[key].soldiersWaiting = Math.floor(hex[key].soldiersWaiting - balance.armageddonKills * hex[key].soldiersWaiting);
+    hex[key].mages = Math.floor(hex[key].mages - balance.armageddonKills * hex[key].mages);
+    hex[key].magesWaiting = Math.floor(hex[key].magesWaiting - balance.armageddonKills * hex[key].magesWaiting);
+  }
+
+  //Send info to the other player
+  var otherPlayer = findOtherPlayer(socket, gameID);
+  for(var i in socketList){
+    if (parseFloat(i) === otherPlayer){
+      var sock = socketList[i];
+      sock.emit("armageddonCast");
+    }
+  }
 }
 
 //Export

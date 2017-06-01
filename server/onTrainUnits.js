@@ -74,7 +74,7 @@ checkForCorrectBuildingWithUnits = function(data, units){
 checkIfEnoughGoldForTraining = function(data, goldAmount){
   if (data.actionType === "train"){
     var unitCost = getUnitCost(data.units);
-    if (goldAmount >= unitCost*data.amount){
+    if (goldAmount >= unitCost*data.amount || data.amount === 0){
       return true;
     }
     else {
