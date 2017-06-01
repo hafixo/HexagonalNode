@@ -637,9 +637,9 @@ chooseDescriptionText = function(id){
 			case 6:
 				description.row.push("Energy boost");
 				description.row.push("Price: " + balance.energyBoostCost + " mana");
-				description.row.push("All units in a selected hexagon can move");
-				description.row.push("and attack. If they already moved or");
-				description.row.push("attacked, they can do it again.");
+				description.row.push("All units in a selected friendly hexagon");
+				description.row.push("can move and attack. If they already");
+				description.row.push("moved or attacked, they can do it again.");
 				break;
 			case 7:
 				description.row.push("Magic wind");

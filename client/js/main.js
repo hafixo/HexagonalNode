@@ -67,6 +67,7 @@ var showConfirmSpellUI = false;
 var justOpenedSendUI = false;   //Využití u funkce showSendUnitsUI(). Slouží k tomu, aby se UI nezavřela hned potom, co se otevře.
 var justOpenedConfirmSpellUI = false;
 var justStartedTargeting = false;   //spells.js
+var justTargetedSpell = false;    //spells.js
 
 
 //UI
@@ -225,6 +226,7 @@ onGreedCast(socket);    //spells.js
 onBlackMagicCast(socket);
 onPoisonousPlantsCast(socket);
 onArmageddonCast(socket);
+onEnergyBoostCast(socket);
 
 //Inputs
 input();

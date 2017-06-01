@@ -124,6 +124,15 @@ checkForAdditionalConditionsBasedOnSpell = function(owner, data, gameID){
     case 5:
       return true;
       break;
+    case 6:
+    if (gamesList[gameID].hex[data.target1] !== undefined &&
+      gamesList[gameID].hex[data.target1].owner === owner){
+        return true;
+      }
+      else {
+        return false
+      }
+      break;
   }
 }
 
@@ -147,6 +156,9 @@ spellEffect = function(socket, owner, data, gameID){
       break;
     case 5:
       armageddonEffect(socket, gameID);
+      break;
+    case 6:
+      energyBoostEffect(socket, data, gameID);
       break;
   }
 }
@@ -253,6 +265,29 @@ armageddonEffect = function(socket, gameID){
     if (parseFloat(i) === otherPlayer){
       var sock = socketList[i];
       sock.emit("armageddonCast");
+    }
+  }
+}
+
+energyBoostEffect = function(socket, data, gameID){
+  function convertWaitingToReady(key, units, gameID){
+    var unitWaitingName = units + "Waiting";
+    gamesList[gameID].hex[key][units] += gamesList[gameID].hex[key][unitWaitingName];
+    gamesList[gameID].hex[key][unitWaitingName] = 0;
+  }
+  convertWaitingToReady(data.target1, "workers", gameID);
+  convertWaitingToReady(data.target1, "soldiers", gameID);
+  convertWaitingToReady(data.target1, "mages", gameID);
+
+  //Send info to the other player
+  var otherPlayer = findOtherPlayer(socket, gameID);
+  for(var i in socketList){
+    if (parseFloat(i) === otherPlayer){
+      var sock = socketList[i];
+      var sendData = {
+        hex:data.target1
+      }
+      sock.emit("energyBoostCast", sendData);
     }
   }
 }

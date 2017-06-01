@@ -1,4 +1,6 @@
 castSpell = function(){
+  justTargetedSpell = false;   //Prevents the ability to select a hexagon just after targeting a spell
+
   var proceed = selectSpell();    //changes global variable castingSpell
   if (proceed){
     selectTargetOrConfirm();
@@ -82,6 +84,7 @@ getSpellCost = function(spell){
 }
 
 selectTargetOrConfirm = function(){
+  justTargetedSpell = true;
   switch(castingSpell){
     case 0:
       castHappiness();
@@ -100,6 +103,9 @@ selectTargetOrConfirm = function(){
       break;
     case 5:
       castArmageddon();
+      break;
+    case 6:
+      castEnergyBoost();
       break;
   }
 }
@@ -137,6 +143,18 @@ castPoisonousPlants = function(){
   possibleSpellTarget = [];
   for (var key in hex){
     possibleSpellTarget.push(key);
+  }
+
+  justStartedTargeting = true;
+}
+
+castEnergyBoost = function(){
+  //Označí všechny přátelské země - vytvoří global array se všemi možnými cílenými zeměmi (array bude později smazána)
+  possibleSpellTarget = [];
+  for (var key in hex){
+    if (hex[key].owner === player){
+      possibleSpellTarget.push(key);
+    }
   }
 
   justStartedTargeting = true;
@@ -208,6 +226,9 @@ confirmedSpellEffect = function(castingSpell, targetHex){
     case 5:
       armageddonEffect(targetHex);
       break;
+    case 6:
+      energyBoostEffect(targetHex);
+      break;
   }
 }
 
@@ -249,6 +270,18 @@ armageddonEffect = function(){
     hex[key].magesWaiting = Math.floor(hex[key].magesWaiting - balance.armageddonKills * hex[key].magesWaiting);
   }
   changeIncome();
+}
+
+energyBoostEffect = function(key){
+  convertWaitingToReady(key, "workers");
+  convertWaitingToReady(key, "soldiers");
+  convertWaitingToReady(key, "mages");
+}
+
+convertWaitingToReady = function(key, units){
+  var unitWaitingName = units + "Waiting";
+  hex[key][units] += hex[key][unitWaitingName];
+  hex[key][unitWaitingName] = 0;
 }
 
 //Recieve sockets
@@ -294,5 +327,13 @@ onArmageddonCast = function(socket){
       hex[key].magesWaiting = Math.floor(hex[key].magesWaiting - balance.armageddonKills * hex[key].magesWaiting);
     }
     changeIncome();
+  });
+}
+
+onEnergyBoostCast = function(socket){
+  socket.on("energyBoostCast", function(data){
+    convertWaitingToReady(data.hex, "workers");
+    convertWaitingToReady(data.hex, "soldiers");
+    convertWaitingToReady(data.hex, "mages");
   });
 }
