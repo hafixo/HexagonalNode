@@ -121,6 +121,7 @@ checkForAdditionalConditionsBasedOnSpell = function(owner, data, gameID){
       else {
         return false;
       }
+      break;
     case 5:
       return true;
       break;
@@ -137,6 +138,14 @@ checkForAdditionalConditionsBasedOnSpell = function(owner, data, gameID){
       if (gamesList[gameID].hex[data.target1] !== undefined &&
         gamesList[gameID].hex[data.target2] !== undefined &&
         (gamesList[gameID].hex[data.target2].owner === owner || gamesList[gameID].hex[data.target2].owner !== owner && gamesList[gameID].hex[data.target2].owner !== 0)){
+        return true;
+      }
+      else {
+        return false;
+      }
+      break;
+    case 8:
+      if (gamesList[gameID].hex[data.target1] !== undefined){
         return true;
       }
       else {
@@ -172,6 +181,9 @@ spellEffect = function(socket, owner, data, gameID){
       break;
     case 7:
       magicWindEffect(socket, data, gameID);
+      break;
+    case 8:
+      recyclingEffect(socket, owner, data, gameID);
       break;
   }
 }
@@ -329,6 +341,58 @@ magicWindEffect = function(socket, data, gameID){
       sock.emit("magicWindCast", sendData);
     }
   }
+}
+
+recyclingEffect = function(socket, owner, data, gameID){
+  gamesList[gameID].player[owner].gold += getOriginalBuildingCost(gamesList[gameID].hex[data.target1].building);
+  gamesList[gameID].hex[data.target1].building = -1;
+
+  //Send info to the other player
+  var otherPlayer = findOtherPlayer(socket, gameID);
+  for(var i in socketList){
+    if (parseFloat(i) === otherPlayer){
+      var sock = socketList[i];
+      var sendData = {
+        hex:data.target1
+      }
+      sock.emit("recyclingCast", sendData);
+    }
+  }
+}
+
+getOriginalBuildingCost = function(building){
+  var buildingCost;
+  switch(building){
+    case 0:
+      buildingCost = balance.farmCost;
+      break;
+    case 1:
+      buildingCost = balance.barracksCost;
+      break;
+    case 2:
+      buildingCost = balance.schoolOfMagicCost;
+      break;
+    case 3:
+      buildingCost = balance.millCost;
+      break;
+    case 4:
+      buildingCost = balance.wellCost;
+      break;
+    case 5:
+      buildingCost = balance.templeCost;
+      break;
+    case 6:
+      buildingCost = balance.yellowCrystalCost;
+      break;
+    case 7:
+      buildingCost = balance.redCrystalCost;
+      break;
+    case 8:
+      buildingCost = balance.blueCrystalCost;
+      break;
+  }
+
+  return buildingCost;
 }
 
 //Export

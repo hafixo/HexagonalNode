@@ -110,6 +110,9 @@ selectTargetOrConfirm = function(){
     case 7:
       castMagicWind();
       break;
+    case 8:
+      castRecycling();
+      break;
   }
 }
 
@@ -175,6 +178,18 @@ castMagicWind = function(){
   justStartedTargeting = true;
 }
 
+castRecycling = function(){
+  //Označí všechny přátelské země s budovou - vytvoří global array se všemi možnými cílenými zeměmi (array bude později smazána)
+  possibleSpellTarget = [];
+  for (var key in hex){
+    if (hex[key].owner === player && hex[key].building !== -1){
+      possibleSpellTarget.push(key);
+    }
+  }
+
+  justStartedTargeting = true;
+}
+
 waitForConfirmation = function(){
   showConfirmSpellUI = true;
   justOpenedConfirmSpellUI = true;
@@ -185,7 +200,7 @@ performSpell = function(){
   //Confirm
   if (mouseUIcolliding.confirmSpell !== -1 && showConfirmSpellUI){
     if (ui["confirmSpell"][mouseUIcolliding.confirmSpell].name === "yesButton"){
-      sendSpellSocket(castingSpell);
+      //sendSpellSocket(castingSpell);
       confirmedSpellEffect(castingSpell);
       manaAmount -= getSpellCost(castingSpell);
       showConfirmSpellUI = false;
@@ -288,6 +303,9 @@ confirmedSpellEffect = function(castingSpell, firstTarget, secondTarget){
     case 7:
       magicWindEffect(firstTarget, secondTarget);
       break;
+    case 8:
+      recyclingEffect(firstTarget);
+      break;
   }
 }
 
@@ -357,6 +375,11 @@ moveUnitsType = function(firstHex, secondHex, units){
   hex[firstHex][unitWaitingName] = 0;
 }
 
+recyclingEffect = function(key){
+  goldAmount += getOriginalBuildingCost(hex[key].building);   //input
+  hex[key].building = -1;
+}
+
 //Recieve sockets
 onGreedCast = function(socket){
   socket.on("greedCast", function(data){
@@ -416,5 +439,11 @@ onMagicWindCast = function(socket){
     moveUnitsType(data.firstHex, data.secondHex, "workers");
     moveUnitsType(data.firstHex, data.secondHex, "soldiers");
     moveUnitsType(data.firstHex, data.secondHex, "mages");
+  });
+}
+
+onRecyclingCast = function(socket){
+  socket.on("recyclingCast", function(data){
+    hex[data.hex].building = -1;
   });
 }

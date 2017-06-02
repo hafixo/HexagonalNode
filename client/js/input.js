@@ -171,7 +171,7 @@ placeBuilding = function(){
   }
 }
 
-getBuildingCost = function(building){
+getOriginalBuildingCost = function(building){
   var cost;
   switch(building){
     case 0:
@@ -202,6 +202,12 @@ getBuildingCost = function(building){
       cost = balance.blueCrystalCost;
       break;
    }
+
+  return cost;
+}
+
+getBuildingCost = function(building){
+  var cost = getOriginalBuildingCost(building);
 
   cost = Math.round(cost * buildingSale);
 

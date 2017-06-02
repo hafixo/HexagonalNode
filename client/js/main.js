@@ -229,6 +229,7 @@ onPoisonousPlantsCast(socket);
 onArmageddonCast(socket);
 onEnergyBoostCast(socket);
 onMagicWindCast(socket);
+onRecyclingCast(socket);
 
 //Inputs
 input();

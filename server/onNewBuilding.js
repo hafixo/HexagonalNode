@@ -34,37 +34,43 @@ checkIfEnoughGoldForBuilding = function(building, owner, goldAmount, gameID){
   else return false;
 }
 
-getBuildingCost = function(building, owner, gameID){
+getOriginalBuildingCost = function(building){
   var buildingCost;
   switch(building){
     case 0:
       buildingCost = balance.farmCost;
-    break;
+      break;
     case 1:
       buildingCost = balance.barracksCost;
-    break;
+      break;
     case 2:
       buildingCost = balance.schoolOfMagicCost;
-    break;
+      break;
     case 3:
       buildingCost = balance.millCost;
-    break;
+      break;
     case 4:
       buildingCost = balance.wellCost;
-    break;
+      break;
     case 5:
       buildingCost = balance.templeCost;
-    break;
+      break;
     case 6:
       buildingCost = balance.yellowCrystalCost;
-    break;
+      break;
     case 7:
       buildingCost = balance.redCrystalCost;
-    break;
+      break;
     case 8:
       buildingCost = balance.blueCrystalCost;
-    break;
+      break;
   }
+
+  return buildingCost;
+}
+
+getBuildingCost = function(building, owner, gameID){
+  var buildingCost = getOriginalBuildingCost(building)
 
   buildingCost = Math.round(buildingCost * gamesList[gameID].player[owner].buildingSale);
 
