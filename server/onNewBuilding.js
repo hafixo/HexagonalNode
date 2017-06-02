@@ -70,7 +70,7 @@ getOriginalBuildingCost = function(building){
 }
 
 getBuildingCost = function(building, owner, gameID){
-  var buildingCost = getOriginalBuildingCost(building)
+  var buildingCost = getOriginalBuildingCost(building);
 
   buildingCost = Math.round(buildingCost * gamesList[gameID].player[owner].buildingSale);
 

@@ -200,7 +200,7 @@ performSpell = function(){
   //Confirm
   if (mouseUIcolliding.confirmSpell !== -1 && showConfirmSpellUI){
     if (ui["confirmSpell"][mouseUIcolliding.confirmSpell].name === "yesButton"){
-      //sendSpellSocket(castingSpell);
+      sendSpellSocket(castingSpell);
       confirmedSpellEffect(castingSpell);
       manaAmount -= getSpellCost(castingSpell);
       showConfirmSpellUI = false;
