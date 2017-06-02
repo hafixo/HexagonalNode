@@ -14,9 +14,9 @@ var createGameVariables = function(gameID, columns, mainColumnSize){
 
   //May be different variables
   gamesList[gameID].player[1].gold = 2500;
-  gamesList[gameID].player[1].mana = 100;
+  gamesList[gameID].player[1].mana = 15;
   gamesList[gameID].player[2].gold = 2500;
-  gamesList[gameID].player[2].mana = 100;
+  gamesList[gameID].player[2].mana = 15;
 
 
 
