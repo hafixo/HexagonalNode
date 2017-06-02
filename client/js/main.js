@@ -68,6 +68,7 @@ var justOpenedSendUI = false;   //Využití u funkce showSendUnitsUI(). Slouží
 var justOpenedConfirmSpellUI = false;
 var justStartedTargeting = false;   //spells.js
 var justTargetedSpell = false;    //spells.js
+var justSelectedFirstTarget = false; //spells.js
 
 
 //UI
@@ -227,6 +228,7 @@ onBlackMagicCast(socket);
 onPoisonousPlantsCast(socket);
 onArmageddonCast(socket);
 onEnergyBoostCast(socket);
+onMagicWindCast(socket);
 
 //Inputs
 input();

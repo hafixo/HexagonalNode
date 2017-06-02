@@ -107,6 +107,9 @@ selectTargetOrConfirm = function(){
     case 6:
       castEnergyBoost();
       break;
+    case 7:
+      castMagicWind();
+      break;
   }
 }
 
@@ -160,6 +163,18 @@ castEnergyBoost = function(){
   justStartedTargeting = true;
 }
 
+castMagicWind = function(){
+  //Označí všechny přátelské a nepřátelské země - vytvoří global array se všemi možnými cílenými zeměmi (array bude později smazána)
+  possibleSpellTarget = [];
+  for (var key in hex){
+    if ((hex[key].owner === player) || (hex[key].owner !== player && hex[key].owner !== 0)){
+      possibleSpellTarget.push(key);
+    }
+  }
+
+  justStartedTargeting = true;
+}
+
 waitForConfirmation = function(){
   showConfirmSpellUI = true;
   justOpenedConfirmSpellUI = true;
@@ -178,18 +193,35 @@ performSpell = function(){
   }
 
   //Select target
+  justSelectedFirstTarget = false;
   if (typeof possibleSpellTarget !== "undefined"){
     var targetSelected = false;
     for (var key in possibleSpellTarget){
       if (possibleSpellTarget[key] === mouseHexColliding){
         //1 target
-        sendSpellSocket(castingSpell, mouseHexColliding);
-        confirmedSpellEffect(castingSpell, mouseHexColliding);
-        manaAmount -= getSpellCost(castingSpell);
+        if (castingSpell !== 7){
+          sendSpellSocket(castingSpell, mouseHexColliding);
+          confirmedSpellEffect(castingSpell, mouseHexColliding);
 
-        targetSelected = true;
-        delete possibleSpellTarget;
-        break;
+          manaAmount -= getSpellCost(castingSpell);
+          targetSelected = true;
+          delete possibleSpellTarget;
+          break;
+        }
+        //2 targets
+        else {
+          firstTarget = possibleSpellTarget[key];
+          possibleSecondaryTarget = [];
+          var adjacentHexagons = findAdjacentHexagons(possibleSpellTarget[key]);
+          for (var key in adjacentHexagons){
+            if (hex[adjacentHexagons[key]].owner === hex[firstTarget].owner){
+              possibleSecondaryTarget.push(adjacentHexagons[key]);
+            }
+          }
+          justSelectedFirstTarget = true;
+          delete possibleSpellTarget;
+          break;
+        }
       }
     }
     //Unselect
@@ -197,18 +229,42 @@ performSpell = function(){
       delete possibleSpellTarget;
     }
   }
+
   justStartedTargeting = false;
+
+  //Second target
+  if (typeof possibleSecondaryTarget !== "undefined"){
+    var targetSelected = false;
+    for (var key in possibleSecondaryTarget){
+      if (possibleSecondaryTarget[key] === mouseHexColliding){
+        sendSpellSocket(castingSpell, firstTarget, mouseHexColliding);
+        confirmedSpellEffect(castingSpell, firstTarget, mouseHexColliding);
+
+        manaAmount -= getSpellCost(castingSpell);
+        targetSelected = true;
+        delete possibleSecondaryTarget;
+        delete firstTarget;
+        break;
+      }
+    }
+
+    //Unselect
+    if (!targetSelected && !justStartedTargeting && !justSelectedFirstTarget){
+      delete possibleSecondaryTarget;
+    }
+  }
 }
 
-sendSpellSocket = function(castingSpell, target1){
+sendSpellSocket = function(castingSpell, target1, target2){
   var sendData = {
     spell:castingSpell,
-    target1:target1
+    target1:target1,
+    target2:target2
   }
   socket.emit("spellCast", sendData);
 }
 
-confirmedSpellEffect = function(castingSpell, targetHex){
+confirmedSpellEffect = function(castingSpell, firstTarget, secondTarget){
   switch(castingSpell){
     case 0:
       happinessEffect();
@@ -218,16 +274,19 @@ confirmedSpellEffect = function(castingSpell, targetHex){
       efficiencyEffect();
       break;
     case 3:
-      blackMagicEffect(targetHex);
+      blackMagicEffect(firstTarget);
       break;
     case 4:
-      poisonousPlantsEffect(targetHex);
+      poisonousPlantsEffect(firstTarget);
       break;
     case 5:
-      armageddonEffect(targetHex);
+      armageddonEffect(firstTarget);
       break;
     case 6:
-      energyBoostEffect(targetHex);
+      energyBoostEffect(firstTarget);
+      break;
+    case 7:
+      magicWindEffect(firstTarget, secondTarget);
       break;
   }
 }
@@ -273,7 +332,7 @@ armageddonEffect = function(){
 }
 
 energyBoostEffect = function(key){
-  convertWaitingToReady(key, "workers");
+    convertWaitingToReady(key, "workers");
   convertWaitingToReady(key, "soldiers");
   convertWaitingToReady(key, "mages");
 }
@@ -282,6 +341,20 @@ convertWaitingToReady = function(key, units){
   var unitWaitingName = units + "Waiting";
   hex[key][units] += hex[key][unitWaitingName];
   hex[key][unitWaitingName] = 0;
+}
+
+magicWindEffect = function(firstHex, secondHex){
+  moveUnitsType(firstHex, secondHex, "workers");
+  moveUnitsType(firstHex, secondHex, "soldiers");
+  moveUnitsType(firstHex, secondHex, "mages");
+}
+
+moveUnitsType = function(firstHex, secondHex, units){
+  var unitWaitingName = units + "Waiting";
+  hex[secondHex][units] += hex[firstHex][units];
+  hex[firstHex][units] = 0;
+  hex[secondHex][unitWaitingName] += hex[firstHex][unitWaitingName];
+  hex[firstHex][unitWaitingName] = 0;
 }
 
 //Recieve sockets
@@ -335,5 +408,13 @@ onEnergyBoostCast = function(socket){
     convertWaitingToReady(data.hex, "workers");
     convertWaitingToReady(data.hex, "soldiers");
     convertWaitingToReady(data.hex, "mages");
+  });
+}
+
+onMagicWindCast = function(socket){
+  socket.on("magicWindCast", function(data){
+    moveUnitsType(data.firstHex, data.secondHex, "workers");
+    moveUnitsType(data.firstHex, data.secondHex, "soldiers");
+    moveUnitsType(data.firstHex, data.secondHex, "mages");
   });
 }

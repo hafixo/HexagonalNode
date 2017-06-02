@@ -1,6 +1,6 @@
 var onSpellCast = function(socket){
   socket.on("spellCast", function(data){
-    //Data: {spell, target1}
+    //Data: {spell, target1, target2}
     checkForOwner = require("./checkForOwner");
     var gameID = socketList[socket.id].gameID;
     var owner = checkForOwner(socket, gameID);
@@ -125,12 +125,22 @@ checkForAdditionalConditionsBasedOnSpell = function(owner, data, gameID){
       return true;
       break;
     case 6:
-    if (gamesList[gameID].hex[data.target1] !== undefined &&
+      if (gamesList[gameID].hex[data.target1] !== undefined &&
       gamesList[gameID].hex[data.target1].owner === owner){
         return true;
       }
       else {
         return false
+      }
+      break;
+    case 7:
+      if (gamesList[gameID].hex[data.target1] !== undefined &&
+        gamesList[gameID].hex[data.target2] !== undefined &&
+        (gamesList[gameID].hex[data.target2].owner === owner || gamesList[gameID].hex[data.target2].owner !== owner && gamesList[gameID].hex[data.target2].owner !== 0)){
+        return true;
+      }
+      else {
+        return false;
       }
       break;
   }
@@ -159,6 +169,9 @@ spellEffect = function(socket, owner, data, gameID){
       break;
     case 6:
       energyBoostEffect(socket, data, gameID);
+      break;
+    case 7:
+      magicWindEffect(socket, data, gameID);
       break;
   }
 }
@@ -244,7 +257,6 @@ findAdjacentHexagons = function(key, gameID){
 			if (Math.abs(hex[key].line - hex[id].line) === 1)
 				adjacentHexagons.push(id);
 	}
-	//console.log(adjacentHexagons.join(" "));
 	return adjacentHexagons;
 }
 
@@ -288,6 +300,33 @@ energyBoostEffect = function(socket, data, gameID){
         hex:data.target1
       }
       sock.emit("energyBoostCast", sendData);
+    }
+  }
+}
+
+magicWindEffect = function(socket, data, gameID){
+  function moveUnitsType(firstHex, secondHex, units, gameID){
+    var unitWaitingName = units + "Waiting";
+    gamesList[gameID].hex[secondHex][units] += gamesList[gameID].hex[firstHex][units];
+    gamesList[gameID].hex[firstHex][units] = 0;
+    gamesList[gameID].hex[secondHex][unitWaitingName] += gamesList[gameID].hex[firstHex][unitWaitingName];
+    gamesList[gameID].hex[firstHex][unitWaitingName] = 0;
+  }
+
+  moveUnitsType(data.target1, data.target2, "workers", gameID);
+  moveUnitsType(data.target1, data.target2, "soldiers", gameID);
+  moveUnitsType(data.target1, data.target2, "mages", gameID);
+
+  //Send info to the other player
+  var otherPlayer = findOtherPlayer(socket, gameID);
+  for(var i in socketList){
+    if (parseFloat(i) === otherPlayer){
+      var sock = socketList[i];
+      var sendData = {
+        firstHex:data.target1,
+        secondHex:data.target2
+      }
+      sock.emit("magicWindCast", sendData);
     }
   }
 }

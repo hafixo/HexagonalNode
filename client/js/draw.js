@@ -106,9 +106,15 @@ drawHexAdjacentToSelectedHex = function(key){
 
 drawHexTargetingSpellHover = function(key){
 	//Draw background if a a spell can target this hexagon and mouse is hovering over this hexagon
-	if (playing && typeof possibleSpellTarget !== "undefined" && key === mouseHexColliding && hexBackgroundSelected === false){
-		for (var targetKey in possibleSpellTarget){
-			if (key === possibleSpellTarget[targetKey]){
+	var arrayName;
+	if (typeof possibleSpellTarget !== "undefined")
+		arrayName = possibleSpellTarget;
+	else if (typeof possibleSecondaryTarget !== "undefined")
+		arrayName = possibleSecondaryTarget;
+
+	if (playing && arrayName !== undefined && key === mouseHexColliding && hexBackgroundSelected === false){
+		for (var targetKey in arrayName){
+			if (key === arrayName[targetKey]){
 				var centerX = hex[key].x - Img.hex.width/2;
 				var centerY = hex[key].y - Img.hex.height/2;
 				ctx.drawImage(Img.hexTargeted,0,0,Img.hexTargeted.width,Img.hexTargeted.height,centerX,centerY,Img.hexTargeted.width,Img.hexTargeted.height);
@@ -121,9 +127,15 @@ drawHexTargetingSpellHover = function(key){
 
 drawHexTargetingSpellAvailable = function(key){
 	//Draw background if a a spell can target this hexagon
-	if (playing && typeof possibleSpellTarget !== "undefined" && hexBackgroundSelected === false){
-		for (var targetKey in possibleSpellTarget){
-			if (key === possibleSpellTarget[targetKey]){
+	var arrayName;
+	if (typeof possibleSpellTarget !== "undefined")
+		arrayName = possibleSpellTarget;
+	else if (typeof possibleSecondaryTarget !== "undefined")
+		arrayName = possibleSecondaryTarget;
+
+	if (playing && arrayName !== undefined && hexBackgroundSelected === false){
+		for (var targetKey in arrayName){
+			if (key === arrayName[targetKey]){
 				var centerX = hex[key].x - Img.hex.width/2;
 				var centerY = hex[key].y - Img.hex.height/2;
 				ctx.drawImage(Img.hexAvailable,0,0,Img.hexAvailable.width,Img.hexAvailable.height,centerX,centerY,Img.hexAvailable.width,Img.hexAvailable.height);
@@ -164,7 +176,7 @@ drawHexPlacingBuildingAvailable = function(key){
 
 drawHexHover = function(key){
 	//Draw mouse hovering over a normal hexagon with no other background (except owner's bachground)
-	if (playing && typeof possibleSpellTarget === "undefined" && !showConfirmSpellUI && hexBackgroundSelected === false){
+	if (playing && typeof possibleSpellTarget === "undefined" && typeof possibleSecondaryTarget === "undefined" && !showConfirmSpellUI && hexBackgroundSelected === false){
   	if (mouseHexColliding === key && hex[mouseHexColliding].owner === player && hexSelected === -1 && placingBuilding === -1){
   		var centerX = hex[mouseHexColliding].x - Img.hexHover.width/2;
   		var centerY = hex[mouseHexColliding].y - Img.hexHover.height/2;

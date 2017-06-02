@@ -84,7 +84,7 @@ selectHexagon = function(){
   if (playing && !showSendUnitUI && !showConfirmSpellUI){
   	var notUnselect = false;		//Zajistí, aby se země neodznačila hned po to, co je označena.
   	//Klikne na zemi, nestaví budovu a zrovna neseslal kouzlo
-  	if (mouseHexColliding !== -1 && placingBuilding === -1 && !justTargetedSpell){
+  	if (mouseHexColliding !== -1 && placingBuilding === -1 && !justTargetedSpell && !justSelectedFirstTarget){
   		//Pokud klikne na svou zemi, tak danou zemi označí.
   		if (hexSelected === -1 && hex[mouseHexColliding].owner === player){
   			hexSelected = mouseHexColliding;
